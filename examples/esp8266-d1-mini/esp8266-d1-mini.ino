@@ -2,6 +2,12 @@
  *  IOSignal Remocon Example. 
  *  ESP8266 D1 mini
  *
+ *  Example of the Remote Control WebApp integration.
+ *  Open and control https://remocon.kr with a web browser connected to the same router
+ *
+ *  IoT리모컨 WebApp 연동 예제입니다.
+ *  동일한 공유기에 연결된 웹브라우저로 https://remocon.kr 을 열고 제어하세요  
+ *
  *  Lee Dongeun <sixgen@gmail.com>
  *  https://github.com/remocons/remocon-signal-arduino
  *
@@ -78,13 +84,12 @@ void setup() {
 
 
 void loop() {
-    if(io.update() == 0 ){
-      aBtn.update();
-      if ( aBtn.pressed() ) {
-        deviceToggle();
-        delay(100);
-      }  
-    }
+  io.loop();
+  aBtn.update();
+  if ( aBtn.pressed() ) {
+    deviceToggle();
+    delay(100);
+  }  
 }
 
 void onReady()

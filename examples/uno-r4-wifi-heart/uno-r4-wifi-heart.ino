@@ -2,6 +2,12 @@
  *  IOSignal Remocon Example. 
  *  Arduino Uno R4 WiFi
  *
+ *  Example of the Remote Control WebApp integration.
+ *  Open and control https://remocon.kr with a web browser connected to the same router
+ *
+ *  IoT리모컨 WebApp 연동 예제입니다.
+ *  동일한 공유기에 연결된 웹브라우저로 https://remocon.kr 을 열고 제어하세요  
+ *
  *  Lee Dongeun <sixgen@gmail.com>
  *  https://github.com/remocons/remocon-arduino
  *
@@ -81,26 +87,14 @@ void setup() {
 
 void loop() {
   
-    if(io.update() == 0 ){ 
+    io.loop();
        
-      if(isPressed()){
-        Serial.println(F("pressed"));
-        deviceToggle();
-        // type 1. Multicasting to a public channel
-        // io.signal("public_button", "click" );  // simple channel
-        // io.signal("public#button", "click" );  // Separate channel names and a topic with # marks.
-
-        // type 2. Multicasting to a Private HOME_CHANNEL 
-        // Omitting the channel name allows devices with the same global IP address to communicate.
-        // io.signal("#button", "click" );  // Omit the channel name and separate it from the topic with a # marker.
-        io.signal("#screen", "playToggle" );
-        // io.signal("#screen", "next" );
-
-        // type 3. To make a uni-cast transmission, you need to know the CID of the recipient.
-        // io.signal("cid@", "click" );   // Follow the recipient's CID with the @ character.
-        // io.signal("cid@button", "click" ); // You can add a topic after the @.
-      }
-    } 
+    if(isPressed()){
+      Serial.println(F("pressed"));
+      deviceToggle();
+      io.signal("#screen", "playToggle" );
+      // io.signal("#screen", "next" );
+    }
 
 }
 

@@ -1,7 +1,13 @@
 /*
  *  IOSignal Remocon Example. 
  *  Remocon8266 board
- 
+ *
+ *  Example of the Remote Control WebApp integration.
+ *  Open and control https://remocon.kr with a web browser connected to the same router
+ *
+ *  IoT리모컨 WebApp 연동 예제입니다.
+ *  동일한 공유기에 연결된 웹브라우저로 https://remocon.kr 을 열고 제어하세요  
+ *
  *  Lee Dongeun <sixgen@gmail.com>
  *  https://github.com/remocons/remocon-arduino
  *
@@ -210,17 +216,9 @@ void setup() {
 
   
 void loop() {
-
-    uint8_t conditionCode = io.update();
-    if(conditionCode != 0 ){ 
-      Serial.print("C");
-      Serial.println( conditionCode );
-        return;
-    } 
-
+    io.loop();
     check_events();
     handle_events();
-    
 }
 
 
