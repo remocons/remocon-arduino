@@ -1,11 +1,11 @@
 # Remocon
 
  This is an example of remote control of an Arduino in conjunction with a web browser app (https://remocon.kr).
- The  [`IOSignal`](https://github.com/remocons/remocon-arduino) Arduino client library was used.
+ The  [`IOSignal`](https://github.com/remocons/iosignal-arduino) Arduino client library was used.
 
 
- 웹브라우저 앱(https://remocon.kr)과 연동하여 아두이노를 원격 제어하는 예제소스입니다.
-  [`IOSignal`](https://github.com/remocons/remocon-arduino) 아두이노 클라이언트 라이브러리가 사용되었습니다.
+ 웹브라우저 https://remocon.kr 웹앱과 연동하여 아두이노를 원격 제어하는 예제소스입니다.
+  [`IOSignal`](https://github.com/remocons/iosignal-arduino) 아두이노 클라이언트 라이브러리가 사용되었습니다.
 
 
 
