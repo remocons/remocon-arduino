@@ -47,8 +47,9 @@ void deviceOff(){
 
 void deviceToggle(){
   int nextState = !digitalRead(BUILTIN_LED);
+  Serial.println( nextState);
   digitalWrite(BUILTIN_LED, nextState);
-   if( nextState){
+   if( !nextState){  // active low
     deviceOn();
    }else{
     deviceOff();
@@ -67,7 +68,7 @@ void setup() {
   Serial.begin(115200);
   WiFi.mode(WIFI_STA);
   wifiMulti.addAP( "WIFI_SSID", "WIFI_PASS");
-  wifiMulti.addAP( "twesomego", "qwer1234");  
+  // wifiMulti.addAP( "twesomego", "qwer1234");  
   // You can add multiple APs.  
   Serial.println();
   Serial.println();
@@ -95,6 +96,7 @@ void loop() {
   aBtn.update();
   if ( aBtn.pressed() ) {
     deviceToggle();
+    Serial.println("button");
     delay(100);
   }  
 }
