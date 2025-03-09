@@ -40,7 +40,7 @@ WiFiClient client;
 IOSignal io;
 
 const char *name = "Remocon8266:HOME";
-const char *ui = "L,A,B";
+const char *ui = "LED,OUT1,OUT2";
 char states[] = "100";
 char last_states[] = "100";
 uint8_t pinMap[] = { LED_BUILTIN , OUT1, OUT2 };
@@ -191,7 +191,7 @@ void setup() {
   
   WiFi.mode(WIFI_STA);
   wifiMulti.addAP( "WIFI_SSID", "WIFI_PASS");
-  wifiMulti.addAP( "twesomego", "qwer1234");  
+  // wifiMulti.addAP( "twesomego", "qwer1234");  
   // You can add multiple APs.  
   Serial.println();
   Serial.println();
@@ -238,9 +238,9 @@ void onReady()
     u8g2.setCursor(0, 0);
     u8g2.print("Ready CID: ");
     u8g2.print(io.cid);
-    u8g2.drawStr(0, 15, "remote control:");
+    u8g2.drawStr(0, 15, "Access the webapp");
     u8g2.drawStr(0, 30, "https://remocon.kr");
-    u8g2.drawStr(0, 45, "IOSignal IoT");
+    u8g2.drawStr(0, 45, "Control DIY IoT");
     u8g2.sendBuffer();
 }
 
@@ -279,11 +279,11 @@ void onMessage( char *tag, uint8_t payloadType, uint8_t* payload, size_t payload
   }
       
   if( strcmp(tag, "@") == 0){
-    if( strcmp((char *)payload, "L") == 0){
+    if( strcmp((char *)payload, "LED") == 0){
       toggle(0);
-    }else if( strcmp((char *)payload, "A") == 0){
+    }else if( strcmp((char *)payload, "OUT1") == 0){
       toggle(1);
-    }else if( strcmp((char *)payload, "B") == 0){
+    }else if( strcmp((char *)payload, "OUT2") == 0){
       toggle(2);
     }
   }

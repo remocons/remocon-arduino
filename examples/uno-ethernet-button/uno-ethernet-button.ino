@@ -2,17 +2,23 @@
 /*
  *  IOSignal Remocon Example. 
  *  Arduino Uno + Ethernet shield W5100 + Button
- *
- *  Example of the Remote Control WebApp integration.
- *  Open and control https://remocon.kr with a web browser connected to the same router
- *
- *  IoT리모컨 WebApp 연동 예제입니다.
- *  동일한 공유기에 연결된 웹브라우저로 https://remocon.kr 을 열고 제어하세요  
- *
- *  Taeo Lee <sixgen@gmail.com>
  *  https://github.com/remocons/remocon-arduino
  *
- *  MIT License
+
+  An example of communicating between Arduinos and controlling them with a webapp.
+    1. change the LED_PIN and BUTTON_PIN numbers according to your board.
+    2. set WIFI_SSID and KEY when using wifi.
+    3. iosignal server information is used without modification. If you use another server, change the server address and port number.
+    4. compile and upload to Arduino.
+    5. Access https://remocon.kr with a modern web browser.
+
+  [kr] 아두이노들간의 통신과 웹앱으로 제어하는 예제입니다.
+    1. 보드에 따라 LED_PIN과 BUTTON_PIN 번호를 변경하세요.
+    2. wifi 사용시 WIFI_SSID와 KEY 를 설정하세요.
+    3. iosignal 서버 정보는 수정 없이 그대로 사용합니다. 다른 서버를 사용할 경우 서버 주소와 포트번호를 변경해줍니다.
+    4. 아두이노에 컴파일하고 업로딩합니다.
+    5. 모던 웹브라우저로  https://remocon.kr 에 접속하세요.
+
  */
 
 #include <SPI.h>
@@ -25,7 +31,7 @@
 byte mac[]{0, 0, 0, 0, 0, 0x07}; 
 EthernetClient client;
 IOSignal io;
-const char *name = "UnoR3-EthBtn:HOME";
+const char *name = "Uno-Btn:HOME";
 const char *ui = "on,off,toggle";
 
 const int buttonPin = 2;
@@ -94,6 +100,7 @@ void loop() {
       io.loop();
       if(isPressed()){
         Serial.println(F("pressed"));
+        deviceToggle();
         io.signal("#screen", "playToggle" );
       }
 

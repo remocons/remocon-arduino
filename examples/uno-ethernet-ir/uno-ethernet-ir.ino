@@ -1,36 +1,45 @@
 /*
  *  IOSignal Remocon Example. 
  *  Arduino Uno + Ethernet shield W5100 + IR Receiver
- *
- *  Example of the Remote Control WebApp integration.
- *  Open and control https://remocon.kr with a web browser connected to the same router
- *
- *  IoT리모컨 WebApp 연동 예제입니다.
- *  동일한 공유기에 연결된 웹브라우저로 https://remocon.kr 을 열고 제어하세요  
- *
- *  Taeo Lee <sixgen@gmail.com>
+
  *  https://github.com/remocons/remocon-arduino
+ *
+ 
+  An example of an Arduino detecting a remote control signal and forwarding it to another device, or an Arduino receiving a signal from a web app.
+    - Connect the IR Receiver module to IR_RECEIVE_PIN.
+    - iosignal server information is used without modification. If you use another server, change the server address and port number.
+    - compile and upload to Arduino.
+    - Access https://remocon.kr and https://bayo.tv with a modern web browser.
+    - control youtube player on bayo.tv
+    - It works with NEC compatible remotes, for other remotes you can modify the library and signal code.
+
+  [kr] 리모컨 신호를 아두이노에서 감지하고 다른 장치에 신호를 전달하거나 웹앱의 신호를 아두이노가 수신하는 예제입니다. 
+    - IR수신모듈을 IR_RECEIVE_PIN에 연결하세요.
+    - iosignal 서버 정보는 수정 없이 그대로 사용합니다. 다른 서버를 사용할 경우 서버 주소와 포트번호를 변경해줍니다.
+    - 아두이노에 컴파일하고 업로딩합니다.
+    - 모던 웹브라우저로  https://remocon.kr 와 https://bayo.tv 에 접속하세요.
+    - bayo.tv 의 동영상을 제어하세요!
+    - NEC 호환 리모컨으로 작동되며, 다른 리모컨의 경우 라이브러리와 신호 코드를 수정하시면됩니다.
+
  *
  *  I used a library for a low-capacity NEC-compatible remote.
  *  If you are using a different remote, change the library
  *
- *  MIT License
  */
 
 
+
 #include <Arduino.h>
-#define IR_INPUT_PIN 3 // do not use 4,10,11,12(sd,spi)
 #define NO_LED_FEEDBACK_CODE
+#define IR_RECEIVE_PIN 2
 #include "TinyIRReceiver.hpp" 
 #include <SPI.h>
 #include <Ethernet.h>
 #include <string.h>
 #include <IOSignal.h>
 
-volatile struct TinyIRReceiverCallbackDataStruct sCallbackData;
-
 // If you have multiple devices, you'll need to change the MAC address.
-byte mac[]{0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0x06};
+byte mac[]{0xDE, 0xAD, 0x1E, 0xEF, 0xFE, 0x50};
 EthernetClient client;
 IOSignal io;
 const char *name = "UnoR3-Eth-IR:HOME";
@@ -56,7 +65,8 @@ void setup()
   io.begin(&client, "io.remocon.kr", 55488 );
   io.onReady(&onReady);
   io.onMessage(&onMessage);
-  // io.auth( "id_key" );
+  // io.auth( "id_key" );  // Only if you have an authentication key.
+
 
 }
 
@@ -92,22 +102,24 @@ void deviceToggle()
 void loop()
 {
     io.loop();
-    if (sCallbackData.justWritten)
-    {
-      sCallbackData.justWritten = false;
 
-      if (sCallbackData.Flags == IRDATA_FLAGS_IS_REPEAT)
+    if (TinyIRReceiverData.justWritten)
+    {
+      TinyIRReceiverData.justWritten = false;
+
+        // Serial.println( TinyIRReceiverData.Command );
+      if (TinyIRReceiverData.Flags == IRDATA_FLAGS_IS_REPEAT)
       {
         // Serial.println(F("Repeat"));
       }
       else
       {
-        Serial.print(F("A="));
-        Serial.print(sCallbackData.Address, HEX);
+        // Serial.print(F("A="));
+        // Serial.print(TinyIRReceiverData.Address, HEX);
         Serial.print(F(" C="));
-        Serial.println(sCallbackData.Command, HEX);
+        Serial.println(TinyIRReceiverData.Command, HEX);
 
-        switch (sCallbackData.Command)
+        switch (TinyIRReceiverData.Command)
         {
         // Change to the code value of your NEC compatible remote
         case 0x01 :
@@ -193,10 +205,3 @@ void onMessage(char *tag, uint8_t payloadType, uint8_t *payload, size_t payloadS
   }
 }
 
-void handleReceivedTinyIRData(uint8_t aAddress, uint8_t aCommand, uint8_t aFlags)
-{
-  sCallbackData.Address = aAddress;
-  sCallbackData.Command = aCommand;
-  sCallbackData.Flags = aFlags;
-  sCallbackData.justWritten = true;
-}
