@@ -9,7 +9,7 @@
  *  IoT리모컨 WebApp 연동 예제입니다.
  *  동일한 공유기에 연결된 웹브라우저로 https://remocon.kr 을 열고 제어하세요  
  *
- *  Lee Dongeun <sixgen@gmail.com>
+ *  Taeo Lee <sixgen@gmail.com>
  *  https://github.com/remocons/remocon-arduino
  *
  *  MIT License
