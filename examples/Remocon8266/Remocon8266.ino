@@ -17,6 +17,7 @@
 
 #include <ESP8266WiFiMulti.h>
 #include <IOSignal.h>
+#include <string.h>
 #include <Bounce2.h>
 #include <U8g2lib.h>
 #include <Wire.h>
@@ -35,8 +36,8 @@
 #define OUT1       15   // D8  LED, NeoPixel, Servo or else.
 #define OUT2       12   // D6 
 
-#define WIFI_ID  "WIFI_SSID"  //"twesomego"  // "WIFI_SSID"
-#define WIFI_KEY "WIFI_PASS"  //"qwer1234"  // "WIFI_PASS"
+#define WIFI_ID  "WIFI_SSID"
+#define WIFI_KEY "WIFI_PASS"
 
 #define SERVER_URL "io.remocon.kr"
 #define SERVER_PORT 55488
@@ -198,7 +199,7 @@ void setup() {
   
   WiFi.mode(WIFI_STA);
   wifiMulti.addAP( WIFI_ID, WIFI_KEY );
-  // wifiMulti.addAP( "twesomego", "qwer1234");  
+
   // You can add multiple APs.  
   Serial.println();
   Serial.println();
@@ -217,7 +218,7 @@ void setup() {
   io.begin( &client , SERVER_URL, SERVER_PORT );
   io.onReady( &onReady );
   io.onMessage( &onMessage );
-  // io.auth( "ID_KEY" ); 
+  // io.auth("ID_KEY"); // Optional: use your own device key.
 
 }
 
@@ -262,7 +263,7 @@ void onMessage( char *tag, uint8_t payloadType, uint8_t* payload, size_t payload
   Serial.print(" size: " );
   Serial.println( payloadSize );
 
-  if( payloadType == IOSignal::PAYLOAD_TYPE::TEXT ){  
+  if( payloadType == IOSignal::PAYLOAD_TYPE::TEXT && payload && payloadSize && memchr(payload, 0, payloadSize) ){
     Serial.print("string payload: " );
     Serial.println( (char *)payload  );
   }
@@ -270,6 +271,10 @@ void onMessage( char *tag, uint8_t payloadType, uint8_t* payload, size_t payload
   if( strcmp(tag, "#search") == 0){
     io.signal( "#notify", io.cid );
   }
+
+  // Ignore non-text or unterminated payloads before using string APIs.
+  if (payloadType != IOSignal::PAYLOAD_TYPE::TEXT || !payload ||
+      !payloadSize || !memchr(payload, 0, payloadSize)) return;
 
   if( strcmp(tag, "@ui") == 0){
     io.signal2( (char *)payload, "@ui", io.cid , ui );

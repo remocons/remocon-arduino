@@ -35,10 +35,12 @@ const char *name = "Uno-Btn:HOME";
 const char *ui = "on,off,toggle";
 
 const int buttonPin = 2;
-int lastButtonState = HIGH; 
+Bounce2::Button button;
 
 void setup() {
-  pinMode(buttonPin, INPUT_PULLUP);
+  button.attach(buttonPin, INPUT_PULLUP);
+  button.interval(5);
+  button.setPressedState(LOW);
   pinMode(5, OUTPUT); // LED
   pinMode(6, OUTPUT); // Relay
   digitalWrite(5, LOW);
@@ -56,7 +58,7 @@ void setup() {
   io.begin( &client, "io.remocon.kr", 55488);
   io.onReady( &onReady );
   io.onMessage( &onMessage );
-  // io.auth( "id_key" );
+  // io.auth("ID_KEY"); // Optional: use your own device key.
 
 }
 
@@ -83,22 +85,11 @@ void deviceToggle(){
    }
 }
 
-int isPressed(){
-  int currentState = digitalRead(buttonPin);
-  if(lastButtonState == HIGH && currentState == LOW){
-    lastButtonState = LOW;
-    return 1;
-  } 
-  else{
-    lastButtonState = currentState;
-    return 0;
-  } 
-}
-
 void loop() {
 
       io.loop();
-      if(isPressed()){
+      button.update();
+      if(button.pressed()){
         Serial.println(F("pressed"));
         deviceToggle();
         io.signal("#screen", "playToggle" );
@@ -111,7 +102,7 @@ void onReady()
 {
   Serial.print(F("onReady cid: "));
   Serial.println( io.cid );
-  io.signal("@$state", "off" );
+  io.signal("@$state", digitalRead(5) ? "on" : "off");
   io.signal("@$ui", ui );
   io.signal("@$name", name );
   io.signal("#notify", io.cid );
@@ -128,7 +119,7 @@ void onMessage( char *tag, uint8_t payloadType, uint8_t* payload, size_t payload
   Serial.print(F(" size: " ));
   Serial.println( payloadSize );
 
-  if( payloadType == IOSignal::PAYLOAD_TYPE::TEXT ){  
+  if( payloadType == IOSignal::PAYLOAD_TYPE::TEXT && payload && payloadSize && memchr(payload, 0, payloadSize) ){
     Serial.print(F("string payload: ") );
     Serial.println( (char *)payload  );
   }
@@ -137,6 +128,10 @@ void onMessage( char *tag, uint8_t payloadType, uint8_t* payload, size_t payload
       io.signal( "#notify", io.cid );
   }
       
+  // Ignore non-text or unterminated payloads before using string APIs.
+  if (payloadType != IOSignal::PAYLOAD_TYPE::TEXT || !payload ||
+      !payloadSize || !memchr(payload, 0, payloadSize)) return;
+
   if( strcmp(tag, "@ui") == 0){
       io.signal2( (const char*)payload, "@ui", io.cid , ui);
   }

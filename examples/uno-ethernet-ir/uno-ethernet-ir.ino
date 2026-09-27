@@ -64,7 +64,7 @@ void setup()
   io.begin(&client, "io.remocon.kr", 55488 );
   io.onReady(&onReady);
   io.onMessage(&onMessage);
-  // io.auth( "id_key" );  // Only if you have an authentication key.
+  // io.auth("ID_KEY"); // Optional: use your own device key.
 
 
 }
@@ -107,7 +107,7 @@ void loop()
       TinyIRReceiverData.justWritten = false;
 
         // Serial.println( TinyIRReceiverData.Command );
-      if (TinyIRReceiverData.Flags == IRDATA_FLAGS_IS_REPEAT)
+      if ((TinyIRReceiverData.Flags & IRDATA_FLAGS_IS_REPEAT) != 0)
       {
         // Serial.println(F("Repeat"));
       }
@@ -154,7 +154,7 @@ void onReady()
 {
   Serial.print(F("onReady cid: "));
   Serial.println(io.cid);
-  io.signal("@$state", "off");
+  io.signal("@$state", digitalRead(5) ? "on" : "off");
   io.signal("@$name", name );
   io.signal("@$ui", ui);
   io.signal("#notify", io.cid);
@@ -171,7 +171,7 @@ void onMessage(char *tag, uint8_t payloadType, uint8_t *payload, size_t payloadS
   Serial.print(F(" size: "));
   Serial.println(payloadSize);
 
-  if (payloadType == IOSignal::PAYLOAD_TYPE::TEXT)
+  if (payloadType == IOSignal::PAYLOAD_TYPE::TEXT && payload && payloadSize && memchr(payload, 0, payloadSize))
   {
     Serial.print(F("string payload: "));
     Serial.println((char *)payload);
@@ -181,6 +181,10 @@ void onMessage(char *tag, uint8_t payloadType, uint8_t *payload, size_t payloadS
   {
     io.signal("#notify", io.cid);
   }
+
+  // Ignore non-text or unterminated payloads before using string APIs.
+  if (payloadType != IOSignal::PAYLOAD_TYPE::TEXT || !payload ||
+      !payloadSize || !memchr(payload, 0, payloadSize)) return;
 
   if (strcmp(tag, "@ui") == 0)
   {

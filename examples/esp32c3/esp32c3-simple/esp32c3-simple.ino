@@ -12,13 +12,14 @@
 
 #include <WiFi.h>
 #include <IOSignal.h>
+#include <string.h>
 
 #define LED_PIN 8
 #define WIFI_ID  "WIFI_SSID"
 #define WIFI_KEY "WIFI_PASS"
 #define SERVER_URL "io.remocon.kr"
 #define SERVER_PORT 55488
-#define SWICH_CH "#$switch"
+#define SWITCH_CH "#$switch"
 
 WiFiClient client;
 IOSignal io;
@@ -54,7 +55,7 @@ void onReady()
 {
   Serial.print("onReady cid: ");
   Serial.println( io.cid );
-  io.subscribe( SWICH_CH );
+  io.subscribe( SWITCH_CH );
 }
 
 void onMessage( char *tag, uint8_t payloadType, uint8_t* payload, size_t payloadSize)
@@ -64,9 +65,9 @@ void onMessage( char *tag, uint8_t payloadType, uint8_t* payload, size_t payload
   Serial.print(" type: " ); Serial.print( payloadType );
   Serial.print(" size: " ); Serial.println( payloadSize );
 
-  if( payloadType == IOSignal::PAYLOAD_TYPE::TEXT ){  
+  if( payloadType == IOSignal::PAYLOAD_TYPE::TEXT && payload && payloadSize && memchr(payload, 0, payloadSize) ){
     Serial.print("string payload: " ); Serial.println( (char *)payload  );
-    if( strcmp( tag, SWICH_CH ) == 0 ){
+    if( strcmp( tag, SWITCH_CH ) == 0 ){
       if (payload[0] == '1') {
         digitalWrite( LED_PIN, LOW);
       } else {

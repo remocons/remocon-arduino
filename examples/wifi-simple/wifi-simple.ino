@@ -7,13 +7,16 @@
  #include <ESP8266WiFi.h>
 #elif defined(ESP32)
  #include <WiFi.h>
+#else
+ #error "Select an ESP8266 or ESP32 board for this example."
 #endif
 #include <IOSignal.h>
-#define WIFI_ID  "twesomego" //"WIFI_SSID"
-#define WIFI_KEY "qwer1234" //"WIFI_PASS"
+#include <string.h>
+#define WIFI_ID  "WIFI_SSID"
+#define WIFI_KEY "WIFI_PASS"
 #define SERVER_URL "io.remocon.kr"
 #define SERVER_PORT 55488
-#define SWICH_CH "#$switch"
+#define SWITCH_CH "#$switch"
 
 WiFiClient client;
 IOSignal io;
@@ -29,7 +32,7 @@ void setup() {
   io.begin( &client, SERVER_URL, SERVER_PORT );
   io.onReady( &onReady );
   io.onMessage( &onMessage );
-  // io.auth( "three.ZTBmfEkKfhJJK9Oine");
+  // io.auth("ID_KEY"); // Optional: use your own device key.
 }
 
 void loop() { io.loop(); }
@@ -37,7 +40,7 @@ void loop() { io.loop(); }
 void onReady()
 {
   Serial.print("onReady cid: "); Serial.println( io.cid );
-  io.subscribe( SWICH_CH );
+  io.subscribe( SWITCH_CH );
 }
 
 void onMessage( char *tag, uint8_t payloadType, uint8_t* payload, size_t payloadSize)
@@ -45,7 +48,7 @@ void onMessage( char *tag, uint8_t payloadType, uint8_t* payload, size_t payload
   Serial.print(">> signal tag: " ); Serial.print( tag );
   Serial.print(" type: " ); Serial.print( payloadType );
   Serial.print(" size: " ); Serial.println( payloadSize );
-  if( payloadType == IOSignal::PAYLOAD_TYPE::TEXT ){  
+  if( payloadType == IOSignal::PAYLOAD_TYPE::TEXT && payload && payloadSize && memchr(payload, 0, payloadSize) ){
     Serial.print("string payload: " ); Serial.println( (char *)payload  );
   }
 }

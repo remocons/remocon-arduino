@@ -23,6 +23,7 @@
 
 #include <ESP8266WiFiMulti.h>
 #include <IOSignal.h>
+#include <string.h>
 #include <Bounce2.h>
 #define BUTTON_PIN    14
 #define BUILTIN_LED   2
@@ -68,7 +69,7 @@ void setup() {
   Serial.begin(115200);
   WiFi.mode(WIFI_STA);
   wifiMulti.addAP( "WIFI_SSID", "WIFI_PASS");
-  // wifiMulti.addAP( "twesomego", "qwer1234");  
+
   // You can add multiple APs.  
   Serial.println();
   Serial.println();
@@ -87,7 +88,7 @@ void setup() {
   io.begin( &client , "io.remocon.kr", 55488);
   io.onReady( &onReady );
   io.onMessage( &onMessage );
-  // io.auth( "ID_KEY" ); 
+  // io.auth("ID_KEY"); // Optional: use your own device key.
 }
 
 
@@ -105,7 +106,7 @@ void onReady()
 {
   Serial.print("onReady cid: ");
   Serial.println( io.cid );
-  io.signal("@$state", "off" );
+  io.signal("@$state", digitalRead(BUILTIN_LED) == LOW ? "on" : "off");
   io.signal("@$ui", ui );
   io.signal("@$name", name );
   io.signal("#notify", io.cid );
@@ -123,7 +124,7 @@ void onMessage( char *tag, uint8_t payloadType, uint8_t* payload, size_t payload
   Serial.print(" size: " );
   Serial.println( payloadSize );
 
-  if( payloadType == IOSignal::PAYLOAD_TYPE::TEXT ){  
+  if( payloadType == IOSignal::PAYLOAD_TYPE::TEXT && payload && payloadSize && memchr(payload, 0, payloadSize) ){
     Serial.print("string payload: " );
     Serial.println( (char *)payload  );
   }
@@ -131,6 +132,10 @@ void onMessage( char *tag, uint8_t payloadType, uint8_t* payload, size_t payload
   if( strcmp(tag, "#search") == 0){
     io.signal( "#notify", io.cid );
   }
+
+  // Ignore non-text or unterminated payloads before using string APIs.
+  if (payloadType != IOSignal::PAYLOAD_TYPE::TEXT || !payload ||
+      !payloadSize || !memchr(payload, 0, payloadSize)) return;
 
   if( strcmp(tag, "@ui") == 0){
     io.signal2( (char *)payload, "@ui", io.cid , ui );

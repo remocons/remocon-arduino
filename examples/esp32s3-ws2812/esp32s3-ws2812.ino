@@ -16,8 +16,8 @@ CRGB leds[NUM_LEDS];
 uint8_t hue = 0;  // 초기 색상
 
 #define BUTTON_PIN  0 //12 
-#define WIFI_ID "Hollys2 2G"
-#define WIFI_KEY "a0312917933"
+#define WIFI_ID  "WIFI_SSID"
+#define WIFI_KEY "WIFI_PASS"
 
 WiFiClient client;
 IOSignal io;
@@ -47,7 +47,7 @@ void setup() {
 
   io.setRxBuffer( 200 );
   io.begin( &client , "io.remocon.kr", 55488);  
-  // io.begin( &client , "192.168.0.204", 55488);
+
   io.onReady( &onReady );
   io.onMessage( &onMessage );
 

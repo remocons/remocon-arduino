@@ -22,6 +22,7 @@
 
 #include <ESP8266WiFiMulti.h>
 #include <IOSignal.h>
+#include <string.h>
 #include <Bounce2.h>
 
 #define RELAY_PIN    0
@@ -38,7 +39,7 @@ const char *name = "ESP01-Relay-Btn:HOME";
 const char *ui = "Relay,LED";
 char states[] = "11";
 char last_states[] = "11";
-uint8_t pinMap[] = { 0,1 }; 
+uint8_t pinMap[] = { RELAY_PIN, LED_PIN };
 
 void stateChange(int i){
   //local
@@ -66,8 +67,8 @@ void toggle(int i){
 
 
 void setup() {  
-  pinMode(0, OUTPUT);
-  digitalWrite(0, HIGH);
+  pinMode(RELAY_PIN, OUTPUT);
+  digitalWrite(RELAY_PIN, HIGH);
 
   pinMode( LED_PIN , OUTPUT);
   digitalWrite( LED_PIN, HIGH);  // active low
@@ -82,7 +83,7 @@ void setup() {
   
   WiFi.mode(WIFI_STA);
   wifiMulti.addAP( "WIFI_SSID", "WIFI_PASS");
-  // wifiMulti.addAP( "twesomego", "qwer1234");  
+
   // You can add multiple APs.  
 
   while (wifiMulti.run() != WL_CONNECTED) {
@@ -94,7 +95,7 @@ void setup() {
   io.begin( &client , "io.remocon.kr", 55488);
   io.onReady( &onReady );
   io.onMessage( &onMessage );
-  // io.auth( "ID_KEY" );   // Only if you have an authentication key.
+  // io.auth("ID_KEY"); // Optional: use your own device key.
 
 }
 
@@ -103,7 +104,7 @@ void loop() {
     io.loop();   
     aBtn.update();
     if ( aBtn.pressed() ) {
-      toggle( RELAY_PIN );
+      toggle(0);
       delay(100);
     }  
 
@@ -134,16 +135,20 @@ void onMessage( char *tag, uint8_t payloadType, uint8_t* payload, size_t payload
     io.signal( "#notify", io.cid );
   }
 
+  // Ignore non-text or unterminated payloads before using string APIs.
+  if (payloadType != IOSignal::PAYLOAD_TYPE::TEXT || !payload ||
+      !payloadSize || !memchr(payload, 0, payloadSize)) return;
+
   if( strcmp(tag, "@ui") == 0){
     io.signal2( (char *)payload, "@ui", io.cid , ui );
   }
       
   if( strcmp(tag, "@") == 0){
     if( strcmp((char *)payload, "Relay") == 0){
-      toggle( RELAY_PIN);
+      toggle(0);
     }
     else if( strcmp((char *)payload, "LED") == 0){
-      toggle( LED_PIN );
+      toggle(1);
     }
   }
       
