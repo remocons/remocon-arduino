@@ -1,7 +1,6 @@
 /*
  *  IOSignal Remocon Example. 
  *  Arduino Uno R4 WiFi
-
  *  https://github.com/remocons/remocon-arduino
 
   An example of communicating between Arduinos and controlling them with a webapp.

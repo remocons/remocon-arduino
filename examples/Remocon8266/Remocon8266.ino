@@ -35,9 +35,16 @@
 #define OUT1       15   // D8  LED, NeoPixel, Servo or else.
 #define OUT2       12   // D6 
 
+#define WIFI_ID  "WIFI_SSID"  //"twesomego"  // "WIFI_SSID"
+#define WIFI_KEY "WIFI_PASS"  //"qwer1234"  // "WIFI_PASS"
+
+#define SERVER_URL "io.remocon.kr"
+#define SERVER_PORT 55488
+
 ESP8266WiFiMulti wifiMulti;
 WiFiClient client;
 IOSignal io;
+
 
 const char *name = "Remocon8266:HOME";
 const char *ui = "LED,OUT1,OUT2";
@@ -190,7 +197,7 @@ void setup() {
     u8g2.sendBuffer();
   
   WiFi.mode(WIFI_STA);
-  wifiMulti.addAP( "WIFI_SSID", "WIFI_PASS");
+  wifiMulti.addAP( WIFI_ID, WIFI_KEY );
   // wifiMulti.addAP( "twesomego", "qwer1234");  
   // You can add multiple APs.  
   Serial.println();
@@ -207,7 +214,7 @@ void setup() {
   delay(500);
 
   io.setRxBuffer( 200 );
-  io.begin( &client , "io.remocon.kr", 55488);
+  io.begin( &client , SERVER_URL, SERVER_PORT );
   io.onReady( &onReady );
   io.onMessage( &onMessage );
   // io.auth( "ID_KEY" ); 

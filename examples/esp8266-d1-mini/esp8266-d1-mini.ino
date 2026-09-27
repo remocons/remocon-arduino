@@ -1,7 +1,7 @@
 
 /*
  *  IOSignal Remocon Example. 
- *  ESP8266 D1 mini
+ *  Arduino d1 mini
  *  https://github.com/remocons/remocon-arduino
  *
 

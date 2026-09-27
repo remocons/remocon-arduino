@@ -1,7 +1,6 @@
 /*
  *  IOSignal Remocon Example. 
  *  Arduino Uno + Ethernet shield W5100 + IR Receiver
-
  *  https://github.com/remocons/remocon-arduino
  *
  
