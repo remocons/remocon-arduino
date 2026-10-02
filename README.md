@@ -57,7 +57,7 @@ Wi-Fi 및 UNO R4 LED 매트릭스 헤더는 해당 보드 패키지에서 제공
 
 `esp32s3-ws2812`는 [IOSignal 통신 실습실(test.iosignal.net)](https://test.iosignal.net/)의 RGB 프리셋과 연동하는 채널 통신 예제입니다. `#homeButton` 신호로 색상을 바꾸며, `#robot`에는 4바이트 페이로드를 보내면 앞의 3바이트를 RGB로 사용합니다.
 
-통신 실습실은 [HTTPS](https://test.iosignal.net/)와 [HTTP](http://test.iosignal.net/) 접속을 모두 제공합니다. 공개 서버에는 HTTPS + WSS를 권장합니다. HTTPS 페이지의 WS 연결은 브라우저 및 로컬 네트워크 접근 권한에 따라 제한될 수 있으며, HTTP로 전환해도 모든 제한이 해결되지는 않습니다. 상단 전환 버튼으로 이동한 후 다시 연결하세요. [연결 조건과 로컬 실습 안내](https://iosignal.net/docs/examples/workbench/start)를 참고하세요.
+통신 실습실은 [HTTPS](https://test.iosignal.net/)와 [HTTP](http://test.iosignal.net/) 접속을 모두 제공합니다. 공개 서버에는 HTTPS + WSS를 권장합니다. HTTPS 페이지의 WS 연결은 브라우저 및 로컬 네트워크 접근 권한에 따라 제한될 수 있으며, HTTP로 전환해도 모든 제한이 해결되지는 않습니다. HTTP로 접속하려면 브라우저 주소창에 `http://test.iosignal.net`을 직접 입력하여 새로 접속하세요. [연결 조건과 로컬 실습 안내](https://iosignal.net/docs/examples/workbench/start)를 참고하세요.
 
 다음은 remocon.kr 사용 순서입니다.
 
