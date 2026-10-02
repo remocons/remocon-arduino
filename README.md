@@ -1,9 +1,9 @@
 # Remocon
 
-[remocon.kr](https://remocon.kr) 웹앱으로 아두이노 장치를 원격 제어하는 예제 모음입니다.
+[remocon.kr](https://remocon.kr/) 및 [IOSignal 통신 실습실(test.iosignal.net)](https://test.iosignal.net/) 웹앱과 연동하여 아두이노 장치를 원격 제어하고 시그널을 송수신하는 예제 모음입니다.
 통신에는 [IOSignal Arduino 클라이언트](https://github.com/remocons/iosignal-arduino)를 사용합니다.
 
-Arduino remote-control examples for the remocon.kr web app, using the IOSignal client library.
+Arduino remote-control and messaging examples for [remocon.kr](https://remocon.kr/) and [test.iosignal.net](https://test.iosignal.net/), using the IOSignal client library.
 Choose an example for your board, replace the Wi-Fi placeholders, then compile and upload it.
 
 ## 설치 및 시작
@@ -19,10 +19,18 @@ Choose an example for your board, replace the Wi-Fi placeholders, then compile a
 공개 예제의 기본 서버는 `io.remocon.kr`, TCP 포트는 `55488`입니다.
 Ethernet 예제는 DHCP를 사용하므로 유선 연결과 DHCP 가능한 공유기가 필요합니다. 여러 장치를 사용할 때는 MAC 주소를 서로 다르게 설정하세요.
 
+## 보드별 튜토리얼
+
+[공개 통신 실습실과 ESP32 실습](https://iosignal.net/docs/examples/workbench/start)에서 기본 통신, CID 개별 제어, 그룹 제어, RGB LED를 순서대로 진행할 수 있습니다. 새 스케치는 공개 저장소 소스에 포함되며 Library Manager 반영 전에는 저장소에서 직접 열어 사용하세요.
+
 ## 보드별 예제
 
 | 예제 경로 (`examples/` 아래) | 대상 보드 | 동작 / 준비물 |
 | --- | --- | --- |
+| `esp32c3-button-led` | ESP32-C3 Super Mini | GPIO 9 버튼으로 `#homeButton` 송신, 수신 시 GPIO 8 LED 토글 |
+| `iris-group` | iris (ESP32-C3) | DIP로 그룹·장치 번호를 설정하고 버튼·웹앱으로 WS2812 4개 제어 |
+| `esp32-cid-led` | ESP32 + GPIO 4 외부 LED | 장치 검색·CID 명령·실제 상태 발행, Remocon 또는 공개 통신 실습실 |
+| `esp32-group-led` | ESP32 1~2대 + GPIO 4 외부 LED | 두 자리 상태 문자열로 그룹 출력 제어, 보드별 OUTPUT_INDEX 선택 |
 | `wifi-simple` | ESP8266, ESP32 | `#$switch` 공유스위치 상태를 시리얼로 출력 |
 | `esp32c3/esp32c3-simple` | ESP32-C3 Super Mini 기준 | 공유스위치로 GPIO 8 LED 제어, active low |
 | `esp8266-d1-mini` | ESP8266 D1 mini | 내장 LED와 GPIO 14(D5) 버튼 제어 |
@@ -42,10 +50,20 @@ Wi-Fi 및 UNO R4 LED 매트릭스 헤더는 해당 보드 패키지에서 제공
 
 ## 웹앱에서 제어하기
 
+- [remocon.kr](https://remocon.kr/): 장치 검색·제어 UI와 계정 기반 관리 서비스를 사용합니다.
+- [IOSignal 통신 실습실 — test.iosignal.net](https://test.iosignal.net/): 보드별 프리셋 또는 직접 입력으로 송수신·구독·로그를 확인합니다. [웹앱 소스 저장소](https://github.com/remocons/test_iosignal_net)에서 내려받아 로컬 실행할 수도 있습니다.
+
+통신 실습실에서는 보드를 선택하고 예제와 같은 서버에 연결하세요. 기본 Remocon 예제는 웹앱의 서버 URL을 `wss://io.remocon.kr/ws`로 설정합니다. 보드별 연결·제어 순서는 [튜토리얼](https://iosignal.net/docs/examples/workbench/start)을 참고하세요.
+
+`esp32s3-ws2812`는 [IOSignal 통신 실습실(test.iosignal.net)](https://test.iosignal.net/)의 RGB 프리셋과 연동하는 채널 통신 예제입니다. `#homeButton` 신호로 색상을 바꾸며, `#robot`에는 4바이트 페이로드를 보내면 앞의 3바이트를 RGB로 사용합니다.
+
+통신 실습실은 [HTTPS](https://test.iosignal.net/)와 [HTTP](http://test.iosignal.net/) 접속을 모두 제공합니다. 공개 서버에는 HTTPS + WSS를 권장합니다. HTTPS 페이지의 WS 연결은 브라우저 및 로컬 네트워크 접근 권한에 따라 제한될 수 있으며, HTTP로 전환해도 모든 제한이 해결되지는 않습니다. 상단 전환 버튼으로 이동한 후 다시 연결하세요. [연결 조건과 로컬 실습 안내](https://iosignal.net/docs/examples/workbench/start)를 참고하세요.
+
+다음은 remocon.kr 사용 순서입니다.
+
 1. 아두이노와 **동일한 공유기에 연결된 스마트폰 또는 PC**에서 [remocon.kr](https://remocon.kr)을 엽니다.
 2. 장치 목록을 제공하는 예제에서는 장치가 접속하면 앱에서 해당 장치를 선택해 제어합니다.
 3. `wifi-simple` 및 `esp32c3-simple`은 장치 버튼 UI를 등록하지 않고 **공유스위치** 채널을 구독합니다. 앱의 공유스위치를 조작하여 확인하세요.
-4. `esp32s3-ws2812`는 별도의 채널 통신 예제입니다. `#homeButton` 신호로 색상을 바꾸며, `#robot`에는 4바이트 페이로드를 보내면 앞의 3바이트를 RGB로 사용합니다.
 
 인증키를 설정하지 않는 사용 흐름은 동일 공유기 환경을 기준으로 합니다. 외부 네트워크에서 내 장치를 제어하려면 앱 계정의 장치 인증키를 설정하세요.
 계정 메뉴·인증키 발급 수량·서비스 이용 범위는 현재 웹앱 안내를 확인하세요.
@@ -75,5 +93,14 @@ Wi-Fi 비밀번호와 장치 인증키를 공개 저장소에 올리지 마세�
 [MIT License](LICENSE)
 
 - [Remocon 웹앱](https://remocon.kr)
+- [IOSignal 통신 실습실](https://test.iosignal.net/) · [소스 저장소](https://github.com/remocons/test_iosignal_net)
 - [IOSignal Arduino 라이브러리](https://github.com/remocons/iosignal-arduino)
 - [Arduino 라이브러리 규격](https://docs.arduino.cc/arduino-cli/library-specification/)
+
+### 보드별 공개 실습
+
+- [ESP32-C3 Super Mini 버튼/LED](examples/esp32c3-button-led): LED GPIO8, BOOT GPIO9, `#homeButton` 송수신.
+- [iris 그룹 제어](examples/iris-group): WS2812 4개, GROUP/SELF 버튼, DIP 그룹·장치 번호.
+- [보드별 튜토리얼](https://iosignal.net/docs/examples/workbench/start): D1 mini, ESP-01, ESP32, ESP32-S3도 보드별로 안내합니다.
+
+기존 보드 예제는 실제 작동 확인된 보드를 기준으로 합니다. 새로 구성한 C3 버튼/LED 및 iris 공개 스케치는 별도 하드웨어 재검증 대상입니다.
