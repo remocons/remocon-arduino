@@ -5,6 +5,10 @@
 Arduino remote-control and messaging examples for the [remocon.kr](https://remocon.kr/) and [IOSignal Communication Workbench (test.iosignal.net)](https://test.iosignal.net/) web apps.
 Communication uses the [IOSignal Arduino client](https://github.com/remocons/iosignal-arduino).
 
+<p align="center">
+  <img src="docs/assets/iosignal-ecosystem.png" alt="Server, CLI, Node.js, Arduino and remote web apps connected through IOSignal" width="720" />
+</p>
+
 ## Installation and getting started
 
 1. Search for `Remocon` in the Arduino IDE Library Manager and install it with its dependencies.

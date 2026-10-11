@@ -5,6 +5,10 @@
 [remocon.kr](https://remocon.kr/) 및 [IOSignal 통신 실습실(test.iosignal.net)](https://test.iosignal.net/) 웹앱과 연동하여 아두이노 장치를 원격 제어하고 시그널을 송수신하는 예제 모음입니다.
 통신에는 [IOSignal Arduino 클라이언트](https://github.com/remocons/iosignal-arduino)를 사용합니다.
 
+<p align="center">
+  <img src="docs/assets/iosignal-ecosystem.png" alt="IOSignal로 연결되는 서버, CLI, Node.js, Arduino와 원격 제어 웹앱" width="720" />
+</p>
+
 ## 설치 및 시작
 
 1. Arduino IDE의 라이브러리 매니저에서 `Remocon`을 검색하여 의존 라이브러리와 함께 설치합니다.
