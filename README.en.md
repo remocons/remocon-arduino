@@ -9,6 +9,10 @@ Communication uses the [IOSignal Arduino client](https://github.com/remocons/ios
   <img src="docs/assets/iosignal-ecosystem.png" alt="Server, CLI, Node.js, Arduino and remote web apps connected through IOSignal" width="720" />
 </p>
 
+## Versions
+
+From **9.0.0**, Remocon uses the same version number as the public [iosignal](https://github.com/remocons/iosignal) and [iosignal-arduino](https://github.com/remocons/iosignal-arduino) packages. Packages with the same number are meant to be used together. 9.0.0 requires IOSignal Arduino **9.0.0 or later**. See [Changes by version](#changes-by-version) below.
+
 ## Installation and getting started
 
 1. Search for `Remocon` in the Arduino IDE Library Manager and install it with its dependencies.
@@ -18,6 +22,8 @@ Communication uses the [IOSignal Arduino client](https://github.com/remocons/ios
 4. Replace `WIFI_SSID` and `WIFI_PASS` with your Wi-Fi credentials. Depending on the example, edit the `WIFI_ID` / `WIFI_KEY` macros or the strings passed to `WiFi.begin()` / `wifiMulti.addAP()`.
 5. Connect any required LEDs, buttons, or relays, check the pin assignments, then compile and upload.
 6. Open the Serial Monitor at **115200 baud** to check the connection. The ESP-01 example uses the TX pin for an LED and does not provide serial output.
+
+Every example sets its receive buffer with `io.setRxBuffer()` before `io.begin()`. The size is sent to the server when connecting, so keep `setRxBuffer()` before `begin()` when you change an example. The server does not send the device messages larger than that.
 
 The default server for the public examples is `io.remocon.kr`, using TCP port `55488`.
 Ethernet examples use DHCP and require a wired connection to a router that supports DHCP. Assign a unique MAC address to each device when using multiple devices.
@@ -47,7 +53,7 @@ The [public workbench and ESP32 tutorials](https://iosignal.net/docs/examples/wo
 Not every example compiles for every board. LED types and pin assignments can also vary between ESP32-C3/S3 products; adjust the sketch for your actual board.
 On ESP-01, GPIO 0 and GPIO 2 affect boot behavior, so check the button and relay wiring as well.
 
-The common communication dependencies are `IOSignal`, `Boho`, and `Crypto`. Individual examples also use `Bounce2`, `U8g2`, `IRremote`, `FastLED`, or `Ethernet`.
+The common communication dependencies are `IOSignal` (9.0.0 or later), `Boho`, and `Crypto`. Individual examples also use `Bounce2`, `U8g2`, `IRremote`, `FastLED`, or `Ethernet`.
 Wi-Fi and UNO R4 LED matrix headers are provided by the relevant board package.
 Dependencies are declared in [library.properties](library.properties). The `architectures=*` declaration is package metadata and does not guarantee that every example supports every board.
 
@@ -90,6 +96,24 @@ Revoke and reissue any real authentication key that has already been published. 
 - **Server connection fails:** Check internet connectivity, DNS, and whether communication on TCP port 55488 is allowed.
 - **Device does not appear in the app:** Check whether the example provides a device UI, whether you are on the same router, and whether a guest network or VPN is in use. When using authentication, also check the device key and app account.
 - **LED behavior is inverted:** Check active-low / active-high behavior and pin assignments.
+- **Device stops after authentication and does not reconnect:** When another device or program logs in with the same `ID_KEY`, the server closes the earlier connection and that device stops instead of reconnecting (IOSignal Arduino 7.0.0 and later). Use a separate key for each device.
+- **Large messages do not arrive:** Messages larger than the receive buffer (`setRxBuffer`) are not sent by a 9.0 server, or are skipped by the device. Increase the buffer if needed, keeping the board's memory in mind.
+
+## Changes by version
+
+### 9.0.0
+
+- **The version number now matches the public iosignal package.** This release follows 4.0.0.
+- The dependency is now `IOSignal (>=9.0.0)`. IOSignal Arduino 9.0.0 tells the server its receive buffer size and skips messages larger than the buffer instead of disconnecting.
+- The example code is unchanged. Every example already calls `setRxBuffer()` before `begin()`.
+
+### 4.0.0
+
+- The dependency became `IOSignal (>=7.0.0)`. When the connection is replaced by a login with the same ID elsewhere, the device stops instead of reconnecting anonymously.
+
+### 3.0.0
+
+- Added board tutorials and control examples (`esp32c3-button-led`, `iris-group`, `esp32-cid-led`, `esp32-group-led` and others).
 
 ## License and references
 
