@@ -1,21 +1,19 @@
 /*
- *  IOSignal Remocon Example. 
- *  Arduino Uno R4 WiFi
+ *  IOSignal Remocon example: Arduino UNO R4 WiFi heart
+ *
+ *  remocon.kr shows it as a light (remocon/light/v1): on, off, toggle.
+ *    On shows a heart on the LED matrix and lights the built-in LED.
+ *    A button on D12 (to GND) toggles it and sends #screen playToggle,
+ *    which plays or pauses a bayo.tv screen.
+ *
+ *  Setup: replace "WIFI_SSID" and "WIFI_PASS" in WiFi.begin(), upload,
+ *  then open https://remocon.kr in a browser on the same router.
+ *
+ *  [kr] UNO R4 WiFi의 LED 매트릭스 하트를 전등 타입으로 켜고 끕니다. D12 버튼은 bayo.tv 재생 신호도 보냅니다.
+ *
+ *  Taeo Lee <sixgen@gmail.com>
  *  https://github.com/remocons/remocon-arduino
-
-  An example of communicating between Arduinos and controlling them with a webapp.
-    1. change the LED_PIN and BUTTON_PIN numbers according to your board.
-    2. set WIFI_SSID and KEY when using wifi.
-    3. iosignal server information is used without modification. If you use another server, change the server address and port number.
-    4. compile and upload to Arduino.
-    5. Access https://remocon.kr with a modern web browser.
-
-  [kr] 아두이노들간의 통신과 웹앱으로 제어하는 예제입니다.
-    1. 보드에 따라 LED_PIN과 BUTTON_PIN 번호를 변경하세요.
-    2. wifi 사용시 WIFI_SSID와 KEY 를 설정하세요.
-    3. iosignal 서버 정보는 수정 없이 그대로 사용합니다. 다른 서버를 사용할 경우 서버 주소와 포트번호를 변경해줍니다.
-    4. 아두이노에 컴파일하고 업로딩합니다.
-    5. 모던 웹브라우저로  https://remocon.kr 에 접속하세요.
+ *  MIT License
  */
 
 

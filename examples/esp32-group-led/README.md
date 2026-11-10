@@ -38,7 +38,6 @@ ESP32 두 대가 #lab 그룹을 공유합니다. 앱의 2구 스위치 하나가
 
 - 첫 보드는 s1, 둘째 보드는 s2를 읽습니다.
 - 접속할 때 공유 상태를 덮어쓰지 않습니다.
-- 튜토리얼: https://iosignal.net/docs/examples/workbench/group-led
 
 ## 컴파일
 

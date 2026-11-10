@@ -1,4 +1,4 @@
-// iris ESP32-C3 controller for a iris-basic board.
+// iris ESP32-C3 controller for an iris-basic board.
 // It finds the Iris Basic like the web app does (#search, #notify, @$info),
 // shows its state on its own four LEDs and sends commands from its buttons.
 // Button 1 turns all LEDs on or off. Button 2 lights one more LED each press.

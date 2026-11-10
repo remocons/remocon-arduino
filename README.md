@@ -28,9 +28,9 @@
 공개 예제의 기본 서버는 `io.remocon.kr`, TCP 포트는 `55488`입니다.
 Ethernet 예제는 DHCP를 사용하므로 유선 연결과 DHCP 가능한 공유기가 필요합니다. 여러 장치를 사용할 때는 MAC 주소를 서로 다르게 설정하세요.
 
-## 보드별 튜토리얼
+## Arduino 문서
 
-[공개 통신 실습실과 ESP32 실습](https://iosignal.net/docs/examples/workbench/start)에서 기본 통신, CID 개별 제어, 그룹 제어, RGB LED를 순서대로 진행할 수 있습니다. 새 스케치는 공개 저장소 소스에 포함되며 Library Manager 반영 전에는 저장소에서 직접 열어 사용하세요.
+IOSignal Arduino 라이브러리 설치와 UNO Ethernet 실습은 [iosignal.net Arduino 문서](https://iosignal.net/docs/arduino/)에 있습니다. 예제별 배선과 사용 순서는 각 예제 폴더의 `README.md`를 참고하세요. 새 스케치는 공개 저장소 소스에 포함되며 Library Manager 반영 전에는 저장소에서 직접 열어 사용하세요.
 
 ## 보드별 예제
 
@@ -65,9 +65,9 @@ Wi-Fi 및 UNO R4 LED 매트릭스 헤더는 해당 보드 패키지에서 제공
 - [remocon.kr](https://remocon.kr/): 장치 검색·제어 UI와 계정 기반 관리 서비스를 사용합니다.
 - [IOSignal 통신 실습실 — test.iosignal.net](https://test.iosignal.net/): 보드별 프리셋 또는 직접 입력으로 송수신·구독·로그를 확인합니다. [웹앱 소스 저장소](https://github.com/remocons/test_iosignal_net)에서 내려받아 로컬 실행할 수도 있습니다.
 
-통신 실습실에서는 보드를 선택하고 예제와 같은 서버에 연결하세요. 기본 Remocon 예제는 웹앱의 서버 URL을 `wss://io.remocon.kr/ws`로 설정합니다. 보드별 연결·제어 순서는 [튜토리얼](https://iosignal.net/docs/examples/workbench/start)을 참고하세요.
+통신 실습실에서는 보드를 선택하고 예제와 같은 서버에 연결하세요. 기본 Remocon 예제는 웹앱의 서버 URL을 `wss://io.remocon.kr/ws`로 설정합니다.
 
-통신 실습실은 [HTTPS](https://test.iosignal.net/)와 [HTTP](http://test.iosignal.net/) 접속을 모두 제공합니다. 공개 서버에는 HTTPS + WSS를 권장합니다. HTTPS 페이지의 WS 연결은 브라우저 및 로컬 네트워크 접근 권한에 따라 제한될 수 있으며, HTTP로 전환해도 모든 제한이 해결되지는 않습니다. HTTP로 접속하려면 브라우저 주소창에 `http://test.iosignal.net`을 직접 입력하여 새로 접속하세요. [연결 조건과 로컬 실습 안내](https://iosignal.net/docs/examples/workbench/start)를 참고하세요.
+통신 실습실은 [HTTPS](https://test.iosignal.net/)와 [HTTP](http://test.iosignal.net/) 접속을 모두 제공합니다. 공개 서버에는 HTTPS + WSS를 권장합니다. HTTPS 페이지의 WS 연결은 브라우저 및 로컬 네트워크 접근 권한에 따라 제한될 수 있으며, HTTP로 전환해도 모든 제한이 해결되지는 않습니다. HTTP로 접속하려면 브라우저 주소창에 `http://test.iosignal.net`을 직접 입력하여 새로 접속하세요.
 
 다음은 remocon.kr 사용 순서입니다.
 
@@ -137,5 +137,4 @@ Wi-Fi 비밀번호와 장치 인증키를 공개 저장소에 올리지 마세�
 ### 보드별 공개 실습
 
 - [iris 그룹 제어](examples/iris-group): WS2812 4개, GROUP/SELF 버튼, DIP 그룹·장치 번호.
-- [보드별 튜토리얼](https://iosignal.net/docs/examples/workbench/start): D1 mini, ESP-01, ESP32, ESP32-S3도 보드별로 안내합니다.
 

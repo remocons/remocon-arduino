@@ -2,7 +2,6 @@
   ESP32: Remocon device discovery, direct CID commands and state publication.
   Wiring: GPIO 4 -> 330 ohm resistor -> LED anode; LED cathode -> GND.
   Uses an external active-high LED; no assumption about onboard LEDs.
-  Tutorial: https://iosignal.net/docs/examples/workbench/cid-led
 */
 #include <WiFi.h>
 #include <IOSignal.h>

@@ -28,9 +28,9 @@ Every example sets its receive buffer with `io.setRxBuffer()` before `io.begin()
 The default server for the public examples is `io.remocon.kr`, using TCP port `55488`.
 Ethernet examples use DHCP and require a wired connection to a router that supports DHCP. Assign a unique MAC address to each device when using multiple devices.
 
-## Board tutorials
+## Arduino documentation
 
-The [public workbench and ESP32 tutorials](https://iosignal.net/docs/examples/workbench/start) cover basic communication, individual control by CID, group control, and RGB LEDs in sequence. New sketches are included in the public repository; open them directly from the repository until they become available through Library Manager.
+Installing the IOSignal Arduino library and the UNO Ethernet exercise are in the [iosignal.net Arduino docs](https://iosignal.net/docs/arduino/). See the `README.md` in each example folder for wiring and steps. New sketches are included in the public repository; open them directly from the repository until they become available through Library Manager.
 
 ## Examples by board
 
@@ -65,9 +65,9 @@ Dependencies are declared in [library.properties](library.properties). The `arch
 - [remocon.kr](https://remocon.kr/): Device discovery and control UI, with account-based management services.
 - [IOSignal Communication Workbench — test.iosignal.net](https://test.iosignal.net/): Send, receive, subscribe, and inspect logs using board presets or manual input. You can also download the [web app source](https://github.com/remocons/test_iosignal_net) and run it locally.
 
-In the workbench, select your board and connect to the same server as the example. For the default Remocon examples, set the web app server URL to `wss://io.remocon.kr/ws`. See the [tutorials](https://iosignal.net/docs/examples/workbench/start) for board-specific connection and control steps.
+In the workbench, select your board and connect to the same server as the example. For the default Remocon examples, set the web app server URL to `wss://io.remocon.kr/ws`.
 
-The workbench is available over both [HTTPS](https://test.iosignal.net/) and [HTTP](http://test.iosignal.net/). HTTPS + WSS is recommended for public servers. WS connections from an HTTPS page may be restricted by the browser and local network access permissions; switching to HTTP does not resolve every restriction. To use HTTP, enter `http://test.iosignal.net` directly in the browser address bar and open it anew. See the [connection requirements and local practice guide](https://iosignal.net/docs/examples/workbench/start).
+The workbench is available over both [HTTPS](https://test.iosignal.net/) and [HTTP](http://test.iosignal.net/). HTTPS + WSS is recommended for public servers. WS connections from an HTTPS page may be restricted by the browser and local network access permissions; switching to HTTP does not resolve every restriction. To use HTTP, enter `http://test.iosignal.net` directly in the browser address bar and open it anew.
 
 To use remocon.kr:
 
@@ -137,5 +137,4 @@ Revoke and reissue any real authentication key that has already been published. 
 ### Public board exercises
 
 - [iris group control](examples/iris-group): Four WS2812 LEDs, GROUP/SELF buttons, DIP switches for group and device numbers.
-- [Board tutorials](https://iosignal.net/docs/examples/workbench/start): Also covers D1 mini, ESP-01, ESP32, and ESP32-S3.
 

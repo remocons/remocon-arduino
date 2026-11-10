@@ -1,5 +1,8 @@
-// iris ESP32-C3: pin map based on the tested iris-v1a board.
-// Tutorial: https://iosignal.net/docs/examples/workbench/iris
+// iris ESP32-C3 group lights: boards in one group share an 8-way switch (remocon/switch8/v1).
+// DIP switches (read at boot, LOW = 1): GPIO21, 20, 10 group id 0-7; GPIO7, 6, 5 device id 0-7.
+// Each board lights its four WS2812 LEDs (GPIO4) from switch s<device id + 1>.
+// Button GPIO1 turns the whole group on or off, GPIO2 toggles this board. Status LED: GPIO8.
+// Pins follow iris board v1a.
 #include <FastLED.h>
 #include <WiFi.h>
 #include <IOSignal.h>

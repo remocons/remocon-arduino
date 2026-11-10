@@ -1,19 +1,22 @@
 /*
- *  IOSignal Remocon Example.
- *  Remocon8266 board: controller for a 4-channel relay board (esp8266_relay4ch).
+ *  IOSignal Remocon example: Remocon8266 controller for a 4-channel relay board
  *
- *  The relay board is chosen by its CID (default "1414", a fixed CID from its device key).
- *  The target CID can be changed without new firmware:
- *  - The controller is a device card in the web app. Its card sends "target=<cid>".
- *  - Or from a CLI: remocon pub "<controller cid>@" "target=2001"
- *  The new CID is kept in flash and used after a reboot.
+ *  Controls a board running esp8266_relay4ch by its CID (default "1414", a fixed
+ *  CID from that board's device key). The target can change without new firmware:
+ *    - this board is a card in the web app, and its card sends "target=<cid>";
+ *    - or from a CLI: remocon pub "<controller cid>@" "target=2001".
+ *    The new CID is kept in flash and used after a reboot.
+ *  Buttons SW1-SW4 toggle relays 1-4, and a button on D6 (GPIO12, to GND) turns
+ *  all relays off, or all on when every relay is off. The OLED shows the target
+ *  CID and the four relay states. Needs IOSignal 9.6.0 or later (unsubscribe()).
  *
- *  - The four buttons toggle relay 1-4 of the target.
- *  - The OLED shows the target CID and the four relay states.
+ *  Setup: put Wi-Fi in _secrets.h, or edit WIFI_SSID and WIFI_PASS below. Use a
+ *  device key different from the relay board's (SECRET_CONTROL_ID_KEY).
+ *
+ *  [kr] CID로 4채널 릴레이 보드를 제어합니다. 버튼 4개, D6 전체 버튼, OLED 상태 표시. 대상 CID는 앱이나 CLI로 바꿉니다.
  *
  *  Taeo Lee <sixgen@gmail.com>
  *  https://github.com/remocons/remocon-arduino
- *
  *  MIT License
  */
 

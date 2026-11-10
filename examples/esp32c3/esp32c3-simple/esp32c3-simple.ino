@@ -1,14 +1,23 @@
 /*
-  WiFi에 연결하고, 앱과 아두이노의 신호를 중계해주는 서버에 연결합니다.
-  공유 스위치 그룹(#switch)에 참여합니다.
-  동일한 공유기에 연결된 브라우저로 https://remocon.kr 웹앱 실행후, 공유스위치의 상태를 실시간 수신합니다.
-
-  보드유형: ESP32C3 DEV Module : super mini 기준. 단, 실제 제품 마다 핀번호가 다를수있음.
-  gpio2 external hw pullup. POWER_SPI pin.
-  gpio8 external hw pullup. LED active low.
-  gpio9 external hw pullup. BOOT Button.
-  
-*/
+ *  IOSignal Remocon example: ESP32-C3 shared switch
+ *
+ *  Joins the shared switch group #switch (remocon/switch3/v1). remocon.kr shows it
+ *  as one "공유 스위치" card for every board in the group.
+ *    s1 drives the LED on GPIO8 (active low). Signals are printed to serial.
+ *
+ *  Board: ESP32C3 Dev Module, based on a Super Mini; pins can differ by product.
+ *    GPIO2: external pull-up, GPIO8: external pull-up and LED (active low),
+ *    GPIO9: external pull-up and BOOT button.
+ *
+ *  Setup: set WIFI_ID and WIFI_KEY below, upload, then open https://remocon.kr
+ *  in a browser on the same router.
+ *
+ *  [kr] 공유 스위치 그룹(#switch)에 참여해 s1 값으로 GPIO8 LED를 켭니다.
+ *
+ *  Taeo Lee <sixgen@gmail.com>
+ *  https://github.com/remocons/remocon-arduino
+ *  MIT License
+ */
 
 #include <WiFi.h>
 #include <IOSignal.h>

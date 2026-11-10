@@ -1,7 +1,6 @@
 // iris ESP32-C3 basic: four onboard RGB LEDs as a 4-way switch.
-// Pin map based on the tested iris-v1a board. No DIP switches or groups.
+// Pins: WS2812 data GPIO4, buttons GPIO1 and GPIO2 (iris board v1a). No DIP switches or groups.
 // Button 1 turns all LEDs on or off. Button 2 lights one more LED each press.
-// Tutorial: https://iosignal.net/docs/examples/workbench/iris
 #include <FastLED.h>
 #include <WiFi.h>
 #include <IOSignal.h>

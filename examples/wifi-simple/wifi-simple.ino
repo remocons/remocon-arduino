@@ -1,7 +1,19 @@
 /*
-  WiFi에 연결하고, 앱과 아두이노의 신호를 중계해주는 서버에 연결후 공유 스위치 그룹(#switch)에 참여합니다.
-  동일한 공유기에 연결된 브라우저로 https://remocon.kr 웹앱의 공유스위치 상태를 실시간 수신합니다.
-*/
+ *  IOSignal Remocon example: the simplest Wi-Fi client (ESP8266, ESP32)
+ *
+ *  Joins the shared switch group #switch (remocon/switch3/v1) and prints the
+ *  shared state to serial (115200). No other hardware is needed.
+ *  remocon.kr shows the group as one "공유 스위치" card.
+ *
+ *  Setup: set WIFI_ID and WIFI_KEY below, upload, then open https://remocon.kr
+ *  in a browser on the same router.
+ *
+ *  [kr] 공유 스위치 그룹(#switch)에 참여해 상태를 시리얼로 출력합니다. 하드웨어 없이 통신만 확인합니다.
+ *
+ *  Taeo Lee <sixgen@gmail.com>
+ *  https://github.com/remocons/remocon-arduino
+ *  MIT License
+ */
 
 #if defined(ESP8266)
  #include <ESP8266WiFi.h>

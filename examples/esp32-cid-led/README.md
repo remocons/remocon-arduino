@@ -37,10 +37,6 @@ ESP32에 연결한 LED를 CID 명령으로 제어합니다. 검색, 명령, 상�
 | 장치 | 앱 | `@$state` | `on=1` | 명령을 처리한 뒤 상태를 보냅니다. 앱의 대기 표시가 풀립니다. |
 | 서버 | 앱 | `<cid>@$state` | `close` | 장치가 끊기면 서버가 보내고 카드가 사라집니다. |
 
-## 참고
-
-- 튜토리얼: https://iosignal.net/docs/examples/workbench/cid-led
-
 ## 컴파일
 
 ```sh

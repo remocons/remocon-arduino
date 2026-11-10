@@ -1,8 +1,8 @@
 /*
-  ESP32: Remocon group channel control.
+  ESP32: Remocon group channel control. Two boards share the #lab group,
+  which remocon.kr shows as one 2-way switch card (remocon/switch2/v1).
   Wiring: GPIO 4 -> 330 ohm resistor -> LED anode; LED cathode -> GND.
   Upload to two boards: OUTPUT_INDEX=0 on the first, 1 on the second.
-  Tutorial: https://iosignal.net/docs/examples/workbench/group-led
 */
 #include <WiFi.h>
 #include <IOSignal.h>

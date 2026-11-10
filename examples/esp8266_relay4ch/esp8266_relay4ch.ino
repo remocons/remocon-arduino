@@ -1,9 +1,20 @@
 /*
- *  IOSignal Remocon Example. 
+ *  IOSignal Remocon example: ESP-12F 4-channel relay board
+ *
+ *  remocon.kr shows it as a 4-channel relay (remocon/relay4/v1).
+ *    Relays 1-4 are on GPIO13, 12, 14 and 16. Commands: r1=1 ... r4=0, all=1, all=0.
+ *    The names L (built-in LED, GPIO2) and A-D toggle an output; they are for IR
+ *    routers that do not know the state.
+ *    Its info has group=1414; Remocon8266-4ch-control can control this board.
+ *
+ *  Setup: put Wi-Fi (and an optional device key) in _secrets.h, or edit WIFI_SSID
+ *  and WIFI_PASS below. Connect a USB-TTL adapter to the programming port, hold
+ *  IO0 to GND while resetting, upload, then release IO0 and reset.
+ *
+ *  [kr] ESP-12F 4채널 릴레이 보드를 relay4 타입으로 제어합니다. 업로드할 때 IO0을 GND에 연결합니다.
  *
  *  Taeo Lee <sixgen@gmail.com>
  *  https://github.com/remocons/remocon-arduino
- *
  *  MIT License
  */
 

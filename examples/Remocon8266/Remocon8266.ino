@@ -1,16 +1,20 @@
 /*
- *  IOSignal Remocon Example. 
- *  Remocon8266 board
+ *  IOSignal Remocon example: Remocon8266 board
  *
- *  Example of the Remote Control WebApp integration.
- *  Open and control https://remocon.kr with a web browser connected to the same router
+ *  remocon.kr shows it as a 3-way switch (remocon/switch3/v1):
+ *    s1 = built-in LED (active low), s2 = OUT1 (GPIO15, D8), s3 = OUT2 (GPIO12, D6).
+ *  The four buttons send #screen commands to a bayo.tv screen:
+ *    SW1 (GPIO16) playToggle, SW2 (GPIO0) left, SW3 (GPIO14) down, SW4 (GPIO13) right.
+ *  The OLED (I2C, GPIO4/5) shows the CID and states; @msg text is shown on it.
+ *  See the schematic PDF in this folder.
  *
- *  IoT리모컨 WebApp 연동 예제입니다.
- *  동일한 공유기에 연결된 웹브라우저로 https://remocon.kr 을 열고 제어하세요  
+ *  Setup: set WIFI_ID and WIFI_KEY below, upload, then open https://remocon.kr
+ *  in a browser on the same router.
+ *
+ *  [kr] Remocon8266 보드의 출력 3개를 3구 스위치로 제어하고, 버튼 4개로 bayo.tv 화면을 조작합니다.
  *
  *  Taeo Lee <sixgen@gmail.com>
  *  https://github.com/remocons/remocon-arduino
- *
  *  MIT License
  */
 
