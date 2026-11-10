@@ -13,20 +13,19 @@ const char* WIFI_PASS = "WIFI_PASS";
 const char* IO_HOST = "io.remocon.kr";
 const uint16_t IO_PORT = 55488;
 const uint8_t LED_PIN = 4;
-const char* DEVICE_NAME = "ESP32-LED:Tutorial";
+const char* DEVICE_INFO = "name=ESP32-LED;group=Tutorial;ui=on,off,toggle";
 
 WiFiClient client;
 IOSignal io;
 bool ledOn = false;
 unsigned long lastWifiRetry = 0;
 
-void publishState() { io.signal("@$state", ledOn ? "on" : "off"); }
+void publishState() { io.signal("@$state", ledOn ? "on=1" : "on=0"); }
 
 void onReady() {
   Serial.print("READY CID: "); Serial.println(io.cid);
   io.subscribe("#search");
-  io.signal("@$name", DEVICE_NAME);
-  io.signal("@$ui", "on,off,toggle");
+  io.signal("@$info", DEVICE_INFO);
   publishState();
   io.signal("#notify", io.cid);
 }

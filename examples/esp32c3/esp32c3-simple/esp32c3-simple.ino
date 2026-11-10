@@ -1,6 +1,6 @@
 /*
   WiFi에 연결하고, 앱과 아두이노의 신호를 중계해주는 서버에 연결합니다.
-  local 채널 #$switch 를 구독합니다.
+  공유 스위치 그룹(#switch)에 참여합니다.
   동일한 공유기에 연결된 브라우저로 https://remocon.kr 웹앱 실행후, 공유스위치의 상태를 실시간 수신합니다.
 
   보드유형: ESP32C3 DEV Module : super mini 기준. 단, 실제 제품 마다 핀번호가 다를수있음.
@@ -19,7 +19,9 @@
 #define WIFI_KEY "WIFI_PASS"
 #define SERVER_URL "io.remocon.kr"
 #define SERVER_PORT 55488
-#define SWITCH_CH "#$switch"
+#define SWITCH_CH "#switch"
+#define SWITCH_STATE SWITCH_CH "$state"
+#define SWITCH_INFO "name=공유 스위치;type=remocon/switch3/v1"
 
 WiFiClient client;
 IOSignal io;
@@ -41,7 +43,7 @@ void setup() {
   Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
 
-  io.setRxBuffer( 2000 );
+  io.setRxBuffer( 200 );
   io.begin( &client, SERVER_URL, SERVER_PORT );
   io.onReady( &onReady );
   io.onMessage( &onMessage );
@@ -55,7 +57,10 @@ void onReady()
 {
   Serial.print("onReady cid: ");
   Serial.println( io.cid );
-  io.subscribe( SWITCH_CH );
+  io.subscribe( "#search" );
+  io.subscribe( SWITCH_STATE );
+  io.signal( SWITCH_CH "$info", SWITCH_INFO );
+  io.signal( "#notify", SWITCH_CH );
 }
 
 void onMessage( char *tag, uint8_t payloadType, uint8_t* payload, size_t payloadSize)
@@ -64,15 +69,14 @@ void onMessage( char *tag, uint8_t payloadType, uint8_t* payload, size_t payload
   Serial.print(">> signal tag: " ); Serial.print( tag );
   Serial.print(" type: " ); Serial.print( payloadType );
   Serial.print(" size: " ); Serial.println( payloadSize );
+  if( strcmp(tag, "#search") == 0 ) io.signal( "#notify", SWITCH_CH );
 
   if( payloadType == IOSignal::PAYLOAD_TYPE::TEXT && payload && payloadSize && memchr(payload, 0, payloadSize) ){
     Serial.print("string payload: " ); Serial.println( (char *)payload  );
-    if( strcmp( tag, SWITCH_CH ) == 0 ){
-      if (payload[0] == '1') {
-        digitalWrite( LED_PIN, LOW);
-      } else {
-        digitalWrite( LED_PIN, HIGH);
-      }
+    if( strcmp( tag, SWITCH_STATE ) == 0 ){
+      // Read only this device's key, and keep the LED if the key is missing.
+      const char* value = strstr( (const char*)payload, "s1=" );
+      if( value ) digitalWrite( LED_PIN, value[3] == '1' ? LOW : HIGH );
     }
   }
 

@@ -1,5 +1,5 @@
 /*
-  WiFi에 연결하고, 앱과 아두이노의 신호를 중계해주는 서버에 연결후 local #$switch 채널을 구독합니다.
+  WiFi에 연결하고, 앱과 아두이노의 신호를 중계해주는 서버에 연결후 공유 스위치 그룹(#switch)에 참여합니다.
   동일한 공유기에 연결된 브라우저로 https://remocon.kr 웹앱의 공유스위치 상태를 실시간 수신합니다.
 */
 
@@ -16,7 +16,9 @@
 #define WIFI_KEY "WIFI_PASS"
 #define SERVER_URL "io.remocon.kr"
 #define SERVER_PORT 55488
-#define SWITCH_CH "#$switch"
+#define SWITCH_CH "#switch"
+#define SWITCH_STATE SWITCH_CH "$state"
+#define SWITCH_INFO "name=공유 스위치;type=remocon/switch3/v1"
 
 WiFiClient client;
 IOSignal io;
@@ -40,7 +42,10 @@ void loop() { io.loop(); }
 void onReady()
 {
   Serial.print("onReady cid: "); Serial.println( io.cid );
-  io.subscribe( SWITCH_CH );
+  io.subscribe( "#search" );
+  io.subscribe( SWITCH_STATE );
+  io.signal( SWITCH_CH "$info", SWITCH_INFO );
+  io.signal( "#notify", SWITCH_CH );
 }
 
 void onMessage( char *tag, uint8_t payloadType, uint8_t* payload, size_t payloadSize)
@@ -48,6 +53,7 @@ void onMessage( char *tag, uint8_t payloadType, uint8_t* payload, size_t payload
   Serial.print(">> signal tag: " ); Serial.print( tag );
   Serial.print(" type: " ); Serial.print( payloadType );
   Serial.print(" size: " ); Serial.println( payloadSize );
+  if( strcmp(tag, "#search") == 0 ) io.signal( "#notify", SWITCH_CH );
   if( payloadType == IOSignal::PAYLOAD_TYPE::TEXT && payload && payloadSize && memchr(payload, 0, payloadSize) ){
     Serial.print("string payload: " ); Serial.println( (char *)payload  );
   }

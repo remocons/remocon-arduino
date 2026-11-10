@@ -11,7 +11,7 @@
 
 ## 버전
 
-**9.0.0**부터 Remocon은 공개 [iosignal](https://github.com/remocons/iosignal)·[iosignal-arduino](https://github.com/remocons/iosignal-arduino)와 같은 버전 번호를 씁니다. 같은 번호의 패키지는 함께 쓰도록 맞춘 조합입니다. 9.0.0은 IOSignal Arduino **9.0.0 이상**이 필요합니다. 버전별 변경은 아래 [버전별 변경 사항](#버전별-변경-사항)을 참고하세요.
+**9.0.0**부터 Remocon은 공개 [iosignal](https://github.com/remocons/iosignal)·[iosignal-arduino](https://github.com/remocons/iosignal-arduino)와 같은 버전 번호를 씁니다. 같은 번호의 패키지는 함께 쓰도록 맞춘 조합입니다. 9.6.0은 IOSignal Arduino **9.6.0 이상**이 필요합니다. 버전별 변경은 아래 [버전별 변경 사항](#버전별-변경-사항)을 참고하세요.
 
 ## 설치 및 시작
 
@@ -19,7 +19,7 @@
    소스로 설치하려면 [공개 저장소](https://github.com/remocons/remocon-arduino)의 ZIP을 받아 **Sketch > Include Library > Add .ZIP Library**로 추가합니다.
 2. 보드 매니저에서 사용할 보드 패키지를 설치하고 **Tools > Board / Port**에서 보드와 포트를 선택합니다.
 3. **File > Examples > Remocon**에서 보드에 맞는 예제를 선택합니다. 목록이 갱신되지 않으면 IDE를 재시작합니다.
-4. Wi-Fi 예제의 `WIFI_SSID`, `WIFI_PASS`를 공유기 정보로 바꿉니다. 예제에 따라 `WIFI_ID` / `WIFI_KEY` 매크로 또는 `WiFi.begin()` / `wifiMulti.addAP()`의 문자열을 수정합니다.
+4. Wi-Fi 예제의 `WIFI_SSID`, `WIFI_PASS`를 공유기 정보로 바꿉니다. 예제에 따라 `WIFI_ID` / `WIFI_KEY` 매크로 또는 `WiFi.begin()` / `wifiMulti.addAP()`의 문자열을 수정합니다. iris·릴레이 예제는 스케치 폴더에 `_secrets.h`가 있으면 그 값을 씁니다.
 5. 필요한 LED·버튼·릴레이를 연결하고 핀 번호를 확인한 뒤 컴파일 및 업로드합니다.
 6. 시리얼 모니터를 **115200 baud**로 열어 연결 상태를 확인합니다. ESP-01 예제는 TX 핀을 LED로 사용하므로 시리얼 출력을 사용하지 않습니다.
 
@@ -36,24 +36,27 @@ Ethernet 예제는 DHCP를 사용하므로 유선 연결과 DHCP 가능한 공�
 
 | 예제 경로 (`examples/` 아래) | 대상 보드 | 동작 / 준비물 |
 | --- | --- | --- |
-| `esp32c3-button-led` | ESP32-C3 Super Mini | GPIO 9 버튼으로 `#homeButton` 송신, 수신 시 GPIO 8 LED 토글 |
 | `iris-group` | iris (ESP32-C3) | DIP로 그룹·장치 번호를 설정하고 버튼·웹앱으로 WS2812 4개 제어 |
+| `iris-basic` | iris (ESP32-C3) | 내장 RGB LED 4개를 4구 스위치(`remocon/switch4/v1`)로 켜고 끔, 버튼 2개 |
+| `iris-basic-control` | iris (ESP32-C3) | 다른 iris의 `iris-basic`을 찾아 제어하고 상태를 자기 LED에 표시 |
+| `iris-rgb` | iris (ESP32-C3) | LED 4개의 색상·밝기 제어(`remocon/iris/v2`), DIP로 번호·그룹 |
+| `esp8266_relay4ch` | ESP-12F 4채널 릴레이 보드 | 릴레이 4개(`remocon/relay4/v1`), `all=1`/`all=0` |
+| `Remocon8266-4ch-control` | Remocon8266 전용 보드 | CID로 4채널 릴레이 보드를 제어, 버튼 4개·D6 전체 버튼·OLED 상태 |
 | `esp32-cid-led` | ESP32 + GPIO 4 외부 LED | 장치 검색·CID 명령·실제 상태 발행, Remocon 또는 공개 통신 실습실 |
-| `esp32-group-led` | ESP32 1~2대 + GPIO 4 외부 LED | 두 자리 상태 문자열로 그룹 출력 제어, 보드별 OUTPUT_INDEX 선택 |
-| `wifi-simple` | ESP8266, ESP32 | `#$switch` 공유스위치 상태를 시리얼로 출력 |
-| `esp32c3/esp32c3-simple` | ESP32-C3 Super Mini 기준 | 공유스위치로 GPIO 8 LED 제어, active low |
+| `esp32-group-led` | ESP32 1~2대 + GPIO 4 외부 LED | 그룹을 2구 스위치(`remocon/switch2/v1`)로 공유, 보드별 OUTPUT_INDEX 선택 |
+| `wifi-simple` | ESP8266, ESP32 | `#switch` 공유 스위치 그룹에 참여해 상태를 시리얼로 출력 |
+| `esp32c3/esp32c3-simple` | ESP32-C3 Super Mini 기준 | `#switch` 공유 스위치의 `s1`로 GPIO 8 LED 제어, active low |
 | `esp8266-d1-mini` | ESP8266 D1 mini | 내장 LED와 GPIO 14(D5) 버튼 제어 |
 | `esp01-relay-button` | ESP8266 ESP-01 | 릴레이 GPIO 0, LED GPIO 1, 버튼 GPIO 2 |
 | `Remocon8266` | Remocon8266 전용 보드 | OLED·버튼·출력 제어, 폴더 내 회로도 참고 |
-| `esp32s3-ws2812` | ESP32-S3 | WS2812 GPIO 48, BOOT 버튼 GPIO 0, `#homeButton` / `#robot` 채널 |
 | `uno-r4-wifi-heart` | Arduino UNO R4 WiFi | LED 매트릭스 하트와 내장 LED, D12 버튼 |
 | `uno-ethernet-button` | UNO R3 + W5100 Ethernet 실드 | D2 버튼, D5 LED, D6 릴레이 출력 |
 | `uno-ethernet-ir` | UNO R3 + W5100 Ethernet 실드 | D2 NEC 적외선 수신기, D5·D6 출력 |
 
-모든 예제가 모든 보드에서 컴파일되는 것은 아닙니다. ESP32-C3/S3 제품별 LED 종류와 핀 번호도 다를 수 있으므로 실제 보드에 맞게 수정하세요.
+모든 예제가 모든 보드에서 컴파일되는 것은 아닙니다. ESP32-C3 제품별 LED 종류와 핀 번호도 다를 수 있으므로 실제 보드에 맞게 수정하세요.
 ESP-01은 부팅 시 GPIO 0·2 상태의 영향을 받으므로 버튼·릴레이 배선도 확인해야 합니다.
 
-공통 통신 의존성은 `IOSignal`(9.0.0 이상), `Boho`, `Crypto`이며 예제에 따라 `Bounce2`, `U8g2`, `IRremote`, `FastLED`, `Ethernet`을 사용합니다.
+공통 통신 의존성은 `IOSignal`(9.6.0 이상), `Boho`, `Crypto`이며 예제에 따라 `Bounce2`, `U8g2`, `IRremote`, `FastLED`, `Ethernet`을 사용합니다.
 Wi-Fi 및 UNO R4 LED 매트릭스 헤더는 해당 보드 패키지에서 제공합니다.
 의존성 선언은 [library.properties](library.properties)에 있습니다. `architectures=*`는 패키지 전체의 메타데이터이며, 각 예제의 보드 호환성을 보장하지 않습니다.
 
@@ -64,15 +67,13 @@ Wi-Fi 및 UNO R4 LED 매트릭스 헤더는 해당 보드 패키지에서 제공
 
 통신 실습실에서는 보드를 선택하고 예제와 같은 서버에 연결하세요. 기본 Remocon 예제는 웹앱의 서버 URL을 `wss://io.remocon.kr/ws`로 설정합니다. 보드별 연결·제어 순서는 [튜토리얼](https://iosignal.net/docs/examples/workbench/start)을 참고하세요.
 
-`esp32s3-ws2812`는 [IOSignal 통신 실습실(test.iosignal.net)](https://test.iosignal.net/)의 RGB 프리셋과 연동하는 채널 통신 예제입니다. `#homeButton` 신호로 색상을 바꾸며, `#robot`에는 4바이트 페이로드를 보내면 앞의 3바이트를 RGB로 사용합니다.
-
 통신 실습실은 [HTTPS](https://test.iosignal.net/)와 [HTTP](http://test.iosignal.net/) 접속을 모두 제공합니다. 공개 서버에는 HTTPS + WSS를 권장합니다. HTTPS 페이지의 WS 연결은 브라우저 및 로컬 네트워크 접근 권한에 따라 제한될 수 있으며, HTTP로 전환해도 모든 제한이 해결되지는 않습니다. HTTP로 접속하려면 브라우저 주소창에 `http://test.iosignal.net`을 직접 입력하여 새로 접속하세요. [연결 조건과 로컬 실습 안내](https://iosignal.net/docs/examples/workbench/start)를 참고하세요.
 
 다음은 remocon.kr 사용 순서입니다.
 
 1. 아두이노와 **동일한 공유기에 연결된 스마트폰 또는 PC**에서 [remocon.kr](https://remocon.kr)을 엽니다.
 2. 장치 목록을 제공하는 예제에서는 장치가 접속하면 앱에서 해당 장치를 선택해 제어합니다.
-3. `wifi-simple` 및 `esp32c3-simple`은 장치 버튼 UI를 등록하지 않고 **공유스위치** 채널을 구독합니다. 앱의 공유스위치를 조작하여 확인하세요.
+3. `wifi-simple`과 `esp32c3-simple`은 `#switch` 그룹에 참여하며 앱에 **공유 스위치** 카드로 나타납니다. 그 카드의 스위치를 조작하여 확인하세요.
 
 인증키를 설정하지 않는 사용 흐름은 동일 공유기 환경을 기준으로 합니다. 외부 네트워크에서 내 장치를 제어하려면 앱 계정의 장치 인증키를 설정하세요.
 계정 메뉴·인증키 발급 수량·서비스 이용 범위는 현재 웹앱 안내를 확인하세요.
@@ -101,6 +102,15 @@ Wi-Fi 비밀번호와 장치 인증키를 공개 저장소에 올리지 마세�
 
 ## 버전별 변경 사항
 
+### 9.6.0
+
+- **버전 번호를 공개 iosignal 9.6.0과 맞췄습니다.** 의존성을 `IOSignal (>=9.6.0)`으로 올렸습니다. IOSignal Arduino 9.6.0에는 `unsubscribe()`와 전송 실패 시 재접속이 들어 있습니다.
+- 새 예제: `iris-basic`, `iris-basic-control`, `iris-rgb`, `esp8266_relay4ch`, `Remocon8266-4ch-control`.
+- `iris-group`, `uno-ethernet-button`, `uno-ethernet-ir`이 장치 검색·제어 규칙(`@$info`, `key=value` 상태, `#search`/`#notify`)을 따릅니다. `uno-ethernet-ir`의 리모컨 키 코드가 바뀌었습니다.
+- `Remocon8266`, `esp01-relay-button`, `esp8266-d1-mini`, `uno-r4-wifi-heart`, `esp32-cid-led`, `esp32-group-led`, `wifi-simple`, `esp32c3/esp32c3-simple`도 같은 규칙을 따르도록 바꿨습니다. 이전 방식(`$name`/`$ui`, `#scan/ch`, `#$switch`)은 더 쓰지 않습니다. 공유 스위치 채널은 `#switch`입니다. 이 8개는 컴파일과 규칙 검사만 했고 실제 보드에서는 확인하지 않았습니다.
+- `esp32c3-button-led`와 `esp32s3-ws2812` 예제를 삭제했습니다.
+- 예제마다 `README.md`가 있습니다.
+
 ### 9.0.0
 
 - **버전 번호를 공개 iosignal과 맞췄습니다.** 4.0.0 다음 버전입니다.
@@ -126,8 +136,6 @@ Wi-Fi 비밀번호와 장치 인증키를 공개 저장소에 올리지 마세�
 
 ### 보드별 공개 실습
 
-- [ESP32-C3 Super Mini 버튼/LED](examples/esp32c3-button-led): LED GPIO8, BOOT GPIO9, `#homeButton` 송수신.
 - [iris 그룹 제어](examples/iris-group): WS2812 4개, GROUP/SELF 버튼, DIP 그룹·장치 번호.
 - [보드별 튜토리얼](https://iosignal.net/docs/examples/workbench/start): D1 mini, ESP-01, ESP32, ESP32-S3도 보드별로 안내합니다.
 
-기존 보드 예제는 실제 작동 확인된 보드를 기준으로 합니다. 새로 구성한 C3 버튼/LED 및 iris 공개 스케치는 별도 하드웨어 재검증 대상입니다.

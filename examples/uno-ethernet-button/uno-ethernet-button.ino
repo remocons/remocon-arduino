@@ -31,8 +31,9 @@
 byte mac[]{0, 0, 0, 0, 0, 0x07}; 
 EthernetClient client;
 IOSignal io;
-const char *name = "Uno-Btn:HOME";
-const char *ui = "on,off,toggle";
+const char *deviceInfo = "name=Uno-Btn;type=remocon/light/v1";
+
+void publishState() { io.signal("@$state", digitalRead(5) ? "on=1" : "on=0"); }
 
 const int buttonPin = 2;
 Bounce2::Button button;
@@ -65,13 +66,13 @@ void setup() {
 void deviceOn(){
    digitalWrite( 5, HIGH);
    digitalWrite( 6, HIGH);
-  io.signal("@$state", "on" );
+  io.signal("@$state", "on=1" );
 }
 
 void deviceOff(){
    digitalWrite(5, LOW);
    digitalWrite(6, LOW);
-  io.signal("@$state", "off" );
+  io.signal("@$state", "on=0" );
 }
 
 void deviceToggle(){
@@ -79,9 +80,9 @@ void deviceToggle(){
   digitalWrite(5, nextState);
   digitalWrite(6, nextState);
    if(nextState){
-    io.signal("@$state", "on" );
+    io.signal("@$state", "on=1" );
    }else{
-    io.signal("@$state", "off" );
+    io.signal("@$state", "on=0" );
    }
 }
 
@@ -102,11 +103,10 @@ void onReady()
 {
   Serial.print(F("onReady cid: "));
   Serial.println( io.cid );
-  io.signal("@$state", digitalRead(5) ? "on" : "off");
-  io.signal("@$ui", ui );
-  io.signal("@$name", name );
-  io.signal("#notify", io.cid );
   io.subscribe("#search");
+  io.signal("@$info", deviceInfo);
+  publishState();
+  io.signal("#notify", io.cid);
   
 }
 
@@ -132,10 +132,6 @@ void onMessage( char *tag, uint8_t payloadType, uint8_t* payload, size_t payload
   if (payloadType != IOSignal::PAYLOAD_TYPE::TEXT || !payload ||
       !payloadSize || !memchr(payload, 0, payloadSize)) return;
 
-  if( strcmp(tag, "@ui") == 0){
-      io.signal2( (const char*)payload, "@ui", io.cid , ui);
-  }
-      
   if( strcmp(tag, "@") == 0){
     if( strcmp((const char*)payload, "on") == 0){
       deviceOn();
@@ -143,6 +139,8 @@ void onMessage( char *tag, uint8_t payloadType, uint8_t* payload, size_t payload
       deviceOff();
     }else if( strcmp((const char*)payload, "toggle") == 0){
       deviceToggle();
+    } else {
+      publishState(); // Unknown commands still get a reply.
     }
   }
       

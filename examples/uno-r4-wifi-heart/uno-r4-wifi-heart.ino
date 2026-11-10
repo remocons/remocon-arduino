@@ -32,8 +32,9 @@ Bounce2::Button aBtn = Bounce2::Button();
 ArduinoLEDMatrix matrix;
 WiFiClient client;
 IOSignal io;
-const char *name = "UnoR4-WiFi:HOME";
-const char *ui = "on,off,toggle";
+const char *deviceInfo = "name=UnoR4-WiFi;group=HOME;type=remocon/light/v1";
+
+void publishState() { io.signal("@$state", digitalRead(LED_BUILTIN) ? "on=1" : "on=0"); }
 
 int lastButtonState = HIGH; 
 
@@ -43,13 +44,13 @@ const uint32_t fullOff[] = { 0, 0, 0 };
 void deviceOn(){
   digitalWrite(LED_BUILTIN, HIGH);
   matrix.loadFrame(heart);
-  io.signal("@$state", "on" );
+  io.signal("@$state", "on=1" );
 }
 
 void deviceOff(){
   digitalWrite(LED_BUILTIN, LOW);
   matrix.loadFrame(fullOff);
-  io.signal("@$state", "off" );
+  io.signal("@$state", "on=0" );
 }
 
 void deviceToggle(){
@@ -105,11 +106,10 @@ void onReady()
 {
   Serial.print("onReady cid: ");
   Serial.println( io.cid );
-  io.signal("@$state", digitalRead(LED_BUILTIN) ? "on" : "off");
-  io.signal("@$name", name );
-  io.signal("@$ui", ui );
-  io.signal("#notify", io.cid );
   io.subscribe("#search");
+  io.signal("@$info", deviceInfo);
+  publishState();
+  io.signal("#notify", io.cid);
   
 }
 
@@ -137,10 +137,6 @@ void onMessage( char *tag, uint8_t payloadType, uint8_t* payload, size_t payload
   if (payloadType != IOSignal::PAYLOAD_TYPE::TEXT || !payload ||
       !payloadSize || !memchr(payload, 0, payloadSize)) return;
 
-  if( strcmp(tag, "@ui") == 0){
-    io.signal2( (char *)payload, "@ui", io.cid , ui );
-  }
-      
   if( strcmp(tag, "@") == 0){
     if( strcmp((char *)payload, "on") == 0){
       deviceOn();
@@ -148,6 +144,8 @@ void onMessage( char *tag, uint8_t payloadType, uint8_t* payload, size_t payload
       deviceOff();
     }else if( strcmp((char *)payload, "toggle") == 0){
       deviceToggle();
+    } else {
+      publishState(); // Unknown commands still get a reply.
     }
   }
       

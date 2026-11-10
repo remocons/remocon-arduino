@@ -1,0 +1,116 @@
+// iris ESP32-C3 basic: four onboard RGB LEDs as a 4-way switch.
+// Pin map based on the tested iris-v1a board. No DIP switches or groups.
+// Button 1 turns all LEDs on or off. Button 2 lights one more LED each press.
+// Tutorial: https://iosignal.net/docs/examples/workbench/iris
+#include <FastLED.h>
+#include <WiFi.h>
+#include <IOSignal.h>
+#include <Bounce2.h>
+#include <string.h>
+// USB serial blocks when the cable is in but no monitor reads it.
+// Skip a log line when it does not fit, so buttons and commands stay responsive.
+void logLine(const char* a, const char* b) {
+  if (Serial.availableForWrite() < (int)(strlen(a) + strlen(b) + 2)) return;
+  Serial.print(a); Serial.println(b);
+}
+// Wi-Fi values (and an optional device key) can go in _secrets.h next to this sketch,
+// which keeps them out of version control. Without it, edit WIFI_SSID and WIFI_PASS below.
+#if __has_include("_secrets.h")
+#include "_secrets.h"
+#endif
+#ifndef SECRET_WIFI_SSID
+#define SECRET_WIFI_SSID "WIFI_SSID"
+#define SECRET_WIFI_PASS "WIFI_PASS"
+#endif
+const char* WIFI_SSID = SECRET_WIFI_SSID;
+const char* WIFI_PASS = SECRET_WIFI_PASS;
+WiFiClient client;
+IOSignal io;
+unsigned long wifiRetry = 0;
+void connectNetwork() {
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(WIFI_SSID, WIFI_PASS);
+  WiFi.setTxPower(WIFI_POWER_8_5dBm); // Small ESP32-C3 boards drop sent packets at full power (antenna).
+  WiFi.setSleep(false); // Power save delays incoming signals by 100-800 ms.
+  io.setRxBuffer(256);
+  io.onReady(onReady);
+  io.onMessage(onMessage);
+  io.begin(&client, "io.remocon.kr", 55488);
+#ifdef SECRET_ID_KEY
+  io.auth(SECRET_ID_KEY); // Optional: your own key (id.key) from _secrets.h.
+#endif
+}
+void pollNetwork() {
+  if (WiFi.status() == WL_CONNECTED) {
+    // Send each small signal at once instead of waiting for the previous ACK.
+    if (client.connected() && !client.getNoDelay()) client.setNoDelay(true);
+    io.loop();
+  }
+  else if (millis() - wifiRetry >= 10000) {
+    wifiRetry = millis();
+    logLine("Waiting for WiFi...", "");
+    WiFi.reconnect();
+  }
+}
+
+const uint8_t DATA_PIN = 4;
+const uint8_t BUTTON_PINS[] = {1, 2};
+const char* DEVICE_INFO = "name=Iris Basic;type=remocon/switch4/v1";
+CRGB leds[4];
+Bounce2::Button buttons[2];
+char states[5] = "0000"; // One character per LED, '1' means on.
+
+// Shows the states and reports them as s1=0;s2=1;s3=0;s4=0.
+void publishState() {
+  for (uint8_t i = 0; i < 4; i++) leds[i] = states[i] == '1' ? CRGB(100, 80, 50) : CRGB::Black;
+  FastLED.show();
+  char text[24];
+  snprintf(text, sizeof(text), "s1=%c;s2=%c;s3=%c;s4=%c", states[0], states[1], states[2], states[3]);
+  io.signal("@$state", text);
+  logLine("STATE ", text);
+}
+void onReady() {
+  logLine("READY CID: ", io.cid);
+  io.subscribe("#search");
+  io.signal("@$info", DEVICE_INFO);
+  publishState();
+  io.signal("#notify", io.cid);
+}
+void onMessage(char* tag, uint8_t type, uint8_t* payload, size_t size) {
+  if (strcmp(tag, "#search") == 0) { io.signal("#notify", io.cid); return; }
+  if (strcmp(tag, "@") != 0 || type != IOSignal::TEXT || !payload || !size || !memchr(payload, 0, size)) return;
+  // s1=1 sets one LED. Unknown commands still get the current state.
+  const char* c = (const char*)payload;
+  logLine("COMMAND ", c);
+  if (c[0] == 's' && c[1] >= '1' && c[1] <= '4' && c[2] == '=' && (c[3] == '0' || c[3] == '1') && !c[4])
+    states[c[1] - '1'] = c[3];
+  publishState();
+}
+void setup() {
+  Serial.begin(115200);
+  logLine("iris basic start", "");
+  FastLED.addLeds<NEOPIXEL, DATA_PIN>(leds, 4); FastLED.clear(true);
+  for (uint8_t i = 0; i < 2; i++) {
+    buttons[i].attach(BUTTON_PINS[i], INPUT_PULLUP);
+    buttons[i].interval(10); buttons[i].setPressedState(LOW);
+  }
+  connectNetwork();
+}
+void loop() {
+  pollNetwork();
+  for (uint8_t i = 0; i < 2; i++) buttons[i].update();
+  if (buttons[0].pressed()) {
+    logLine("BUTTON 1: all on/off", "");
+    memset(states, strcmp(states, "0000") == 0 ? '1' : '0', 4);
+    publishState();
+  }
+  if (buttons[1].pressed()) {
+    logLine("BUTTON 2: one more LED", "");
+    // 0 -> 1 -> 2 -> 3 -> 4 -> 0 LEDs on, from the first LED.
+    uint8_t count = 0;
+    while (count < 4 && states[count] == '1') count++;
+    count = count == 4 ? 0 : count + 1;
+    for (uint8_t i = 0; i < 4; i++) states[i] = i < count ? '1' : '0';
+    publishState();
+  }
+}

@@ -47,10 +47,11 @@ WiFiClient client;
 IOSignal io;
 
 
-const char *name = "Remocon8266:HOME";
-const char *ui = "LED,OUT1,OUT2";
-char states[] = "100";
-char last_states[] = "100";
+const char *deviceInfo = "name=Remocon8266;group=HOME;type=remocon/switch3/v1";
+// 1 means on, whatever the pin polarity.
+char states[] = "000";
+char last_states[] = "000";
+const bool activeLow[] = { true, false, false };
 uint8_t pinMap[] = { LED_BUILTIN , OUT1, OUT2 };
 
 U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* reset=*/U8X8_PIN_NONE);
@@ -61,18 +62,24 @@ Bounce2::Button leftBtn = Bounce2::Button();
 Bounce2::Button downBtn = Bounce2::Button();
 Bounce2::Button rightBtn = Bounce2::Button();
 
+void publishState() {
+  char text[30];
+  snprintf(text, sizeof(text), "s1=%c;s2=%c;s3=%c", states[0], states[1], states[2]);
+  io.signal("@$state", text);
+}
+
 void stateChange(int i){
   //local state
   char state = states[i];
   if( state != last_states[i] ){
-    digitalWrite( pinMap[i] , states[i] - '0' );
+    digitalWrite( pinMap[i] , (states[i] == '1') != activeLow[i] );
     last_states[i] = state;
   }
   Serial.print("states: ");
   Serial.println( states);
 
   //publish device states
-  io.signal("@$state", states );
+  publishState();
 
   u8g2.clearBuffer();
   u8g2.drawStr(0, 10, "Remote Info");
@@ -236,11 +243,10 @@ void onReady()
 {
   Serial.print("onReady cid: ");
   Serial.println( io.cid );
-  io.signal("@$state", states );
-  io.signal("@$ui", ui );
-  io.signal("@$name", name );
-  io.signal("#notify", io.cid );
   io.subscribe("#search");
+  io.signal("@$info", deviceInfo);
+  publishState();
+  io.signal("#notify", io.cid);
   
   u8g2.clearBuffer();
     u8g2.setCursor(0, 0);
@@ -276,10 +282,6 @@ void onMessage( char *tag, uint8_t payloadType, uint8_t* payload, size_t payload
   if (payloadType != IOSignal::PAYLOAD_TYPE::TEXT || !payload ||
       !payloadSize || !memchr(payload, 0, payloadSize)) return;
 
-  if( strcmp(tag, "@ui") == 0){
-    io.signal2( (char *)payload, "@ui", io.cid , ui );
-  }
-
   if( strcmp(tag, "@msg") == 0){
 
     u8g2.clearBuffer();
@@ -291,12 +293,14 @@ void onMessage( char *tag, uint8_t payloadType, uint8_t* payload, size_t payload
   }
       
   if( strcmp(tag, "@") == 0){
-    if( strcmp((char *)payload, "LED") == 0){
-      toggle(0);
-    }else if( strcmp((char *)payload, "OUT1") == 0){
-      toggle(1);
-    }else if( strcmp((char *)payload, "OUT2") == 0){
-      toggle(2);
+    // s1=1 sets an output. Unknown commands still get a reply.
+    const char *c = (const char *)payload;
+    int i = c[0] == 's' ? c[1] - '1' : -1;
+    if( i >= 0 && i < 3 && c[2] == '=' && (c[3] == '0' || c[3] == '1') && c[4] == 0 ){
+      states[i] = c[3];
+      stateChange(i);
+    }else{
+      publishState();
     }
   }
       

@@ -1,5 +1,5 @@
 /*
-  ESP32: Remocon group channel control, compatible with test_iosignal_net.
+  ESP32: Remocon group channel control.
   Wiring: GPIO 4 -> 330 ohm resistor -> LED anode; LED cathode -> GND.
   Upload to two boards: OUTPUT_INDEX=0 on the first, 1 on the second.
   Tutorial: https://iosignal.net/docs/examples/workbench/group-led
@@ -16,11 +16,13 @@ const uint8_t LED_PIN = 4;
 const uint8_t OUTPUT_INDEX = 0; // Change to 1 on the second board.
 static_assert(OUTPUT_INDEX < 2, "OUTPUT_INDEX must be 0 or 1");
 
-// Keep these tags identical on the two boards and the web control preset.
+// Keep the channel identical on the two boards. The web app finds the group through #search
+// and rewrites the shared state; each board reads its own key (s1 on the first, s2 on the second).
 #define GROUP_CHANNEL "#lab"
-const char* GROUP_NAME_TAG = GROUP_CHANNEL "$name";
-const char* GROUP_UI_TAG = GROUP_CHANNEL "$ui";
-const char* GROUP_STATES_TAG = GROUP_CHANNEL "$states";
+const char* GROUP_INFO_TAG = GROUP_CHANNEL "$info";
+const char* GROUP_STATE_TAG = GROUP_CHANNEL "$state";
+const char* GROUP_INFO = "name=ESP32 LEDs;group=Tutorial;type=remocon/switch2/v1";
+const char STATE_KEY[] = { 's', char('1' + OUTPUT_INDEX), '=', 0 };
 
 WiFiClient client;
 IOSignal io;
@@ -29,28 +31,24 @@ unsigned long lastWifiRetry = 0;
 
 void onReady() {
   Serial.print("READY CID: "); Serial.println(io.cid);
-  io.subscribe("#scan/ch");
-  io.subscribe(GROUP_STATES_TAG);
-  io.signal(GROUP_NAME_TAG, "ESP32 LEDs:Tutorial");
-  io.signal(GROUP_UI_TAG, "LED 1,LED 2");
-  io.signal("@$state", ledOn ? "on" : "off");
-  io.signal("#detect/ch", GROUP_CHANNEL);
-  // Do not overwrite the shared setting on boot. If retained, the server
-  // provides it on subscription according to the service's retention policy.
+  io.subscribe("#search");
+  io.subscribe(GROUP_STATE_TAG);
+  io.signal(GROUP_INFO_TAG, GROUP_INFO);
+  io.signal("#notify", GROUP_CHANNEL);
+  // Do not overwrite the shared state on boot: the retained value arrives with the subscription.
 }
 
 void onMessage(char* tag, uint8_t type, uint8_t* payload, size_t size) {
-  if (strcmp(tag, "#scan/ch") == 0) {
-    io.signal("#detect/ch", GROUP_CHANNEL);
+  if (strcmp(tag, "#search") == 0) {
+    io.signal("#notify", GROUP_CHANNEL);
     return;
   }
-  if (strcmp(tag, GROUP_STATES_TAG) != 0 || type != IOSignal::TEXT ||
-      !payload || size != 3 || payload[2] != 0) return;
-  if ((payload[0] != '0' && payload[0] != '1') ||
-      (payload[1] != '0' && payload[1] != '1')) return;
-  ledOn = payload[OUTPUT_INDEX] == '1';
+  if (strcmp(tag, GROUP_STATE_TAG) != 0 || type != IOSignal::TEXT ||
+      !payload || !size || !memchr(payload, 0, size)) return;
+  const char* value = strstr((const char*)payload, STATE_KEY);
+  if (!value) return;
+  ledOn = value[3] == '1';
   digitalWrite(LED_PIN, ledOn ? HIGH : LOW);
-  io.signal("@$state", ledOn ? "on" : "off");
 }
 
 void setup() {

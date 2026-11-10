@@ -41,8 +41,9 @@
 byte mac[]{0xDE, 0xAD, 0x1E, 0xEF, 0xFE, 0x50};
 EthernetClient client;
 IOSignal io;
-const char *name = "UnoR3-Eth-IR:HOME";
-const char *ui = "on,off,toggle";
+const char *deviceInfo = "name=Uno-IR;type=remocon/light/v1";
+
+void publishState() { io.signal("@$state", digitalRead(5) ? "on=1" : "on=0"); }
 
 void setup()
 {
@@ -73,14 +74,14 @@ void deviceOn()
 {
   digitalWrite(5, HIGH);
   digitalWrite(6, HIGH);
-  io.signal("@$state", "on");
+  io.signal("@$state", "on=1");
 }
 
 void deviceOff()
 {
   digitalWrite(5, LOW);
   digitalWrite(6, LOW);
-  io.signal("@$state", "off");
+  io.signal("@$state", "on=0");
 }
 
 void deviceToggle()
@@ -90,11 +91,11 @@ void deviceToggle()
   digitalWrite(6, nextState);
   if (nextState)
   {
-    io.signal("@$state", "on");
+    io.signal("@$state", "on=1");
   }
   else
   {
-    io.signal("@$state", "off");
+    io.signal("@$state", "on=0");
   }
 }
 
@@ -121,19 +122,19 @@ void loop()
         switch (TinyIRReceiverData.Command)
         {
         // Change to the code value of your NEC compatible remote
-        case 0x01 :
+        case 0x06 :
           io.signal("#screen", "next");
           break;
-        case 0x08 :
+        case 0x07 :
           io.signal("#screen", "prev");
           break;
-        case 0x05 :
+        case 0x40 :
           io.signal("#screen", "up");
           break;
-        case 0 :
+        case 0x41 :
           io.signal("#screen", "down");
           break;
-        case 0x1F :
+        case 0x44 :
           deviceToggle(); 
           break;
         case 0x1E :
@@ -154,11 +155,10 @@ void onReady()
 {
   Serial.print(F("onReady cid: "));
   Serial.println(io.cid);
-  io.signal("@$state", digitalRead(5) ? "on" : "off");
-  io.signal("@$name", name );
-  io.signal("@$ui", ui);
-  io.signal("#notify", io.cid);
   io.subscribe("#search");
+  io.signal("@$info", deviceInfo);
+  publishState();
+  io.signal("#notify", io.cid);
 }
 
 void onMessage(char *tag, uint8_t payloadType, uint8_t *payload, size_t payloadSize)
@@ -186,11 +186,6 @@ void onMessage(char *tag, uint8_t payloadType, uint8_t *payload, size_t payloadS
   if (payloadType != IOSignal::PAYLOAD_TYPE::TEXT || !payload ||
       !payloadSize || !memchr(payload, 0, payloadSize)) return;
 
-  if (strcmp(tag, "@ui") == 0)
-  {
-    io.signal2((char *)payload, "@ui", io.cid, ui);
-  }
-
   if (strcmp(tag, "@") == 0)
   {
     if (strcmp((char *)payload, "on") == 0)
@@ -204,6 +199,8 @@ void onMessage(char *tag, uint8_t payloadType, uint8_t *payload, size_t payloadS
     else if (strcmp((char *)payload, "toggle") == 0)
     {
       deviceToggle();
+    } else {
+      publishState(); // Unknown commands still get a reply.
     }
   }
 }
