@@ -2,7 +2,7 @@
  *  IOSignal Remocon example: ESP-01 relay and button
  *
  *  remocon.kr shows it as a 2-way switch (remocon/switch2/v1):
- *    s1 = relay on GPIO0, s2 = LED on GPIO1 (active low).
+ *    s1 = relay on GPIO0, s2 = LED on GPIO1 (both active low).
  *    The button on GPIO2 toggles the relay.
  *  GPIO1 is the TX pin, so this sketch does not use serial.
  *  GPIO0 and GPIO2 must be HIGH at boot; check the relay and button wiring.
@@ -34,9 +34,10 @@ Bounce2::Button aBtn = Bounce2::Button();
 
 const char *deviceInfo = "name=ESP01-Relay-Btn;group=HOME;type=remocon/switch2/v1";
 // 1 means on, whatever the pin polarity.
-char states[] = "10";
-char last_states[] = "10";
-const bool activeLow[] = { false, true };
+char states[] = "00";
+char last_states[] = "00";
+// The relay module and the LED both turn on with LOW. Change false/true to match your relay.
+const bool activeLow[] = { true, true };
 uint8_t pinMap[] = { RELAY_PIN, LED_PIN };
 
 void publishState() {
@@ -72,7 +73,7 @@ void toggle(int i){
 
 void setup() {  
   pinMode(RELAY_PIN, OUTPUT);
-  digitalWrite(RELAY_PIN, HIGH);
+  digitalWrite(RELAY_PIN, HIGH);  // relay off (active low); GPIO0 must be HIGH at boot
 
   pinMode( LED_PIN , OUTPUT);
   digitalWrite( LED_PIN, HIGH);  // active low
