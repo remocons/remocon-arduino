@@ -54,7 +54,8 @@ void pollNetwork() {
 
 const uint8_t DATA_PIN = 4, STATUS_LED = 8;
 const uint8_t BUTTON_PINS[] = {1, 2};
-const char* TARGET_NAME = "name=Iris Basic"; // A whole field of the target's info.
+const char* TARGET_NAME = "n=Iris Basic"; // A whole field of the target's info.
+const char* TARGET_NAME_OLD = "name=Iris Basic"; // Boards flashed before the short keys.
 CRGB leds[4];
 Bounce2::Button buttons[2];
 char target[MAX_CID_LEN + 1] = ""; // CID of the Iris Basic, empty while searching.
@@ -84,7 +85,7 @@ void onReady() {
   search();
 }
 // Tags arrive as <cid>@$info and <cid>@$state. Copies the <cid> part.
-// True when info "name=Iris Basic;type=..." has the whole field, not just a part of one.
+// True when info "n=Iris Basic;t=..." has the whole field, not just a part of one.
 bool hasField(const char* info, const char* field) {
   const size_t n = strlen(field);
   for (const char* at = strstr(info, field); at; at = strstr(at + 1, field))
@@ -108,7 +109,7 @@ void onMessage(char* tag, uint8_t type, uint8_t* payload, size_t size) {
     io.subscribe(sub);
   } else if (cidOf(tag, "@$info", cid)) {
     io.unsubscribe(tag); // The info is read once. Do not keep receiving it.
-    if (target[0] || !hasField(text, TARGET_NAME)) return;
+    if (target[0] || !(hasField(text, TARGET_NAME) || hasField(text, TARGET_NAME_OLD))) return;
     strcpy(target, cid);
     logLine("TARGET ", target);
     snprintf(sub, sizeof(sub), "%s@$state", target);

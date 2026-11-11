@@ -1,7 +1,7 @@
 /*
  *  IOSignal Remocon example: ESP-01 relay and button
  *
- *  remocon.kr shows it as a 2-way switch (remocon/switch2/v1):
+ *  remocon.kr shows it as a 2-way switch (switch2.1):
  *    s1 = relay on GPIO0, s2 = LED on GPIO1 (both active low).
  *    The button on GPIO2 toggles the relay.
  *  GPIO1 is the TX pin, so this sketch does not use serial.
@@ -32,7 +32,7 @@ IOSignal io;
 
 Bounce2::Button aBtn = Bounce2::Button();
 
-const char *deviceInfo = "name=ESP01-Relay-Btn;group=HOME;type=remocon/switch2/v1";
+const char *deviceInfo = "n=ESP01-Relay-Btn;g=HOME;t=switch2.1";
 // 1 means on, whatever the pin polarity.
 char states[] = "00";
 char last_states[] = "00";

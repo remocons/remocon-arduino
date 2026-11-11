@@ -54,7 +54,7 @@ void pollNetwork() {
 
 const uint8_t DATA_PIN = 4;
 const uint8_t BUTTON_PINS[] = {1, 2};
-const char* DEVICE_INFO = "name=Iris Basic;type=remocon/switch4/v1";
+const char* DEVICE_INFO = "n=Iris Basic;t=switch4.1";
 CRGB leds[4];
 Bounce2::Button buttons[2];
 char states[5] = "0000"; // One character per LED, '1' means on.

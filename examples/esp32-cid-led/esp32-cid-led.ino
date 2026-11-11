@@ -12,7 +12,7 @@ const char* WIFI_PASS = "WIFI_PASS";
 const char* IO_HOST = "io.remocon.kr";
 const uint16_t IO_PORT = 55488;
 const uint8_t LED_PIN = 4;
-const char* DEVICE_INFO = "name=ESP32-LED;group=Tutorial;ui=on,off,toggle";
+const char* DEVICE_INFO = "n=ESP32-LED;g=Tutorial;ui=on,off,toggle";
 
 WiFiClient client;
 IOSignal io;

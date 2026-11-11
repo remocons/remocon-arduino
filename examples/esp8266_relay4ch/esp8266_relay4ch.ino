@@ -1,11 +1,11 @@
 /*
  *  IOSignal Remocon example: ESP-12F 4-channel relay board
  *
- *  remocon.kr shows it as a 4-channel relay (remocon/relay4/v1).
+ *  remocon.kr shows it as a 4-channel relay (relay4.1).
  *    Relays 1-4 are on GPIO13, 12, 14 and 16. Commands: r1=1 ... r4=0, all=1, all=0.
  *    The names L (built-in LED, GPIO2) and A-D toggle an output; they are for IR
  *    routers that do not know the state.
- *    Its info has group=1414; Remocon8266-4ch-control can control this board.
+ *    Its info has g=1414; Remocon8266-4ch-control can control this board.
  *
  *  Setup: put Wi-Fi (and an optional device key) in _secrets.h, or edit WIFI_SSID
  *  and WIFI_PASS below. Connect a USB-TTL adapter to the programming port, hold
@@ -38,7 +38,7 @@ const char* WIFI_PASS = SECRET_WIFI_PASS;
 WiFiClient client;
 IOSignal io;
 
-const char *deviceInfo = "name=Relay4CH;group=1414;type=remocon/relay4/v1";
+const char *deviceInfo = "n=Relay4CH;g=1414;t=relay4.1";
 char states[] = "10000";
 char last_states[] = "10000";
 uint8_t pinMap[] = { 2, 13, 12, 14, 16};

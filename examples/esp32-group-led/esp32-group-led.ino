@@ -1,6 +1,6 @@
 /*
   ESP32: Remocon group channel control. Two boards share the #lab group,
-  which remocon.kr shows as one 2-way switch card (remocon/switch2/v1).
+  which remocon.kr shows as one 2-way switch card (switch2.1).
   Wiring: GPIO 4 -> 330 ohm resistor -> LED anode; LED cathode -> GND.
   Upload to two boards: OUTPUT_INDEX=0 on the first, 1 on the second.
 */
@@ -21,7 +21,7 @@ static_assert(OUTPUT_INDEX < 2, "OUTPUT_INDEX must be 0 or 1");
 #define GROUP_CHANNEL "#lab"
 const char* GROUP_INFO_TAG = GROUP_CHANNEL "$info";
 const char* GROUP_STATE_TAG = GROUP_CHANNEL "$state";
-const char* GROUP_INFO = "name=ESP32 LEDs;group=Tutorial;type=remocon/switch2/v1";
+const char* GROUP_INFO = "n=ESP32 LEDs;g=Tutorial;t=switch2.1";
 const char STATE_KEY[] = { 's', char('1' + OUTPUT_INDEX), '=', 0 };
 
 WiFiClient client;

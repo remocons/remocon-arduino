@@ -1,7 +1,7 @@
 /*
  *  IOSignal Remocon example: Arduino UNO + W5100 Ethernet shield + button
  *
- *  remocon.kr shows it as a light (remocon/light/v1): on, off, toggle.
+ *  remocon.kr shows it as a light (light.1): on, off, toggle.
  *    The light is an LED on D5 and a relay on D6, switched together.
  *    A button on D2 (to GND) toggles them and sends #screen playToggle,
  *    which plays or pauses a bayo.tv screen.
@@ -27,7 +27,7 @@
 byte mac[]{0, 0, 0, 0, 0, 0x07}; 
 EthernetClient client;
 IOSignal io;
-const char *deviceInfo = "name=Uno-Btn;type=remocon/light/v1";
+const char *deviceInfo = "n=Uno-Btn;t=light.1";
 
 void publishState() { io.signal("@$state", digitalRead(5) ? "on=1" : "on=0"); }
 

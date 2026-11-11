@@ -1,13 +1,20 @@
 # WiFi 공유 스위치 수신
 
-#switch 그룹에 참여해 공유 상태를 시리얼로 출력합니다. 하드웨어 없이 통신만 확인하는 가장 간단한 예제입니다.
+#switch 그룹에 참여해 공유 상태를 시리얼로 출력합니다. 하드웨어 없이 통신만 확인하는 가장 간단한 예제입니다. LED_PIN을 켜면 s1 값으로 LED도 켭니다.
 
 ## 준비물
 
 - 보드: ESP8266 D1 mini
 - 보드: ESP32 개발 보드
+- 보드: ESP32-C3 Super Mini
 - 네트워크: Wi-Fi 2.4GHz 공유기
 - 앱: https://remocon.kr 또는 IOSignal Desktop 장치 제어 화면
+
+## 배선
+
+| 보드 핀 | 연결 | 비고 |
+| --- | --- | --- |
+| LED_PIN (선택) | LED | active low. 스케치의 LED_PIN 주석을 풀면 s1 값으로 켭니다. ESP32-C3 Super Mini는 내장 LED GPIO8입니다. |
 
 ## 사용 순서
 
@@ -22,7 +29,7 @@
 | --- | --- | --- | --- | --- |
 | 장치 | 서버 | `#switch$state` | `구독` | 공유 상태를 구독합니다. 보관된 값이 있으면 바로 받습니다. |
 | 장치 | 서버 | `#search` | `구독` | 앱의 검색 요청을 받도록 구독합니다. |
-| 장치 | 서버 | `#switch$info` | `name=공유 스위치;type=remocon/switch3/v1` | 그룹 정보입니다. 서버에 보관됩니다. |
+| 장치 | 서버 | `#switch$info` | `n=공유 스위치;t=switch3.1` | 그룹 정보입니다. 서버에 보관됩니다. |
 | 장치 | 앱 | `#notify` | `#switch` | 그룹은 CID 대신 채널 이름으로 알립니다. |
 | 앱 | 장치 | `#search` |  | 앱이 그룹을 찾습니다. |
 | 장치 | 앱 | `#notify` | `#switch` | 구성원마다 답하고 앱은 하나로 합칩니다. |
@@ -30,11 +37,13 @@
 
 ## 참고
 
-- 값을 출력만 하고 핀은 제어하지 않습니다.
+- 기본은 값을 출력만 하고 핀은 제어하지 않습니다.
+- esp32c3/esp32c3-simple 예제를 합쳤습니다. 보드 제품마다 핀 번호가 다를 수 있습니다.
 
 ## 컴파일
 
 ```sh
 arduino-cli compile --fqbn esp8266:esp8266:d1_mini examples/wifi-simple
 arduino-cli compile --fqbn esp32:esp32:esp32 examples/wifi-simple
+arduino-cli compile --fqbn esp32:esp32:esp32c3 examples/wifi-simple
 ```

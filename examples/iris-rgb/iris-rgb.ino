@@ -1,5 +1,5 @@
 // iris ESP32-C3: four RGB LEDs, each with its own hue and brightness (0 = off).
-// The web app finds it without a key and shows the remocon/iris/v2 screen.
+// The web app finds it without a key and shows the iris.2 screen.
 // DIP switches (read at boot, LOW = 1):
 //   GPIO21, 20, 10: group id 0-7    GPIO7, 6, 5: device id 0-7 -> name "iris<device id>"
 // Buttons: GPIO1 turns the whole group on or off, GPIO2 turns this board on or off.
@@ -64,7 +64,7 @@ uint8_t groupId = 0, deviceId = 0;
 char deviceInfo[96];
 char groupChannel[16]; // #iris-g<group id>: members only, carries "on" and "off".
 
-// What the app sees (remocon/iris/v2): each LED has a hue 0-359 and a brightness 0-100.
+// What the app sees (iris.2): each LED has a hue 0-359 and a brightness 0-100.
 // Brightness 0 is off; anything else is on. There is no separate on/off per LED.
 uint16_t hue[4] = {30, 30, 30, 30};
 uint8_t level[4] = {0, 0, 0, 0};
@@ -176,7 +176,7 @@ void setup() {
   }
   snprintf(groupChannel, sizeof(groupChannel), "#iris-g%u", groupId);
   snprintf(deviceInfo, sizeof(deviceInfo),
-           "name=iris%u;group=iris G%u;type=remocon/iris/v2", deviceId, groupId);
+           "n=iris%u;g=iris G%u;t=iris.2", deviceId, groupId);
   logLine("iris rgb start: ", deviceInfo);
   groupButton.attach(GROUP_BUTTON, INPUT_PULLUP); groupButton.interval(10); groupButton.setPressedState(LOW);
   selfButton.attach(SELF_BUTTON, INPUT_PULLUP); selfButton.interval(10); selfButton.setPressedState(LOW);

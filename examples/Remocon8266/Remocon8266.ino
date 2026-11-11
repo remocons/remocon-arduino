@@ -1,7 +1,7 @@
 /*
  *  IOSignal Remocon example: Remocon8266 board
  *
- *  remocon.kr shows it as a 3-way switch (remocon/switch3/v1):
+ *  remocon.kr shows it as a 3-way switch (switch3.1):
  *    s1 = built-in LED (active low), s2 = OUT1 (GPIO15, D8), s3 = OUT2 (GPIO12, D6).
  *  The four buttons send #screen commands to a bayo.tv screen:
  *    SW1 (GPIO16) playToggle, SW2 (GPIO0) left, SW3 (GPIO14) down, SW4 (GPIO13) right.
@@ -51,7 +51,7 @@ WiFiClient client;
 IOSignal io;
 
 
-const char *deviceInfo = "name=Remocon8266;group=HOME;type=remocon/switch3/v1";
+const char *deviceInfo = "n=Remocon8266;g=HOME;t=switch3.1";
 // 1 means on, whatever the pin polarity.
 char states[] = "000";
 char last_states[] = "000";

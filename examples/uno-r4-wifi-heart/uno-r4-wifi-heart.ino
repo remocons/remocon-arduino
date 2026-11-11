@@ -1,7 +1,7 @@
 /*
  *  IOSignal Remocon example: Arduino UNO R4 WiFi heart
  *
- *  remocon.kr shows it as a light (remocon/light/v1): on, off, toggle.
+ *  remocon.kr shows it as a light (light.1): on, off, toggle.
  *    On shows a heart on the LED matrix and lights the built-in LED.
  *    A button on D12 (to GND) toggles it and sends #screen playToggle,
  *    which plays or pauses a bayo.tv screen.
@@ -30,7 +30,7 @@ Bounce2::Button aBtn = Bounce2::Button();
 ArduinoLEDMatrix matrix;
 WiFiClient client;
 IOSignal io;
-const char *deviceInfo = "name=UnoR4-WiFi;group=HOME;type=remocon/light/v1";
+const char *deviceInfo = "n=UnoR4-WiFi;g=HOME;t=light.1";
 
 void publishState() { io.signal("@$state", digitalRead(LED_BUILTIN) ? "on=1" : "on=0"); }
 

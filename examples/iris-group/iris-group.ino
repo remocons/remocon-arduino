@@ -1,4 +1,4 @@
-// iris ESP32-C3 group lights: boards in one group share an 8-way switch (remocon/switch8/v1).
+// iris ESP32-C3 group lights: boards in one group share an 8-way switch (switch8.1).
 // DIP switches (read at boot, LOW = 1): GPIO21, 20, 10 group id 0-7; GPIO7, 6, 5 device id 0-7.
 // Each board lights its four WS2812 LEDs (GPIO4) from switch s<device id + 1>.
 // Button GPIO1 turns the whole group on or off, GPIO2 toggles this board. Status LED: GPIO8.
@@ -87,7 +87,7 @@ void setup() {
   snprintf(channel, sizeof(channel), "#Iris-g%u", groupId);
   snprintf(stateTag, sizeof(stateTag), "%s$state", channel);
   snprintf(infoTag, sizeof(infoTag), "%s$info", channel);
-  snprintf(groupInfo, sizeof(groupInfo), "name=Iris Lights %u;type=remocon/switch8/v1", groupId);
+  snprintf(groupInfo, sizeof(groupInfo), "n=Iris Lights %u;t=switch8.1", groupId);
   for (uint8_t i = 0; i < 2; i++) {
     buttons[i].attach(BUTTON_PINS[i], INPUT_PULLUP);
     buttons[i].interval(10); buttons[i].setPressedState(LOW);

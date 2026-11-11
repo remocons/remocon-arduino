@@ -1,7 +1,7 @@
 /*
  *  IOSignal Remocon example: ESP8266 D1 mini
  *
- *  remocon.kr shows it as a light (remocon/light/v1): on, off, toggle.
+ *  remocon.kr shows it as a light (light.1): on, off, toggle.
  *    The built-in LED (GPIO2, active low) is the light.
  *    A button on GPIO14 (D5, to GND) toggles it.
  *
@@ -27,7 +27,7 @@ ESP8266WiFiMulti wifiMulti;
 WiFiClient client;
 IOSignal io;
 
-const char *deviceInfo = "name=D1-mini;group=HOME;type=remocon/light/v1";
+const char *deviceInfo = "n=D1-mini;g=HOME;t=light.1";
 
 void publishState() { io.signal("@$state", digitalRead(BUILTIN_LED) == LOW ? "on=1" : "on=0"); }
 

@@ -53,15 +53,17 @@ const uint8_t BUTTON_PINS[4] = { BTN_UP, BTN_LEFT, BTN_DOWN, BTN_RIGHT };
 
 const char* DEFAULT_TARGET = "1414"; // CID of the relay board until the card sets another one.
 
-// The card: a CID input and the relay states. The "text" widget needs a web app that knows it.
-// An app that does not falls back to the ui buttons, which toggle the relays through this board.
-const char* deviceInfo =
-  "{\"name\":\"Relay Control\",\"ui\":\"r1,r2,r3,r4,all\",\"schema\":{\"schema\":1,\"title\":\"Relay Control\",\"controls\":["
+// The card: a CID input and the relay states, kept in <cid>@$panel ("p=1" in the info).
+// The "text" widget needs a web app that knows it. An app that does not falls back
+// to the ui buttons, which toggle the relays through this board.
+const char* devicePanel =
+  "{\"schema\":1,\"title\":\"Relay Control\",\"controls\":["
   "{\"widget\":\"text\",\"label\":\"Target CID\",\"key\":\"target\",\"cmd\":\"target={v}\",\"maxLength\":12},"
   "{\"widget\":\"value\",\"label\":\"Relays 1-4\",\"key\":\"relays\"},"
   "{\"widget\":\"value\",\"label\":\"Connected\",\"key\":\"link\"},"
   "{\"widget\":\"buttons\",\"label\":\"Toggle\",\"options\":[\"r1\",\"r2\",\"r3\",\"r4\",\"all\"],\"cmd\":\"{v}\"}"
-  "]}}";
+  "]}";
+const char* deviceInfo = "n=Relay Control;ui=r1,r2,r3,r4,all;p=1";
 
 ESP8266WiFiMulti wifiMulti;
 WiFiClient client;
@@ -165,6 +167,7 @@ void onReady() {
   Serial.println(io.cid);
   stateKnown = false;
   io.subscribe("#search");
+  io.signal("@$panel", devicePanel); // Before the info, so it is kept when the app sees p=1.
   io.signal("@$info", deviceInfo);
   publishState();
   io.signal("#notify", io.cid);

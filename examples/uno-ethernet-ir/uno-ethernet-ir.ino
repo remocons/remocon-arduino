@@ -41,7 +41,7 @@
 byte mac[]{0xDE, 0xAD, 0x1E, 0xEF, 0xFE, 0x50};
 EthernetClient client;
 IOSignal io;
-const char *deviceInfo = "name=Uno-IR;type=remocon/light/v1";
+const char *deviceInfo = "n=Uno-IR;t=light.1";
 
 void publishState() { io.signal("@$state", digitalRead(5) ? "on=1" : "on=0"); }
 
