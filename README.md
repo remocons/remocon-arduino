@@ -44,8 +44,7 @@ IOSignal Arduino 라이브러리 설치와 UNO Ethernet 실습은 [iosignal.net 
 | `Remocon8266-4ch-control` | Remocon8266 전용 보드 | CID로 4채널 릴레이 보드를 제어, 버튼 4개·D6 전체 버튼·OLED 상태 |
 | `esp32-cid-led` | ESP32 + GPIO 4 외부 LED | 장치 검색·CID 명령·실제 상태 발행, Remocon 또는 공개 통신 실습실 |
 | `esp32-group-led` | ESP32 1~2대 + GPIO 4 외부 LED | 그룹을 2구 스위치(`remocon/switch2/v1`)로 공유, 보드별 OUTPUT_INDEX 선택 |
-| `wifi-simple` | ESP8266, ESP32 | `#switch` 공유 스위치 그룹에 참여해 상태를 시리얼로 출력 |
-| `esp32c3/esp32c3-simple` | ESP32-C3 Super Mini 기준 | `#switch` 공유 스위치의 `s1`로 GPIO 8 LED 제어, active low |
+| `wifi-simple` | ESP8266, ESP32, ESP32-C3 | `#switch` 공유 스위치 그룹에 참여해 상태를 시리얼로 출력. `LED_PIN`을 켜면 `s1`로 LED 제어(active low, ESP32-C3 Super Mini는 GPIO 8) |
 | `esp8266-d1-mini` | ESP8266 D1 mini | 내장 LED와 GPIO 14(D5) 버튼 제어 |
 | `esp01-relay-button` | ESP8266 ESP-01 | 릴레이 GPIO 0, LED GPIO 1, 버튼 GPIO 2 |
 | `Remocon8266` | Remocon8266 전용 보드 | OLED·버튼·출력 제어, 폴더 내 회로도 참고 |
@@ -73,7 +72,7 @@ Wi-Fi 및 UNO R4 LED 매트릭스 헤더는 해당 보드 패키지에서 제공
 
 1. 아두이노와 **동일한 공유기에 연결된 스마트폰 또는 PC**에서 [remocon.kr](https://remocon.kr)을 엽니다.
 2. 장치 목록을 제공하는 예제에서는 장치가 접속하면 앱에서 해당 장치를 선택해 제어합니다.
-3. `wifi-simple`과 `esp32c3-simple`은 `#switch` 그룹에 참여하며 앱에 **공유 스위치** 카드로 나타납니다. 그 카드의 스위치를 조작하여 확인하세요.
+3. `wifi-simple`은 `#switch` 그룹에 참여하며 앱에 **공유 스위치** 카드로 나타납니다. 그 카드의 스위치를 조작하여 확인하세요.
 
 인증키를 설정하지 않는 사용 흐름은 동일 공유기 환경을 기준으로 합니다. 외부 네트워크에서 내 장치를 제어하려면 앱 계정의 장치 인증키를 설정하세요.
 계정 메뉴·인증키 발급 수량·서비스 이용 범위는 현재 웹앱 안내를 확인하세요.

@@ -44,8 +44,7 @@ Installing the IOSignal Arduino library and the UNO Ethernet exercise are in the
 | `Remocon8266-4ch-control` | Remocon8266 board | Control a 4-channel relay board by CID: four buttons, a D6 all button, OLED state |
 | `esp32-cid-led` | ESP32 + external LED on GPIO 4 | Device discovery, CID commands, and actual state reporting with Remocon or the public workbench |
 | `esp32-group-led` | One or two ESP32 boards + external LED on GPIO 4 | Share a group as a 2-way switch (`remocon/switch2/v1`); select OUTPUT_INDEX for each board |
-| `wifi-simple` | ESP8266, ESP32 | Join the `#switch` shared-switch group and print its state to serial |
-| `esp32c3/esp32c3-simple` | Based on ESP32-C3 Super Mini | Control the GPIO 8 LED with `s1` of the `#switch` shared switch; active low |
+| `wifi-simple` | ESP8266, ESP32, ESP32-C3 | Join the `#switch` shared-switch group and print its state to serial. Set `LED_PIN` to drive an LED with `s1` (active low; GPIO 8 on an ESP32-C3 Super Mini) |
 | `esp8266-d1-mini` | ESP8266 D1 mini | Built-in LED and GPIO 14 (D5) button control |
 | `esp01-relay-button` | ESP8266 ESP-01 | Relay on GPIO 0, LED on GPIO 1, button on GPIO 2 |
 | `Remocon8266` | Dedicated Remocon8266 board | OLED, button, and output control; see the schematic in the folder |
@@ -73,7 +72,7 @@ To use remocon.kr:
 
 1. Open [remocon.kr](https://remocon.kr) on a **phone or PC connected to the same router as the Arduino**.
 2. For examples that provide a device listing, select the device in the app after it connects, then control it.
-3. `wifi-simple` and `esp32c3-simple` join the `#switch` group and appear in the app as a **shared switch** card. Operate the switches on that card to test them.
+3. `wifi-simple` joins the `#switch` group and appears in the app as a **shared switch** card. Operate the switches on that card to test it.
 
 Use without an authentication key assumes that the devices are connected to the same router. To control your device from an external network, configure a device authentication key from your app account.
 Check the current web app guidance for account menus, authentication key quotas, and service availability.
