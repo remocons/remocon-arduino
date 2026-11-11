@@ -55,7 +55,7 @@ IOSignal Arduino 라이브러리 설치와 UNO Ethernet 실습은 [iosignal.net 
 모든 예제가 모든 보드에서 컴파일되는 것은 아닙니다. ESP32-C3 제품별 LED 종류와 핀 번호도 다를 수 있으므로 실제 보드에 맞게 수정하세요.
 ESP-01은 부팅 시 GPIO 0·2 상태의 영향을 받으므로 버튼·릴레이 배선도 확인해야 합니다.
 
-공통 통신 의존성은 `IOSignal`(9.6.0 이상), `Boho`, `Crypto`이며 예제에 따라 `Bounce2`, `U8g2`, `IRremote`, `FastLED`, `Ethernet`을 사용합니다.
+공통 통신 의존성은 `IOSignal`(9.12.0 이상), `Boho`, `Crypto`이며 예제에 따라 `Bounce2`, `U8g2`, `IRremote`, `FastLED`, `Ethernet`을 사용합니다.
 Wi-Fi 및 UNO R4 LED 매트릭스 헤더는 해당 보드 패키지에서 제공합니다.
 의존성 선언은 [library.properties](library.properties)에 있습니다. `architectures=*`는 패키지 전체의 메타데이터이며, 각 예제의 보드 호환성을 보장하지 않습니다.
 
@@ -100,6 +100,15 @@ Wi-Fi 비밀번호와 장치 인증키를 공개 저장소에 올리지 마세�
 - **큰 메시지가 오지 않음:** 수신 버퍼(`setRxBuffer`)보다 큰 메시지는 서버가 보내지 않거나(9.0 서버), 장치가 건너뜁니다. 필요하면 버퍼 크기를 늘리세요. 보드 메모리를 고려해야 합니다.
 
 ## 버전별 변경 사항
+
+### 9.12.0
+
+- **버전 번호를 공개 iosignal 9.12.0과 맞췄습니다.** 의존성을 `IOSignal (>=9.12.0)`으로 올렸습니다.
+- 모든 예제의 `$info`가 짧은 키(`n=`, `g=`, `t=`)와 타입 이름 `<이름>.<major>`(`light.1`, `switch4.1` 등)를 씁니다. remocon.kr은 예전 형식도 계속 읽습니다.
+- `Remocon8266-4ch-control`: 카드 화면을 `$panel`로 보내고 `$info`에 `p=1`을 붙입니다. OLED 맨 아래 줄에 이 보드의 CID를 표시합니다. 기본 대상 `DEFAULT_TARGET`은 자리표시자 `the-cid`이니 릴레이 보드의 CID로 바꾸세요. 원격으로 지정해 플래시에 저장된 대상이 있으면 그 값을 먼저 씁니다.
+- `esp8266_relay4ch`: `$info` 분류를 `g=relays`로 바꿨습니다.
+- `esp32c3/esp32c3-simple`을 `wifi-simple`에 합쳤습니다. `LED_PIN` 주석을 풀면 `s1` 값으로 LED를 켭니다.
+- 예제별 준비물, 배선, 순서와 브라우저 제어 화면은 [test.iosignal.net](https://test.iosignal.net/)에 있습니다.
 
 ### 9.6.0
 

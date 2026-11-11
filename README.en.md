@@ -55,7 +55,7 @@ Installing the IOSignal Arduino library and the UNO Ethernet exercise are in the
 Not every example compiles for every board. LED types and pin assignments can also vary between ESP32-C3 products; adjust the sketch for your actual board.
 On ESP-01, GPIO 0 and GPIO 2 affect boot behavior, so check the button and relay wiring as well.
 
-The common communication dependencies are `IOSignal` (9.6.0 or later), `Boho`, and `Crypto`. Individual examples also use `Bounce2`, `U8g2`, `IRremote`, `FastLED`, or `Ethernet`.
+The common communication dependencies are `IOSignal` (9.12.0 or later), `Boho`, and `Crypto`. Individual examples also use `Bounce2`, `U8g2`, `IRremote`, `FastLED`, or `Ethernet`.
 Wi-Fi and UNO R4 LED matrix headers are provided by the relevant board package.
 Dependencies are declared in [library.properties](library.properties). The `architectures=*` declaration is package metadata and does not guarantee that every example supports every board.
 
@@ -100,6 +100,15 @@ Revoke and reissue any real authentication key that has already been published. 
 - **Large messages do not arrive:** Messages larger than the receive buffer (`setRxBuffer`) are not sent by a 9.0 server, or are skipped by the device. Increase the buffer if needed, keeping the board's memory in mind.
 
 ## Changes by version
+
+### 9.12.0
+
+- **The version number now matches the public iosignal 9.12.0 package.** The dependency is now `IOSignal (>=9.12.0)`.
+- Every example sends `$info` with the short keys (`n=`, `g=`, `t=`) and the type names `<name>.<major>` (`light.1`, `switch4.1` and so on). remocon.kr still reads the old form.
+- `Remocon8266-4ch-control`: the card screen is sent in `$panel`, with `p=1` in `$info`. The bottom OLED line shows this board's CID. The default target `DEFAULT_TARGET` is the placeholder `the-cid`; set it to your relay board's CID. A target set remotely and kept in flash is used first.
+- `esp8266_relay4ch`: the `$info` group is now `g=relays`.
+- `esp32c3/esp32c3-simple` was merged into `wifi-simple`. Uncomment `LED_PIN` to drive an LED with `s1`.
+- Parts, wiring, steps and a browser control panel for each example are on [test.iosignal.net](https://test.iosignal.net/) (Korean).
 
 ### 9.6.0
 
