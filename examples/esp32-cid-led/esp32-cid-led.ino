@@ -34,15 +34,15 @@ void onMessage(char* tag, uint8_t type, uint8_t* payload, size_t size) {
     io.signal("#notify", io.cid);
     return;
   }
-  if (strcmp(tag, "@") != 0 || type != IOSignal::TEXT || !payload ||
-      size == 0 || payload[size - 1] != 0) return;
-  const char* command = reinterpret_cast<const char*>(payload);
+  if (strcmp(tag, "@") != 0) return;
+  // Only NUL-terminated TEXT is read as a command; anything else counts as unknown.
+  const bool text = type == IOSignal::TEXT && payload && size > 0 && payload[size - 1] == 0;
+  const char* command = text ? reinterpret_cast<const char*>(payload) : "";
   if (strcmp(command, "on") == 0) ledOn = true;
   else if (strcmp(command, "off") == 0) ledOn = false;
   else if (strcmp(command, "toggle") == 0) ledOn = !ledOn;
-  else return;
   digitalWrite(LED_PIN, ledOn ? HIGH : LOW);
-  publishState();
+  publishState(); // Sent for every command, unknown ones too: the app waits for it.
 }
 
 void setup() {
