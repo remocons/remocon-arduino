@@ -37,13 +37,13 @@ IOSignal Arduino 라이브러리 설치와 UNO Ethernet 실습은 [iosignal.net 
 | 예제 경로 (`examples/` 아래) | 대상 보드 | 동작 / 준비물 |
 | --- | --- | --- |
 | `iris-group` | iris (ESP32-C3) | DIP로 그룹·장치 번호를 설정하고 버튼·웹앱으로 WS2812 4개 제어 |
-| `iris-basic` | iris (ESP32-C3) | 내장 RGB LED 4개를 4구 스위치(`remocon/switch4/v1`)로 켜고 끔, 버튼 2개 |
+| `iris-basic` | iris (ESP32-C3) | 내장 RGB LED 4개를 4구 스위치(`switch4.1`)로 켜고 끔, 버튼 2개 |
 | `iris-basic-control` | iris (ESP32-C3) | 다른 iris의 `iris-basic`을 찾아 제어하고 상태를 자기 LED에 표시 |
-| `iris-rgb` | iris (ESP32-C3) | LED 4개의 색상·밝기 제어(`remocon/iris/v2`), DIP로 번호·그룹 |
-| `esp8266_relay4ch` | ESP-12F 4채널 릴레이 보드 | 릴레이 4개(`remocon/relay4/v1`), `all=1`/`all=0` |
+| `iris-rgb` | iris (ESP32-C3) | LED 4개의 색상·밝기 제어(`iris.2`), DIP로 번호·그룹 |
+| `esp8266_relay4ch` | ESP-12F 4채널 릴레이 보드 | 릴레이 4개(`relay4.1`), `all=1`/`all=0` |
 | `Remocon8266-4ch-control` | Remocon8266 전용 보드 | CID로 4채널 릴레이 보드를 제어, 버튼 4개·D6 전체 버튼·OLED 상태 |
 | `esp32-cid-led` | ESP32 + GPIO 4 외부 LED | 장치 검색·CID 명령·실제 상태 발행, Remocon 또는 공개 통신 실습실 |
-| `esp32-group-led` | ESP32 1~2대 + GPIO 4 외부 LED | 그룹을 2구 스위치(`remocon/switch2/v1`)로 공유, 보드별 OUTPUT_INDEX 선택 |
+| `esp32-group-led` | ESP32 1~2대 + GPIO 4 외부 LED | 그룹을 2구 스위치(`switch2.1`)로 공유, 보드별 OUTPUT_INDEX 선택 |
 | `wifi-simple` | ESP8266, ESP32, ESP32-C3 | `#switch` 공유 스위치 그룹에 참여해 상태를 시리얼로 출력. `LED_PIN`을 켜면 `s1`로 LED 제어(active low, ESP32-C3 Super Mini는 GPIO 8) |
 | `esp8266-d1-mini` | ESP8266 D1 mini | 내장 LED와 GPIO 14(D5) 버튼 제어 |
 | `esp01-relay-button` | ESP8266 ESP-01 | 릴레이 GPIO 0, LED GPIO 1, 버튼 GPIO 2 |
