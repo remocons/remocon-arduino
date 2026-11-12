@@ -22,7 +22,7 @@ iris 보드의 RGB LED 4개를 하나씩 색상(hue)과 밝기로 제어합니�
 
 ## 사용 순서
 
-1. 스케치 폴더에 _secrets.h를 만들어 SECRET_WIFI_SSID, SECRET_WIFI_PASS를 #define합니다. 파일이 없으면 스케치의 WIFI_SSID, WIFI_PASS 값을 직접 바꿉니다.
+1. Wi-Fi는 업로드한 뒤 USB로 연결해 https://test.iosignal.net/wifi/ (보드 설정)에서 넣습니다(데스크톱 Chrome·Edge, 보드가 저장). 같은 페이지에서 다른 IOSignal 서버(호스트:포트)와 장치 키도 넣을 수 있습니다. 스케치의 Wi-Fi 값에 실제 값을 쓰면 그 값이 부팅할 때마다 우선합니다. _secrets.h에 SECRET_WIFI_SSID, SECRET_WIFI_PASS를 #define해도 됩니다.
 2. DIP 스위치로 그룹과 장치 번호를 정합니다. 같은 그룹의 보드끼리는 장치 번호를 다르게 합니다.
 3. arduino-cli compile --upload -p <포트> --fqbn esp32:esp32:esp32c3 로 업로드합니다.
 4. 같은 공유기에 연결한 브라우저로 https://remocon.kr 을 엽니다.
@@ -34,7 +34,7 @@ iris 보드의 RGB LED 4개를 하나씩 색상(hue)과 밝기로 제어합니�
 | --- | --- | --- | --- | --- |
 | 장치 | 서버 | `#search` | `구독` | 앱의 검색 요청을 받도록 구독합니다. |
 | 장치 | 서버 | `#iris-g0` | `구독` | 같은 그룹 보드의 전체 켜기/끄기를 받습니다. 검색과는 무관한 채널입니다. |
-| 장치 | 서버 | `@$info` | `n=iris3;g=iris G0;t=iris.2` | 이름은 iris와 장치 번호입니다. 서버에 보관됩니다. |
+| 장치 | 서버 | `@$info` | `n=iris3;g=iris G0;t=iris.2` | 이름은 iris와 장치 번호입니다. 서버에 보관됩니다. g는 앱이 묶어 보여 주는 그룹입니다. 보드 설정 group이 비어 있으면 iris G<그룹 번호>입니다. |
 | 장치 | 서버 | `@$state` | `on=0;h=30;b=0;h1=30;b1=0;h2=30;b2=0;h3=30;b3=0;h4=30;b4=0` | on은 밝기가 0이 아닌 LED가 하나라도 있으면 1입니다. h는 네 LED의 색상이 같을 때만, b는 가장 밝은 LED의 밝기입니다. 서버에 보관됩니다. |
 | 장치 | 앱 | `#notify` | `<cid>` | 인증이 없어 CID는 접속마다 바뀝니다. 앱은 검색으로 찾습니다. |
 | 앱 | 장치 | `<cid>@` | `on, off, h=120, b=70, h1=120, b1=70, b1=0` | 전체 스위치, 전체 색상·밝기 슬라이더, LED별 색상·밝기 슬라이더입니다. 밝기 0은 꺼짐이고, on은 각 LED의 마지막 밝기를 되살립니다. |

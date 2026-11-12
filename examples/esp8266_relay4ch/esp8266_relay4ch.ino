@@ -5,11 +5,13 @@
  *    Relays 1-4 are on GPIO13, 12, 14 and 16. Commands: r1=1 ... r4=0, all=1, all=0.
  *    The names L (built-in LED, GPIO2) and A-D toggle an output; they are for IR
  *    routers that do not know the state.
- *    Its info has g=relays; Remocon8266-4ch-control can control this board.
+ *    Its info group (g=) is the board setting "group" (HOME by default); Remocon8266-4ch-control can control this board.
  *
- *  Setup: put Wi-Fi (and an optional device key) in _secrets.h, or edit WIFI_SSID
- *  and WIFI_PASS below. Connect a USB-TTL adapter to the programming port, hold
- *  IO0 to GND while resetting, upload, then release IO0 and reset.
+ *  Setup: connect a USB-TTL adapter to the programming port, hold IO0 to GND while
+ *  resetting, upload, then release IO0 and reset. Set Wi-Fi over the same adapter on
+ *  https://test.iosignal.net/wifi/ (the board keeps it), or put it (and an optional device
+ *  key) in _secrets.h / edit WIFI_SSID and WIFI_PASS below. The page can also set another
+ *  IOSignal server and a device key.
  *
  *  [kr] ESP-12F 4채널 릴레이 보드를 relay4 타입으로 제어합니다. 업로드할 때 IO0을 GND에 연결합니다.
  *
@@ -20,11 +22,11 @@
 
 
 #include <Arduino.h>
-#include <ESP8266WiFi.h>
 #include <IOSignal.h>
+#include <IOSignalConfig.h>
 
 // Wi-Fi values (and an optional device key) can go in _secrets.h next to this sketch,
-// which keeps them out of version control. Without it, edit WIFI_SSID and WIFI_PASS below.
+// which keeps them out of version control. Leave the placeholders to use the Wi-Fi set over USB.
 #if __has_include("_secrets.h")
 #include "_secrets.h"
 #endif
@@ -36,9 +38,18 @@ const char* WIFI_SSID = SECRET_WIFI_SSID;
 const char* WIFI_PASS = SECRET_WIFI_PASS;
 
 WiFiClient client;
+IOSignalConfig config;
 IOSignal io;
+// Group the web app shows (g= in the info): board settings 'group'. A change is sent at once.
+IOSignalSetting group(config, "group", "Group (g=)", "HOME");
+void sendInfo() {
+  char g[33], info[96];
+  snprintf(g, sizeof(g), "%s", group.value());
+  for (char* c = g; *c; c++) if (*c == ';') *c = ' ';  // ';' separates info fields
+  snprintf(info, sizeof(info), "n=Relay4CH;g=%s;t=relay4.1", g);
+  io.signal("@$info", info);
+}
 
-const char *deviceInfo = "n=Relay4CH;g=relays;t=relay4.1";
 char states[] = "10000";
 char last_states[] = "10000";
 uint8_t pinMap[] = { 2, 13, 12, 14, 16};
@@ -91,37 +102,29 @@ void setup() {
   digitalWrite(16, LOW);
 
 
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(WIFI_SSID, WIFI_PASS);
   Serial.begin(115200);
-  Serial.flush();
   Serial.println();
-  Serial.println();
-  Serial.print("Wait for WiFi... ");
-  while (WiFi.status() != WL_CONNECTED) {
-    Serial.print(".");
-    delay(500);
-  }
-  Serial.println("");
-  Serial.println("WiFi connected");
-  Serial.println("IP address: ");
-  Serial.println(WiFi.localIP());
-  delay(500);
-
-
-  io.setRxBuffer( 200 );
-  io.begin( &client, "io.remocon.kr", 55488 );
+  // Wi-Fi, server and device key: set over USB, or the sketch values.
+  config.begin( Serial, "Relay4CH", WIFI_SSID, WIFI_PASS );
+  group.maxLength(32);
+  group.onChange([](const char*) { if (io.state == IO_READY) sendInfo(); });
 #ifdef SECRET_ID_KEY
-  io.auth(SECRET_ID_KEY); // Optional: your own key (id.key) from _secrets.h.
+  config.setKey( SECRET_ID_KEY ); // optional key (id.key) from _secrets.h; one set over USB wins
 #endif
+  config.setServer( "io.remocon.kr", 55488 );
+  config.printServer();
+  io.setRxBuffer( 200 );
+  io.setLog( [](const char* line) { Serial.println(line); } );
   io.onReady( &onReady );
   io.onMessage( &onMessage );
-
+  if ( config.key() ) io.auth( config.key() ); // a device key set over USB, else anonymous
+  io.begin( &client, config.host(), config.port() );
 }
 
 
 void loop() {
-    io.loop();
+    config.loop(); // USB setup requests, Wi-Fi reconnect
+    if ( config.connected() ) io.loop();
 }
 
 
@@ -130,7 +133,7 @@ void onReady()
   Serial.print("onReady cid: ");
   Serial.println( io.cid );
   io.subscribe("#search");
-  io.signal("@$info", deviceInfo);
+  sendInfo();
   publishState();
   io.signal("#notify", io.cid);
   

@@ -8,8 +8,10 @@
  *  The OLED (I2C, GPIO4/5) shows the CID and states; @msg text is shown on it.
  *  See the schematic PDF in this folder.
  *
- *  Setup: set WIFI_ID and WIFI_KEY below, upload, then open https://remocon.kr
- *  in a browser on the same router.
+ *  Wi-Fi: upload, then set it over USB on https://test.iosignal.net/wifi/ (the board keeps it),
+ *  or write it in the sketch (then the sketch values are used at every boot). The same page can
+ *  set another IOSignal server and a device key.
+ *  Then open https://remocon.kr in a browser on the same router.
  *
  *  [kr] Remocon8266 보드의 출력 3개를 3구 스위치로 제어하고, 버튼 4개로 bayo.tv 화면을 조작합니다.
  *
@@ -19,8 +21,8 @@
  */
 
 
-#include <ESP8266WiFiMulti.h>
 #include <IOSignal.h>
+#include <IOSignalConfig.h>
 #include <string.h>
 #include <Bounce2.h>
 #include <U8g2lib.h>
@@ -46,12 +48,20 @@
 #define SERVER_URL "io.remocon.kr"
 #define SERVER_PORT 55488
 
-ESP8266WiFiMulti wifiMulti;
+IOSignalConfig config;
 WiFiClient client;
 IOSignal io;
+// Group the web app shows (g= in the info): board settings 'group'. A change is sent at once.
+IOSignalSetting group(config, "group", "Group (g=)", "HOME");
+void sendInfo() {
+  char g[33], info[96];
+  snprintf(g, sizeof(g), "%s", group.value());
+  for (char* c = g; *c; c++) if (*c == ';') *c = ' ';  // ';' separates info fields
+  snprintf(info, sizeof(info), "n=Remocon8266;g=%s;t=switch3.1", g);
+  io.signal("@$info", info);
+}
 
 
-const char *deviceInfo = "n=Remocon8266;g=HOME;t=switch3.1";
 // 1 means on, whatever the pin polarity.
 char states[] = "000";
 char last_states[] = "000";
@@ -208,34 +218,25 @@ void setup() {
     u8g2.drawStr(0, 20, "Connecting..");
     u8g2.sendBuffer();
   
-  WiFi.mode(WIFI_STA);
-  wifiMulti.addAP( WIFI_ID, WIFI_KEY );
-
-  // You can add multiple APs.  
   Serial.println();
-  Serial.println();
-  Serial.print("Wait for WiFi... ");
-  while (wifiMulti.run() != WL_CONNECTED) {
-    Serial.print(".");
-    delay(500);
-  }
-  Serial.println("");
-  Serial.println("WiFi connected");
-  Serial.println("IP address: ");
-  Serial.println(WiFi.localIP());
-  delay(500);
-
+  // Wi-Fi, server and device key: set over USB, or the sketch values.
+  config.begin( Serial, "Remocon8266", WIFI_ID, WIFI_KEY );
+  group.maxLength(32);
+  group.onChange([](const char*) { if (io.state == IO_READY) sendInfo(); });
+  config.setServer( SERVER_URL, SERVER_PORT );
+  config.printServer();
   io.setRxBuffer( 200 );
-  io.begin( &client , SERVER_URL, SERVER_PORT );
+  io.setLog( [](const char* line) { Serial.println(line); } );
   io.onReady( &onReady );
   io.onMessage( &onMessage );
-  // io.auth("ID_KEY"); // Optional: use your own device key.
-
+  if ( config.key() ) io.auth( config.key() ); // a device key set over USB, else anonymous
+  io.begin( &client, config.host(), config.port() );
 }
 
   
 void loop() {
-    io.loop();
+    config.loop(); // USB setup requests, Wi-Fi reconnect
+    if ( config.connected() ) io.loop();
     check_events();
     handle_events();
 }
@@ -248,7 +249,7 @@ void onReady()
   Serial.print("onReady cid: ");
   Serial.println( io.cid );
   io.subscribe("#search");
-  io.signal("@$info", deviceInfo);
+  sendInfo();
   publishState();
   io.signal("#notify", io.cid);
   

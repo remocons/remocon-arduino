@@ -4,8 +4,8 @@
 // Button 1 turns all LEDs on or off. Button 2 lights one more LED each press.
 // The status LED (GPIO8) is on while a target is connected.
 #include <FastLED.h>
-#include <WiFi.h>
 #include <IOSignal.h>
+#include <IOSignalConfig.h>
 #include <Bounce2.h>
 #include <string.h>
 // USB serial blocks when the cable is in but no monitor reads it.
@@ -15,7 +15,7 @@ void logLine(const char* a, const char* b) {
   Serial.print(a); Serial.println(b);
 }
 // Wi-Fi values (and an optional device key) can go in _secrets.h next to this sketch,
-// which keeps them out of version control. Without it, edit WIFI_SSID and WIFI_PASS below.
+// which keeps them out of version control. Leave the placeholders to use the Wi-Fi set over USB.
 #if __has_include("_secrets.h")
 #include "_secrets.h"
 #endif
@@ -27,28 +27,27 @@ const char* WIFI_SSID = SECRET_WIFI_SSID;
 const char* WIFI_PASS = SECRET_WIFI_PASS;
 WiFiClient client;
 IOSignal io;
-unsigned long wifiRetry = 0;
+// Wi-Fi, server and device key: set over USB on https://test.iosignal.net/wifi/, or the sketch values.
+IOSignalConfig config;
 void connectNetwork() {
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(WIFI_SSID, WIFI_PASS);
+  config.begin(Serial, "Iris Control", WIFI_SSID, WIFI_PASS);
+  config.setServer("io.remocon.kr", 55488);
+  config.printServer();
   WiFi.setTxPower(WIFI_POWER_8_5dBm); // Small ESP32-C3 boards drop sent packets at full power (antenna).
   WiFi.setSleep(false); // Power save delays incoming signals by 100-800 ms.
   io.setRxBuffer(512);
   io.onReady(onReady);
   io.onMessage(onMessage);
-  io.begin(&client, "io.remocon.kr", 55488);
-  // io.auth("ID_KEY"); // Optional: your own key for this server.
+  io.setLog([](const char* m) { logLine(m, ""); }); // e.g. no reply from a wrong port
+  if (config.key()) io.auth(config.key()); // a device key set over USB, else anonymous
+  io.begin(&client, config.host(), config.port());
 }
 void pollNetwork() {
-  if (WiFi.status() == WL_CONNECTED) {
+  config.loop(); // USB setup requests, Wi-Fi reconnect
+  if (config.connected()) {
     // Send each small signal at once instead of waiting for the previous ACK.
     if (client.connected() && !client.getNoDelay()) client.setNoDelay(true);
     io.loop();
-  }
-  else if (millis() - wifiRetry >= 10000) {
-    wifiRetry = millis();
-    logLine("Waiting for WiFi...", "");
-    WiFi.reconnect();
   }
 }
 

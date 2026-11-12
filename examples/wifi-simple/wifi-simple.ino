@@ -8,8 +8,9 @@
  *  Optional LED: uncomment LED_PIN below and s1 drives an active-low LED.
  *    ESP32-C3 Super Mini: GPIO8 is the on-board LED (pins can differ by product).
  *
- *  Setup: set WIFI_ID and WIFI_KEY below, upload, then open https://remocon.kr
- *  in a browser on the same router.
+ *  Setup: upload, then set Wi-Fi over USB on https://test.iosignal.net/wifi/ (the board keeps it),
+ *  or write WIFI_ID and WIFI_KEY below. Then open https://remocon.kr on the same router.
+ *  The same page can set another IOSignal server and a device key.
  *
  *  [kr] 공유 스위치 그룹(#switch)에 참여해 상태를 시리얼로 출력합니다. 하드웨어 없이 통신만 확인합니다.
  *       LED_PIN 주석을 풀면 s1 값으로 LED(active low)를 켭니다. ESP32-C3 Super Mini는 GPIO8입니다.
@@ -19,14 +20,11 @@
  *  MIT License
  */
 
-#if defined(ESP8266)
- #include <ESP8266WiFi.h>
-#elif defined(ESP32)
- #include <WiFi.h>
-#else
+#if !defined(ESP8266) && !defined(ESP32)
  #error "Select an ESP8266 or ESP32 board for this example."
 #endif
 #include <IOSignal.h>
+#include <IOSignalConfig.h>
 #include <string.h>
 #define WIFI_ID  "WIFI_SSID"
 #define WIFI_KEY "WIFI_PASS"
@@ -34,11 +32,20 @@
 #define SERVER_PORT 55488
 #define SWITCH_CH "#switch"
 #define SWITCH_STATE SWITCH_CH "$state"
-#define SWITCH_INFO "n=공유 스위치;t=switch3.1"
 // #define LED_PIN 8  // Optional: active-low LED driven by s1 (ESP32-C3 Super Mini on-board LED)
 
 WiFiClient client;
 IOSignal io;
+IOSignalConfig config;
+// Group the web app shows (g= in the info): board settings 'group'. A change is sent at once.
+IOSignalSetting group(config, "group", "Group (g=)", "HOME");
+void sendInfo() {
+  char g[33], info[96];
+  snprintf(g, sizeof(g), "%s", group.value());
+  for (char* c = g; *c; c++) if (*c == ';') *c = ' ';  // ';' separates info fields
+  snprintf(info, sizeof(info), "n=공유 스위치;g=%s;t=switch3.1", g);
+  io.signal(SWITCH_CH "$info", info);
+}
 
 void setup() {
   Serial.begin(115200);
@@ -46,26 +53,31 @@ void setup() {
   pinMode(LED_PIN, OUTPUT);
   digitalWrite(LED_PIN, HIGH);
 #endif
-  WiFi.mode( WIFI_STA );
-  WiFi.begin( WIFI_ID, WIFI_KEY );
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500); Serial.print(".");
-  }
+  // Wi-Fi, server and device key: set over USB, or the sketch values.
+  config.begin( Serial, "Wi-Fi Simple", WIFI_ID, WIFI_KEY );
+  group.maxLength(32);
+  group.onChange([](const char*) { if (io.state == IO_READY) sendInfo(); });
+  config.setServer( SERVER_URL, SERVER_PORT );
+  config.printServer();
   io.setRxBuffer( 200 );
-  io.begin( &client, SERVER_URL, SERVER_PORT );
+  io.setLog( [](const char* line) { Serial.println(line); } );
   io.onReady( &onReady );
   io.onMessage( &onMessage );
-  // io.auth("ID_KEY"); // Optional: use your own device key.
+  if ( config.key() ) io.auth( config.key() ); // a device key set over USB, else anonymous
+  io.begin( &client, config.host(), config.port() );
 }
 
-void loop() { io.loop(); }
+void loop() {
+  config.loop(); // USB setup requests, Wi-Fi reconnect
+  if ( config.connected() ) io.loop();
+}
 
 void onReady()
 {
   Serial.print("onReady cid: "); Serial.println( io.cid );
   io.subscribe( "#search" );
   io.subscribe( SWITCH_STATE );
-  io.signal( SWITCH_CH "$info", SWITCH_INFO );
+  sendInfo();
   io.signal( "#notify", SWITCH_CH );
 }
 

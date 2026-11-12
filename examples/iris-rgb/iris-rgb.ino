@@ -5,8 +5,8 @@
 // Buttons: GPIO1 turns the whole group on or off, GPIO2 turns this board on or off.
 // The status LED (GPIO8) is on while the server connection is ready.
 #include <FastLED.h>
-#include <WiFi.h>
 #include <IOSignal.h>
+#include <IOSignalConfig.h>
 #include <Bounce2.h>
 #include <string.h>
 #include <stdlib.h>
@@ -17,7 +17,7 @@ void logLine(const char* a, const char* b) {
   Serial.print(a); Serial.println(b);
 }
 // Wi-Fi values (and an optional device key) can go in _secrets.h next to this sketch,
-// which keeps them out of version control. Without it, edit WIFI_SSID and WIFI_PASS below.
+// which keeps them out of version control. Leave the placeholders to use the Wi-Fi set over USB.
 #if __has_include("_secrets.h")
 #include "_secrets.h"
 #endif
@@ -29,29 +29,28 @@ const char* WIFI_SSID = SECRET_WIFI_SSID;
 const char* WIFI_PASS = SECRET_WIFI_PASS;
 WiFiClient client;
 IOSignal io;
-unsigned long wifiRetry = 0;
+// Wi-Fi, server and device key: set over USB on https://test.iosignal.net/wifi/, or the sketch values.
+IOSignalConfig config;
 void connectNetwork() {
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(WIFI_SSID, WIFI_PASS);
+  config.begin(Serial, "Iris RGB", WIFI_SSID, WIFI_PASS);
+  config.setServer("io.remocon.kr", 55488);
+  config.printServer();
   WiFi.setTxPower(WIFI_POWER_8_5dBm); // Small ESP32-C3 boards drop sent packets at full power (antenna).
   WiFi.setSleep(false); // Power save delays incoming signals by 100-800 ms.
   io.setRxBuffer(256);
   io.onReady(onReady);
   io.onMessage(onMessage);
   io.setLog([](const char* m) { logLine(m, ""); }); // e.g. a send that failed and reconnects
-  io.begin(&client, "io.remocon.kr", 55488);
+  if (config.key()) io.auth(config.key()); // a device key set over USB, else anonymous
+  io.begin(&client, config.host(), config.port());
   // No key: the server gives a new CID on each connection and the app finds it by #search.
 }
 void pollNetwork() {
-  if (WiFi.status() == WL_CONNECTED) {
+  config.loop(); // USB setup requests, Wi-Fi reconnect
+  if (config.connected()) {
     // Send each small signal at once instead of waiting for the previous ACK.
     if (client.connected() && !client.getNoDelay()) client.setNoDelay(true);
     io.loop();
-  }
-  else if (millis() - wifiRetry >= 10000) {
-    wifiRetry = millis();
-    logLine("Waiting for WiFi...", "");
-    WiFi.reconnect();
   }
 }
 
@@ -61,7 +60,16 @@ const uint8_t DIP_PINS[] = {21, 20, 10, 7, 6, 5};
 CRGB leds[4];
 Bounce2::Button groupButton, selfButton;
 uint8_t groupId = 0, deviceId = 0;
+// Group the web app shows (g= in the info): board settings 'group'. Empty: "iris G<group id>" from the DIP switches.
+IOSignalSetting group(config, "group", "Group (g=, empty: iris G<DIP>)", "");
 char deviceInfo[96];
+void makeInfo() {
+  char g[33];
+  if (group.value()[0]) snprintf(g, sizeof(g), "%s", group.value());
+  else snprintf(g, sizeof(g), "iris G%u", groupId);
+  for (char* c = g; *c; c++) if (*c == ';') *c = ' ';  // ';' separates info fields
+  snprintf(deviceInfo, sizeof(deviceInfo), "n=iris%u;g=%s;t=iris.2", deviceId, g);
+}
 char groupChannel[16]; // #iris-g<group id>: members only, carries "on" and "off".
 
 // What the app sees (iris.2): each LED has a hue 0-359 and a brightness 0-100.
@@ -175,8 +183,9 @@ void setup() {
     deviceId = (deviceId << 1) | (digitalRead(DIP_PINS[i + 3]) == LOW);
   }
   snprintf(groupChannel, sizeof(groupChannel), "#iris-g%u", groupId);
-  snprintf(deviceInfo, sizeof(deviceInfo),
-           "n=iris%u;g=iris G%u;t=iris.2", deviceId, groupId);
+  makeInfo();
+  group.maxLength(32);
+  group.onChange([](const char*) { makeInfo(); if (io.state == IO_READY) io.signal("@$info", deviceInfo); });
   logLine("iris rgb start: ", deviceInfo);
   groupButton.attach(GROUP_BUTTON, INPUT_PULLUP); groupButton.interval(10); groupButton.setPressedState(LOW);
   selfButton.attach(SELF_BUTTON, INPUT_PULLUP); selfButton.interval(10); selfButton.setPressedState(LOW);

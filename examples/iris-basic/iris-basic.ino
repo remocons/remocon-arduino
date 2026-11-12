@@ -2,8 +2,8 @@
 // Pins: WS2812 data GPIO4, buttons GPIO1 and GPIO2 (iris board v1a). No DIP switches or groups.
 // Button 1 turns all LEDs on or off. Button 2 lights one more LED each press.
 #include <FastLED.h>
-#include <WiFi.h>
 #include <IOSignal.h>
+#include <IOSignalConfig.h>
 #include <Bounce2.h>
 #include <string.h>
 // USB serial blocks when the cable is in but no monitor reads it.
@@ -13,7 +13,7 @@ void logLine(const char* a, const char* b) {
   Serial.print(a); Serial.println(b);
 }
 // Wi-Fi values (and an optional device key) can go in _secrets.h next to this sketch,
-// which keeps them out of version control. Without it, edit WIFI_SSID and WIFI_PASS below.
+// which keeps them out of version control. Leave the placeholders to use the Wi-Fi set over USB.
 #if __has_include("_secrets.h")
 #include "_secrets.h"
 #endif
@@ -25,36 +25,46 @@ const char* WIFI_SSID = SECRET_WIFI_SSID;
 const char* WIFI_PASS = SECRET_WIFI_PASS;
 WiFiClient client;
 IOSignal io;
-unsigned long wifiRetry = 0;
+// Wi-Fi, server and device key: set over USB on https://test.iosignal.net/wifi/, or the sketch values.
+IOSignalConfig config;
+// Group the web app shows (g= in the info): board settings 'group'. A change is sent at once.
+IOSignalSetting group(config, "group", "Group (g=)", "HOME");
+void sendInfo() {
+  char g[33], info[96];
+  snprintf(g, sizeof(g), "%s", group.value());
+  for (char* c = g; *c; c++) if (*c == ';') *c = ' ';  // ';' separates info fields
+  snprintf(info, sizeof(info), "n=Iris Basic;g=%s;t=switch4.1", g);
+  io.signal("@$info", info);
+}
 void connectNetwork() {
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(WIFI_SSID, WIFI_PASS);
+  config.begin(Serial, "Iris Basic", WIFI_SSID, WIFI_PASS);
+  group.maxLength(32);
+  group.onChange([](const char*) { if (io.state == IO_READY) sendInfo(); });
+  config.setServer("io.remocon.kr", 55488);
+#ifdef SECRET_ID_KEY
+  config.setKey(SECRET_ID_KEY); // optional key (id.key) from _secrets.h; one set over USB wins
+#endif
+  config.printServer();
   WiFi.setTxPower(WIFI_POWER_8_5dBm); // Small ESP32-C3 boards drop sent packets at full power (antenna).
   WiFi.setSleep(false); // Power save delays incoming signals by 100-800 ms.
   io.setRxBuffer(256);
   io.onReady(onReady);
   io.onMessage(onMessage);
-  io.begin(&client, "io.remocon.kr", 55488);
-#ifdef SECRET_ID_KEY
-  io.auth(SECRET_ID_KEY); // Optional: your own key (id.key) from _secrets.h.
-#endif
+  io.setLog([](const char* m) { logLine(m, ""); }); // e.g. no reply from a wrong port
+  if (config.key()) io.auth(config.key()); // a device key set over USB, else anonymous
+  io.begin(&client, config.host(), config.port());
 }
 void pollNetwork() {
-  if (WiFi.status() == WL_CONNECTED) {
+  config.loop(); // USB setup requests, Wi-Fi reconnect
+  if (config.connected()) {
     // Send each small signal at once instead of waiting for the previous ACK.
     if (client.connected() && !client.getNoDelay()) client.setNoDelay(true);
     io.loop();
-  }
-  else if (millis() - wifiRetry >= 10000) {
-    wifiRetry = millis();
-    logLine("Waiting for WiFi...", "");
-    WiFi.reconnect();
   }
 }
 
 const uint8_t DATA_PIN = 4;
 const uint8_t BUTTON_PINS[] = {1, 2};
-const char* DEVICE_INFO = "n=Iris Basic;t=switch4.1";
 CRGB leds[4];
 Bounce2::Button buttons[2];
 char states[5] = "0000"; // One character per LED, '1' means on.
@@ -71,7 +81,7 @@ void publishState() {
 void onReady() {
   logLine("READY CID: ", io.cid);
   io.subscribe("#search");
-  io.signal("@$info", DEVICE_INFO);
+  sendInfo();
   publishState();
   io.signal("#notify", io.cid);
 }

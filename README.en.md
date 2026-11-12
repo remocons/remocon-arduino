@@ -11,7 +11,7 @@ Communication uses the [IOSignal Arduino client](https://github.com/remocons/ios
 
 ## Versions
 
-From **9.0.0**, Remocon uses the same version number as the public [iosignal](https://github.com/remocons/iosignal) and [iosignal-arduino](https://github.com/remocons/iosignal-arduino) packages. Packages with the same number are meant to be used together. 9.6.0 requires IOSignal Arduino **9.6.0 or later**. See [Changes by version](#changes-by-version) below.
+From **9.0.0**, Remocon uses the same version number as the public [iosignal](https://github.com/remocons/iosignal) and [iosignal-arduino](https://github.com/remocons/iosignal-arduino) packages. Packages with the same number are meant to be used together. 9.13.0 requires IOSignal Arduino **9.13.0 or later**. See [Changes by version](#changes-by-version) below.
 
 ## Installation and getting started
 
@@ -43,7 +43,7 @@ Installing the IOSignal Arduino library and the UNO Ethernet exercise are in the
 | `esp8266_relay4ch` | ESP-12F 4-channel relay board | Four relays (`relay4.1`), `all=1`/`all=0` |
 | `Remocon8266-4ch-control` | Remocon8266 board | Control a 4-channel relay board by CID: four buttons, a D6 all button, OLED state |
 | `esp32-cid-led` | ESP32 + external LED on GPIO 4 | Device discovery, CID commands, and actual state reporting with Remocon or the public workbench |
-| `esp32-group-led` | One or two ESP32 boards + external LED on GPIO 4 | Share a group as a 2-way switch (`switch2.1`); select OUTPUT_INDEX for each board |
+| `esp32-group-led` | One or two ESP32 boards + external LED on GPIO 4 | Share a group as a 2-way switch (`switch2.1`); each board's output is the board setting `index` |
 | `wifi-simple` | ESP8266, ESP32, ESP32-C3 | Join the `#switch` shared-switch group and print its state to serial. Set `LED_PIN` to drive an LED with `s1` (active low; GPIO 8 on an ESP32-C3 Super Mini) |
 | `esp8266-d1-mini` | ESP8266 D1 mini | Built-in LED and GPIO 14 (D5) button control |
 | `esp01-relay-button` | ESP8266 ESP-01 | Relay on GPIO 0, LED on GPIO 1, button on GPIO 2 |
@@ -51,11 +51,12 @@ Installing the IOSignal Arduino library and the UNO Ethernet exercise are in the
 | `uno-r4-wifi-heart` | Arduino UNO R4 WiFi | LED matrix heart, built-in LED, and D12 button |
 | `uno-ethernet-button` | UNO R3 + W5100 Ethernet shield | D2 button, D5 LED, D6 relay output |
 | `uno-ethernet-ir` | UNO R3 + W5100 Ethernet shield | D2 NEC infrared receiver, D5 and D6 outputs |
+| `esp32cam` | ESP32-CAM (AI Thinker) | Sends pictures to the remocon.kr device card (`camera.1`), optionally encrypted with an E2E key |
 
 Not every example compiles for every board. LED types and pin assignments can also vary between ESP32-C3 products; adjust the sketch for your actual board.
 On ESP-01, GPIO 0 and GPIO 2 affect boot behavior, so check the button and relay wiring as well.
 
-The common communication dependencies are `IOSignal` (9.12.0 or later), `Boho`, and `Crypto`. Individual examples also use `Bounce2`, `U8g2`, `IRremote`, `FastLED`, or `Ethernet`.
+The common communication dependencies are `IOSignal` (9.13.0 or later), `Boho`, and `Crypto`. Individual examples also use `Bounce2`, `U8g2`, `IRremote`, `FastLED`, or `Ethernet`.
 Wi-Fi and UNO R4 LED matrix headers are provided by the relevant board package.
 Dependencies are declared in [library.properties](library.properties). The `architectures=*` declaration is package metadata and does not guarantee that every example supports every board.
 
@@ -100,6 +101,16 @@ Revoke and reissue any real authentication key that has already been published. 
 - **Large messages do not arrive:** Messages larger than the receive buffer (`setRxBuffer`) are not sent by a 9.0 server, or are skipped by the device. Increase the buffer if needed, keeping the board's memory in mind.
 
 ## Changes by version
+
+### 9.13.0
+
+- **Requires IOSignal Arduino 9.13.0.** The dependency is now `IOSignal (>=9.13.0)`.
+- **The ESP examples use board settings.** Over USB, the [board settings page](https://test.iosignal.net/wifi/) (desktop Chrome or Edge) sets Wi-Fi, the server (host:port), the device key and each example's settings, and the board keeps them. No sketch edits are needed, and the boards no longer block waiting for Wi-Fi. The example pages on [test.iosignal.net](https://test.iosignal.net/) can also install the firmware directly.
+- **The app group (`g=`) is the board setting `group`.** It defaults to `HOME` and is announced again at once when changed. The iris examples use `iris G<group number>` when it is empty. The UNO examples send `g=HOME`.
+- **New example `esp32cam`:** an ESP32-CAM whose pictures show on its remocon.kr device card (official type `camera.1`). With the board setting `e2e_key` the pictures are encrypted end to end, and the card needs the same key. The interval and sending on or off are set from the card.
+- `Remocon8266-4ch-control`: the target CID is the board setting `target`. The remote `target=` command still works. A target stored in flash by an earlier version is moved over once.
+- `esp32-group-led`: the state key to follow is the board setting `index` (0: `s1`, 1: `s2`).
+- The ESP-01 examples drive the LED on GPIO 1 (TX), so they turn on serial and accept board settings only when no Wi-Fi is stored or the button is held within 3 s after power on.
 
 ### 9.12.0
 

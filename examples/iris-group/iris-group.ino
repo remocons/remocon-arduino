@@ -4,28 +4,32 @@
 // Button GPIO1 turns the whole group on or off, GPIO2 toggles this board. Status LED: GPIO8.
 // Pins follow iris board v1a.
 #include <FastLED.h>
-#include <WiFi.h>
 #include <IOSignal.h>
+#include <IOSignalConfig.h>
 #include <Bounce2.h>
 #include <string.h>
 const char* WIFI_SSID = "WIFI_SSID";
 const char* WIFI_PASS = "WIFI_PASS";
 WiFiClient client;
 IOSignal io;
-unsigned long wifiRetry = 0;
+// Wi-Fi, server and device key: set over USB on https://test.iosignal.net/wifi/, or the sketch values.
+IOSignalConfig config;
+// Group the web app shows (g= in the info): board settings 'group'. Empty: "iris G<group id>" from the DIP switches.
+IOSignalSetting group(config, "group", "Group (g=, empty: iris G<DIP>)", "");
 void connectNetwork() {
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(WIFI_SSID, WIFI_PASS);
+  config.begin(Serial, "Iris Group", WIFI_SSID, WIFI_PASS);
+  config.setServer("io.remocon.kr", 55488);
+  config.printServer();
   WiFi.setTxPower(WIFI_POWER_8_5dBm); // Small ESP32-C3 boards drop sent packets at full power (antenna).
   io.setRxBuffer(256);
   io.onReady(onReady);
   io.onMessage(onMessage);
-  io.begin(&client, "io.remocon.kr", 55488);
-  // io.auth("ID_KEY"); // Optional: your own key for this server.
+  if (config.key()) io.auth(config.key()); // a device key set over USB, else anonymous
+  io.begin(&client, config.host(), config.port());
 }
 void pollNetwork() {
-  if (WiFi.status() == WL_CONNECTED) io.loop();
-  else if (millis() - wifiRetry >= 10000) { wifiRetry = millis(); WiFi.reconnect(); }
+  config.loop(); // USB setup requests, Wi-Fi reconnect
+  if (config.connected()) io.loop();
 }
 
 const uint8_t DATA_PIN = 4, STATUS_LED = 8;
@@ -34,11 +38,18 @@ const uint8_t DIP_PINS[] = {21, 20, 10, 7, 6, 5};
 CRGB leds[4];
 Bounce2::Button buttons[2];
 uint8_t groupId = 0, deviceId = 0;
-char channel[16], stateTag[24], infoTag[24], groupInfo[64];
+char channel[16], stateTag[24], infoTag[24], groupInfo[96];
 char states[9] = "00000000";
 // Buttons write the whole state, so wait for the stored value. A new group has none.
 bool stateKnown = false;
 unsigned long readyAt = 0;
+void makeInfo() {
+  char g[33];
+  if (group.value()[0]) snprintf(g, sizeof(g), "%s", group.value());
+  else snprintf(g, sizeof(g), "iris G%u", groupId);
+  for (char* c = g; *c; c++) if (*c == ';') *c = ' ';  // ';' separates info fields
+  snprintf(groupInfo, sizeof(groupInfo), "n=Iris Lights %u;g=%s;t=switch8.1", groupId, g);
+}
 void applyState() {
   const bool on = states[deviceId] == '1';
   fill_solid(leds, 4, on ? CRGB(100,80,50) : CRGB::Black);
@@ -77,6 +88,7 @@ void onMessage(char* tag, uint8_t type, uint8_t* payload, size_t size) {
   applyState();
 }
 void setup() {
+  Serial.begin(115200); // board settings over USB
   pinMode(STATUS_LED, OUTPUT); digitalWrite(STATUS_LED, HIGH);
   FastLED.addLeds<NEOPIXEL, DATA_PIN>(leds, 4); FastLED.clear(true);
   for (uint8_t i = 0; i < 6; i++) pinMode(DIP_PINS[i], INPUT_PULLUP);
@@ -87,7 +99,9 @@ void setup() {
   snprintf(channel, sizeof(channel), "#Iris-g%u", groupId);
   snprintf(stateTag, sizeof(stateTag), "%s$state", channel);
   snprintf(infoTag, sizeof(infoTag), "%s$info", channel);
-  snprintf(groupInfo, sizeof(groupInfo), "n=Iris Lights %u;t=switch8.1", groupId);
+  makeInfo();
+  group.maxLength(32);
+  group.onChange([](const char*) { makeInfo(); if (io.state == IO_READY) io.signal(infoTag, groupInfo); });
   for (uint8_t i = 0; i < 2; i++) {
     buttons[i].attach(BUTTON_PINS[i], INPUT_PULLUP);
     buttons[i].interval(10); buttons[i].setPressedState(LOW);

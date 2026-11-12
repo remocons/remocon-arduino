@@ -20,7 +20,7 @@ ESP-12F 릴레이 보드의 릴레이 4개를 relay4 타입으로 제어합니�
 
 ## 사용 순서
 
-1. 스케치 폴더에 _secrets.h를 만들어 SECRET_WIFI_SSID, SECRET_WIFI_PASS를 #define합니다(장치 키를 쓰면 SECRET_ID_KEY도). 파일이 없으면 스케치의 WIFI_SSID, WIFI_PASS 값을 직접 바꿉니다.
+1. Wi-Fi는 업로드한 뒤 USB로 연결해 https://test.iosignal.net/wifi/ (보드 설정)에서 넣습니다(데스크톱 Chrome·Edge, 보드가 저장). 같은 페이지에서 다른 IOSignal 서버(호스트:포트)와 장치 키도 넣을 수 있습니다. 스케치의 Wi-Fi 값에 실제 값을 쓰면 그 값이 부팅할 때마다 우선합니다. _secrets.h에 SECRET_WIFI_SSID, SECRET_WIFI_PASS(장치 키는 SECRET_ID_KEY)를 #define해도 됩니다.
 2. USB-TTL 어댑터를 프로그래밍 포트(GND, RX, TX, 5V)에 연결하고 IO0을 GND에 연결한 채 리셋합니다.
 3. arduino-cli compile --upload -p <포트> --fqbn esp8266:esp8266:generic 로 업로드합니다(Arduino IDE는 Generic ESP8266 Module).
 4. 업로드 후 IO0을 떼고 리셋하면 스케치가 실행됩니다.
@@ -31,7 +31,7 @@ ESP-12F 릴레이 보드의 릴레이 4개를 relay4 타입으로 제어합니�
 | 보내는 쪽 | 받는 쪽 | 태그 | 값 | 설명 |
 | --- | --- | --- | --- | --- |
 | 장치 | 서버 | `#search` | `구독` | 앱의 검색 요청을 받도록 구독합니다. |
-| 장치 | 서버 | `@$info` | `n=Relay4CH;g=relays;t=relay4.1` | 이름, 분류, 화면 타입입니다. 서버에 보관됩니다. |
+| 장치 | 서버 | `@$info` | `n=Relay4CH;g=HOME;t=relay4.1` | 이름, 분류, 화면 타입입니다. 서버에 보관됩니다. g는 앱이 장치를 묶어 보여 주는 그룹이며 보드 설정 group으로 바꿉니다(바꾸면 바로 다시 보냄). |
 | 장치 | 서버 | `@$state` | `r1=0;r2=0;r3=0;r4=0` | 현재 상태입니다. 서버에 보관됩니다. |
 | 장치 | 앱 | `#notify` | `<cid>` | 접속했음을 알립니다. |
 | 앱 | 장치 | `#search` |  | 앱이 시작할 때, 1초 뒤, 이후 15초마다 보냅니다. |

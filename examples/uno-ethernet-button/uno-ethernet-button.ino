@@ -27,7 +27,7 @@
 byte mac[]{0, 0, 0, 0, 0, 0x07}; 
 EthernetClient client;
 IOSignal io;
-const char *deviceInfo = "n=Uno-Btn;t=light.1";
+const char *deviceInfo = "n=Uno-Btn;g=HOME;t=light.1";
 
 void publishState() { io.signal("@$state", digitalRead(5) ? "on=1" : "on=0"); }
 

@@ -11,7 +11,7 @@
 
 ## 버전
 
-**9.0.0**부터 Remocon은 공개 [iosignal](https://github.com/remocons/iosignal)·[iosignal-arduino](https://github.com/remocons/iosignal-arduino)와 같은 버전 번호를 씁니다. 같은 번호의 패키지는 함께 쓰도록 맞춘 조합입니다. 9.6.0은 IOSignal Arduino **9.6.0 이상**이 필요합니다. 버전별 변경은 아래 [버전별 변경 사항](#버전별-변경-사항)을 참고하세요.
+**9.0.0**부터 Remocon은 공개 [iosignal](https://github.com/remocons/iosignal)·[iosignal-arduino](https://github.com/remocons/iosignal-arduino)와 같은 버전 번호를 씁니다. 같은 번호의 패키지는 함께 쓰도록 맞춘 조합입니다. 9.13.0은 IOSignal Arduino **9.13.0 이상**이 필요합니다. 버전별 변경은 아래 [버전별 변경 사항](#버전별-변경-사항)을 참고하세요.
 
 ## 설치 및 시작
 
@@ -43,7 +43,7 @@ IOSignal Arduino 라이브러리 설치와 UNO Ethernet 실습은 [iosignal.net 
 | `esp8266_relay4ch` | ESP-12F 4채널 릴레이 보드 | 릴레이 4개(`relay4.1`), `all=1`/`all=0` |
 | `Remocon8266-4ch-control` | Remocon8266 전용 보드 | CID로 4채널 릴레이 보드를 제어, 버튼 4개·D6 전체 버튼·OLED 상태 |
 | `esp32-cid-led` | ESP32 + GPIO 4 외부 LED | 장치 검색·CID 명령·실제 상태 발행, Remocon 또는 공개 통신 실습실 |
-| `esp32-group-led` | ESP32 1~2대 + GPIO 4 외부 LED | 그룹을 2구 스위치(`switch2.1`)로 공유, 보드별 OUTPUT_INDEX 선택 |
+| `esp32-group-led` | ESP32 1~2대 + GPIO 4 외부 LED | 그룹을 2구 스위치(`switch2.1`)로 공유, 보드별 출력 번호는 보드 설정 `index` |
 | `wifi-simple` | ESP8266, ESP32, ESP32-C3 | `#switch` 공유 스위치 그룹에 참여해 상태를 시리얼로 출력. `LED_PIN`을 켜면 `s1`로 LED 제어(active low, ESP32-C3 Super Mini는 GPIO 8) |
 | `esp8266-d1-mini` | ESP8266 D1 mini | 내장 LED와 GPIO 14(D5) 버튼 제어 |
 | `esp01-relay-button` | ESP8266 ESP-01 | 릴레이 GPIO 0, LED GPIO 1, 버튼 GPIO 2 |
@@ -51,11 +51,12 @@ IOSignal Arduino 라이브러리 설치와 UNO Ethernet 실습은 [iosignal.net 
 | `uno-r4-wifi-heart` | Arduino UNO R4 WiFi | LED 매트릭스 하트와 내장 LED, D12 버튼 |
 | `uno-ethernet-button` | UNO R3 + W5100 Ethernet 실드 | D2 버튼, D5 LED, D6 릴레이 출력 |
 | `uno-ethernet-ir` | UNO R3 + W5100 Ethernet 실드 | D2 NEC 적외선 수신기, D5·D6 출력 |
+| `esp32cam` | ESP32-CAM (AI Thinker) | 사진을 remocon.kr 장치 카드로 보냄(`camera.1`), E2E 키로 암호화 가능 |
 
 모든 예제가 모든 보드에서 컴파일되는 것은 아닙니다. ESP32-C3 제품별 LED 종류와 핀 번호도 다를 수 있으므로 실제 보드에 맞게 수정하세요.
 ESP-01은 부팅 시 GPIO 0·2 상태의 영향을 받으므로 버튼·릴레이 배선도 확인해야 합니다.
 
-공통 통신 의존성은 `IOSignal`(9.12.0 이상), `Boho`, `Crypto`이며 예제에 따라 `Bounce2`, `U8g2`, `IRremote`, `FastLED`, `Ethernet`을 사용합니다.
+공통 통신 의존성은 `IOSignal`(9.13.0 이상), `Boho`, `Crypto`이며 예제에 따라 `Bounce2`, `U8g2`, `IRremote`, `FastLED`, `Ethernet`을 사용합니다.
 Wi-Fi 및 UNO R4 LED 매트릭스 헤더는 해당 보드 패키지에서 제공합니다.
 의존성 선언은 [library.properties](library.properties)에 있습니다. `architectures=*`는 패키지 전체의 메타데이터이며, 각 예제의 보드 호환성을 보장하지 않습니다.
 
@@ -100,6 +101,16 @@ Wi-Fi 비밀번호와 장치 인증키를 공개 저장소에 올리지 마세�
 - **큰 메시지가 오지 않음:** 수신 버퍼(`setRxBuffer`)보다 큰 메시지는 서버가 보내지 않거나(9.0 서버), 장치가 건너뜁니다. 필요하면 버퍼 크기를 늘리세요. 보드 메모리를 고려해야 합니다.
 
 ## 버전별 변경 사항
+
+### 9.13.0
+
+- **IOSignal Arduino 9.13.0이 필요합니다.** 의존성을 `IOSignal (>=9.13.0)`으로 올렸습니다.
+- **ESP 예제가 보드 설정을 씁니다.** USB로 연결해 [보드 설정 페이지](https://test.iosignal.net/wifi/)(데스크톱 Chrome·Edge)에서 Wi-Fi, 서버(호스트:포트), 장치 키와 예제별 설정을 넣으면 보드가 저장합니다. 스케치를 고치지 않아도 되고, Wi-Fi 연결을 기다리며 멈추지 않습니다. [test.iosignal.net](https://test.iosignal.net/) 예제 페이지에서 펌웨어를 바로 설치할 수도 있습니다.
+- **앱의 그룹(`g=`)을 보드 설정 `group`으로 바꿉니다.** 기본값은 `HOME`이고, 바꾸면 바로 다시 알립니다. iris 예제는 비워 두면 `iris G<그룹 번호>`입니다. UNO 예제는 `g=HOME`을 보냅니다.
+- **새 예제 `esp32cam`:** ESP32-CAM이 찍은 사진을 remocon.kr 장치 카드에 보여 줍니다(공식 타입 `camera.1`). 보드 설정 `e2e_key`를 넣으면 사진을 끝에서 끝까지 암호화하고, 카드에도 같은 키를 넣어야 보입니다. 간격(`interval`)과 전송 켜기·끄기는 카드에서 바꿉니다.
+- `Remocon8266-4ch-control`: 제어 대상 CID가 보드 설정 `target`입니다. 원격 `target=` 명령도 그대로 됩니다. 예전 버전이 플래시에 저장한 대상은 한 번 옮겨 씁니다.
+- `esp32-group-led`: 따를 상태 키를 보드 설정 `index`(0: `s1`, 1: `s2`)로 고릅니다.
+- ESP-01 예제는 GPIO 1(TX)이 LED라, 저장된 Wi-Fi가 없거나 켠 뒤 3초 안에 버튼을 누르고 있을 때만 시리얼을 켜고 보드 설정을 받습니다.
 
 ### 9.12.0
 

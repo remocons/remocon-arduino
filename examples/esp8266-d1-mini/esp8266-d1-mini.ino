@@ -5,8 +5,10 @@
  *    The built-in LED (GPIO2, active low) is the light.
  *    A button on GPIO14 (D5, to GND) toggles it.
  *
- *  Setup: replace "WIFI_SSID" and "WIFI_PASS" in wifiMulti.addAP(), upload,
- *  then open https://remocon.kr in a browser on the same router.
+ *  Wi-Fi: upload, then set it over USB on https://test.iosignal.net/wifi/ (the board keeps it),
+ *  or write it in the sketch (then the sketch values are used at every boot). The same page can
+ *  set another IOSignal server and a device key.
+ *  Then open https://remocon.kr in a browser on the same router.
  *
  *  [kr] D1 mini의 내장 LED를 전등 타입으로 켜고 끕니다. D5 버튼으로도 토글합니다.
  *
@@ -15,19 +17,27 @@
  *  MIT License
  */
 
-#include <ESP8266WiFiMulti.h>
 #include <IOSignal.h>
+#include <IOSignalConfig.h>
 #include <string.h>
 #include <Bounce2.h>
 #define BUTTON_PIN    14
 #define BUILTIN_LED   2
 
 Bounce2::Button aBtn = Bounce2::Button();
-ESP8266WiFiMulti wifiMulti;
+IOSignalConfig config;
 WiFiClient client;
 IOSignal io;
+// Group the web app shows (g= in the info): board settings 'group'. A change is sent at once.
+IOSignalSetting group(config, "group", "Group (g=)", "HOME");
+void sendInfo() {
+  char g[33], info[96];
+  snprintf(g, sizeof(g), "%s", group.value());
+  for (char* c = g; *c; c++) if (*c == ';') *c = ' ';  // ';' separates info fields
+  snprintf(info, sizeof(info), "n=D1-mini;g=%s;t=light.1", g);
+  io.signal("@$info", info);
+}
 
-const char *deviceInfo = "n=D1-mini;g=HOME;t=light.1";
 
 void publishState() { io.signal("@$state", digitalRead(BUILTIN_LED) == LOW ? "on=1" : "on=0"); }
 
@@ -62,33 +72,25 @@ void setup() {
   aBtn.setPressedState(LOW); 
 
   Serial.begin(115200);
-  WiFi.mode(WIFI_STA);
-  wifiMulti.addAP( "WIFI_SSID", "WIFI_PASS");
-
-  // You can add multiple APs.  
   Serial.println();
-  Serial.println();
-  Serial.print("Wait for WiFi... ");
-  while (wifiMulti.run() != WL_CONNECTED) {
-    Serial.print(".");
-    delay(500);
-  }
-  Serial.println("");
-  Serial.println("WiFi connected");
-  Serial.println("IP address: ");
-  Serial.println(WiFi.localIP());
-  delay(500);
-
+  // Wi-Fi, server and device key: set over USB, or the sketch values.
+  config.begin( Serial, "D1-mini", "WIFI_SSID", "WIFI_PASS" );
+  group.maxLength(32);
+  group.onChange([](const char*) { if (io.state == IO_READY) sendInfo(); });
+  config.setServer( "io.remocon.kr", 55488 );
+  config.printServer();
   io.setRxBuffer( 200 );
-  io.begin( &client , "io.remocon.kr", 55488);
+  io.setLog( [](const char* line) { Serial.println(line); } );
   io.onReady( &onReady );
   io.onMessage( &onMessage );
-  // io.auth("ID_KEY"); // Optional: use your own device key.
+  if ( config.key() ) io.auth( config.key() ); // a device key set over USB, else anonymous
+  io.begin( &client, config.host(), config.port() );
 }
 
 
 void loop() {
-  io.loop();
+  config.loop(); // USB setup requests, Wi-Fi reconnect
+  if ( config.connected() ) io.loop();
   aBtn.update();
   if ( aBtn.pressed() ) {
     deviceToggle();
@@ -102,7 +104,7 @@ void onReady()
   Serial.print("onReady cid: ");
   Serial.println( io.cid );
   io.subscribe("#search");
-  io.signal("@$info", deviceInfo);
+  sendInfo();
   publishState();
   io.signal("#notify", io.cid);
   
