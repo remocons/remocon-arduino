@@ -2,12 +2,13 @@
 // Pictures go as binary JPEG on <cid>@image (not kept by the server). With an E2E key they are encrypted
 // end to end (signal_e2e) and the card needs the same key; without one they are plain JPEG.
 // Board settings over USB on https://test.iosignal.net/wifi/: Wi-Fi, server, device key, and
-//   group (g= in the info), e2e_key (secret, never shown again), interval (ms between pictures).
+//   group (the category in $name), e2e_key (secret, never shown again), interval (ms between pictures).
 // Commands on <cid>@: on, off, toggle, interval=<ms>. State: on=1;interval=1000
 #include "esp_camera.h"
 #include <IOSignal.h>
 #include <IOSignalConfig.h>
 #include <string.h>
+#include <RemoconUi.h>
 
 const char* WIFI_SSID = "WIFI_SSID";
 const char* WIFI_PASS = "WIFI_PASS";
@@ -16,8 +17,8 @@ WiFiClient client;
 IOSignal io;
 IOSignalConfig config;
 
-// Group the web app shows (g= in the info): board settings 'group'. A change is sent at once.
-IOSignalSetting group(config, "group", "Group (g=)", "HOME");
+// The category the web app shows (after ':' in $name): board settings 'group'. A change is sent at once.
+IOSignalSetting group(config, "group", "Category ($name)", "HOME");
 // Empty: plain JPEG. Set it on the board settings page and type the same key on the remocon.kr card.
 IOSignalSetting e2eKey(config, "e2e_key", "E2E key (empty: plain)", "", IOSignalSetting::TEXT, IOSignalSetting::SECRET);
 // Milliseconds between pictures. The app's interval command changes it too and the board keeps it.
@@ -28,11 +29,11 @@ bool cameraReady = false;
 unsigned long lastShot = 0;
 
 void sendInfo() {
-  char g[33], info[64];
-  snprintf(g, sizeof(g), "%s", group.value());
-  for (char* c = g; *c; c++) if (*c == ';') *c = ' ';  // ';' separates info fields
-  snprintf(info, sizeof(info), "n=ESP32-CAM;g=%s;t=camera.1", g);
-  io.signal("@$info", info);
+  // $name "name:category" (the board setting group is the category), $ui the type or the buttons (device rules v2).
+  char name[64];
+  remocon::formatName(name, sizeof(name), "ESP32-CAM", group.value());
+  io.signal("@$name", name);
+  io.signal("@$ui", "t=camera.1");
 }
 
 void publishState() {

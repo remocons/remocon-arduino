@@ -6,6 +6,7 @@
 #include <IOSignalConfig.h>
 #include <Bounce2.h>
 #include <string.h>
+#include <RemoconUi.h>
 // USB serial blocks when the cable is in but no monitor reads it.
 // Skip a log line when it does not fit, so buttons and commands stay responsive.
 void logLine(const char* a, const char* b) {
@@ -27,14 +28,14 @@ WiFiClient client;
 IOSignal io;
 // Wi-Fi, server and device key: set over USB on https://test.iosignal.net/wifi/, or the sketch values.
 IOSignalConfig config;
-// Group the web app shows (g= in the info): board settings 'group'. A change is sent at once.
-IOSignalSetting group(config, "group", "Group (g=)", "HOME");
+// The category the web app shows (after ':' in $name): board settings 'group'. A change is sent at once.
+IOSignalSetting group(config, "group", "Category ($name)", "HOME");
 void sendInfo() {
-  char g[33], info[96];
-  snprintf(g, sizeof(g), "%s", group.value());
-  for (char* c = g; *c; c++) if (*c == ';') *c = ' ';  // ';' separates info fields
-  snprintf(info, sizeof(info), "n=Iris Basic;g=%s;t=switch4.1", g);
-  io.signal("@$info", info);
+  // $name "name:category" (the board setting group is the category), $ui the type or the buttons (device rules v2).
+  char name[64];
+  remocon::formatName(name, sizeof(name), "Iris Basic", group.value());
+  io.signal("@$name", name);
+  io.signal("@$ui", "t=switch4.1");
 }
 void connectNetwork() {
   config.begin(Serial, "Iris Basic", WIFI_SSID, WIFI_PASS);
@@ -88,11 +89,13 @@ void onReady() {
 void onMessage(char* tag, uint8_t type, uint8_t* payload, size_t size) {
   if (strcmp(tag, "#search") == 0) { io.signal("#notify", io.cid); return; }
   if (strcmp(tag, "@") != 0 || type != IOSignal::TEXT || !payload || !size || !memchr(payload, 0, size)) return;
-  // s1=1 sets one LED. Unknown commands still get the current state.
+  // s1=1 sets one LED, all=1 / all=0 all four (device rules). Unknown commands still get the current state.
   const char* c = (const char*)payload;
   logLine("COMMAND ", c);
   if (c[0] == 's' && c[1] >= '1' && c[1] <= '4' && c[2] == '=' && (c[3] == '0' || c[3] == '1') && !c[4])
     states[c[1] - '1'] = c[3];
+  else if (strcmp(c, "all=1") == 0 || strcmp(c, "all=0") == 0)
+    memset(states, c[4], 4);
   publishState();
 }
 void setup() {

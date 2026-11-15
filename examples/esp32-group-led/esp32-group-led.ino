@@ -10,6 +10,7 @@
 #include <IOSignalConfig.h>
 #include <string.h>
 #include <stdio.h>
+#include <RemoconUi.h>
 
 const char* WIFI_SSID = "WIFI_SSID";
 const char* WIFI_PASS = "WIFI_PASS";
@@ -20,20 +21,21 @@ const uint8_t LED_PIN = 4;
 // Keep the channel identical on the two boards. The web app finds the group through #search
 // and rewrites the shared state; each board reads its own key (s1 on the first, s2 on the second).
 #define GROUP_CHANNEL "#lab"
-const char* GROUP_INFO_TAG = GROUP_CHANNEL "$info";
+const char* GROUP_NAME_TAG = GROUP_CHANNEL "$name";
+const char* GROUP_UI_TAG = GROUP_CHANNEL "$ui";
 const char* GROUP_STATE_TAG = GROUP_CHANNEL "$state";
 
 WiFiClient client;
 IOSignal io;
 IOSignalConfig config;
-// Group the web app shows (g= in the info): board settings 'group'. A change is sent at once.
-IOSignalSetting group(config, "group", "Group (g=)", "HOME");
+// The category the web app shows (after ':' in $name): board settings 'group'. A change is sent at once.
+IOSignalSetting group(config, "group", "Category ($name)", "HOME");
 void sendInfo() {
-  char g[33], info[96];
-  snprintf(g, sizeof(g), "%s", group.value());
-  for (char* c = g; *c; c++) if (*c == ';') *c = ' ';  // ';' separates info fields
-  snprintf(info, sizeof(info), "n=ESP32 LEDs;g=%s;t=switch2.1", g);
-  io.signal(GROUP_INFO_TAG, info);
+  // Both members send the same $name and $ui; a group's $ui is the extended form (t=…), device rules v2.
+  char name[64];
+  remocon::formatName(name, sizeof(name), "ESP32 LEDs", group.value());
+  io.signal(GROUP_NAME_TAG, name);
+  io.signal(GROUP_UI_TAG, "t=switch2.1");
 }
 // Which key of the shared state this board follows: 0 -> s1, 1 -> s2. Set it over USB.
 IOSignalSetting outputIndex(config, "index", "Output (0: s1, 1: s2)", "0", IOSignalSetting::INT);

@@ -9,6 +9,7 @@
 #include <IOSignalConfig.h>
 #include <Bounce2.h>
 #include <string.h>
+#include <RemoconUi.h>
 #include <stdlib.h>
 // USB serial blocks when the cable is in but no monitor reads it.
 // Skip a log line when it does not fit, so buttons and commands stay responsive.
@@ -60,15 +61,20 @@ const uint8_t DIP_PINS[] = {21, 20, 10, 7, 6, 5};
 CRGB leds[4];
 Bounce2::Button groupButton, selfButton;
 uint8_t groupId = 0, deviceId = 0;
-// Group the web app shows (g= in the info): board settings 'group'. Empty: "iris G<group id>" from the DIP switches.
-IOSignalSetting group(config, "group", "Group (g=, empty: iris G<DIP>)", "");
-char deviceInfo[96];
+// The category the web app shows (after ':' in $name): board settings 'group'. Empty: "iris G<group id>" from the DIP switches.
+IOSignalSetting group(config, "group", "Category ($name, empty: iris G<DIP>)", "");
+// $name "iris<device id>:<category>" and $ui "t=iris.2" (device rules v2).
+char deviceName[64];
 void makeInfo() {
-  char g[33];
-  if (group.value()[0]) snprintf(g, sizeof(g), "%s", group.value());
-  else snprintf(g, sizeof(g), "iris G%u", groupId);
-  for (char* c = g; *c; c++) if (*c == ';') *c = ' ';  // ';' separates info fields
-  snprintf(deviceInfo, sizeof(deviceInfo), "n=iris%u;g=%s;t=iris.2", deviceId, g);
+  char name[12], category[33];
+  snprintf(name, sizeof(name), "iris%u", deviceId);
+  if (group.value()[0]) snprintf(category, sizeof(category), "%s", group.value());
+  else snprintf(category, sizeof(category), "iris G%u", groupId);
+  remocon::formatName(deviceName, sizeof(deviceName), name, category);
+}
+void sendInfo() {
+  io.signal("@$name", deviceName);
+  io.signal("@$ui", "t=iris.2");
 }
 char groupChannel[16]; // #iris-g<group id>: members only, carries "on" and "off".
 
@@ -153,7 +159,7 @@ void onReady() {
   logLine("RSSI dBm: ", rssi); // Below about -75 the link may stall.
   io.subscribe("#search");
   io.subscribe(groupChannel);
-  io.signal("@$info", deviceInfo);
+  sendInfo();
   publishState();
   io.signal("#notify", io.cid);
 }
@@ -185,8 +191,8 @@ void setup() {
   snprintf(groupChannel, sizeof(groupChannel), "#iris-g%u", groupId);
   makeInfo();
   group.maxLength(32);
-  group.onChange([](const char*) { makeInfo(); if (io.state == IO_READY) io.signal("@$info", deviceInfo); });
-  logLine("iris rgb start: ", deviceInfo);
+  group.onChange([](const char*) { makeInfo(); if (io.state == IO_READY) sendInfo(); });
+  logLine("iris rgb start: ", deviceName);
   groupButton.attach(GROUP_BUTTON, INPUT_PULLUP); groupButton.interval(10); groupButton.setPressedState(LOW);
   selfButton.attach(SELF_BUTTON, INPUT_PULLUP); selfButton.interval(10); selfButton.setPressedState(LOW);
   connectNetwork();

@@ -41,7 +41,8 @@
 byte mac[]{0xDE, 0xAD, 0x1E, 0xEF, 0xFE, 0x50};
 EthernetClient client;
 IOSignal io;
-const char *deviceInfo = "n=Uno-IR;g=HOME;t=light.1";
+const char *deviceName = "Uno-IR:HOME";  // $name "name:category" (device rules v2)
+const char *deviceUi = "t=light.1";      // $ui: the official type
 
 void publishState() { io.signal("@$state", digitalRead(5) ? "on=1" : "on=0"); }
 
@@ -156,7 +157,8 @@ void onReady()
   Serial.print(F("onReady cid: "));
   Serial.println(io.cid);
   io.subscribe("#search");
-  io.signal("@$info", deviceInfo);
+  io.signal("@$name", deviceName);
+  io.signal("@$ui", deviceUi);
   publishState();
   io.signal("#notify", io.cid);
 }

@@ -24,6 +24,7 @@
 #include <Arduino.h>
 #include <IOSignal.h>
 #include <IOSignalConfig.h>
+#include <RemoconUi.h>
 
 // Wi-Fi values (and an optional device key) can go in _secrets.h next to this sketch,
 // which keeps them out of version control. Leave the placeholders to use the Wi-Fi set over USB.
@@ -40,14 +41,14 @@ const char* WIFI_PASS = SECRET_WIFI_PASS;
 WiFiClient client;
 IOSignalConfig config;
 IOSignal io;
-// Group the web app shows (g= in the info): board settings 'group'. A change is sent at once.
-IOSignalSetting group(config, "group", "Group (g=)", "HOME");
+// The category the web app shows (after ':' in $name): board settings 'group'. A change is sent at once.
+IOSignalSetting group(config, "group", "Category ($name)", "HOME");
 void sendInfo() {
-  char g[33], info[96];
-  snprintf(g, sizeof(g), "%s", group.value());
-  for (char* c = g; *c; c++) if (*c == ';') *c = ' ';  // ';' separates info fields
-  snprintf(info, sizeof(info), "n=Relay4CH;g=%s;t=relay4.1", g);
-  io.signal("@$info", info);
+  // $name "name:category" (the board setting group is the category), $ui the type or the buttons (device rules v2).
+  char name[64];
+  remocon::formatName(name, sizeof(name), "Relay4CH", group.value());
+  io.signal("@$name", name);
+  io.signal("@$ui", "t=relay4.1");
 }
 
 char states[] = "10000";

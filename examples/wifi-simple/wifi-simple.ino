@@ -26,6 +26,7 @@
 #include <IOSignal.h>
 #include <IOSignalConfig.h>
 #include <string.h>
+#include <RemoconUi.h>
 #define WIFI_ID  "WIFI_SSID"
 #define WIFI_KEY "WIFI_PASS"
 #define SERVER_URL "io.remocon.kr"
@@ -37,14 +38,14 @@
 WiFiClient client;
 IOSignal io;
 IOSignalConfig config;
-// Group the web app shows (g= in the info): board settings 'group'. A change is sent at once.
-IOSignalSetting group(config, "group", "Group (g=)", "HOME");
+// The category the web app shows (after ':' in $name): board settings 'group'. A change is sent at once.
+IOSignalSetting group(config, "group", "Category ($name)", "HOME");
 void sendInfo() {
-  char g[33], info[96];
-  snprintf(g, sizeof(g), "%s", group.value());
-  for (char* c = g; *c; c++) if (*c == ';') *c = ' ';  // ';' separates info fields
-  snprintf(info, sizeof(info), "n=공유 스위치;g=%s;t=switch3.1", g);
-  io.signal(SWITCH_CH "$info", info);
+  // $name "name:category" (the board setting group is the category); a group's $ui is the extended form (t=…).
+  char name[64];
+  remocon::formatName(name, sizeof(name), "공유 스위치", group.value());
+  io.signal(SWITCH_CH "$name", name);
+  io.signal(SWITCH_CH "$ui", "t=switch3.1");
 }
 
 void setup() {

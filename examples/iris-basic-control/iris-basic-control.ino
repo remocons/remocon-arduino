@@ -1,5 +1,5 @@
 // iris ESP32-C3 controller for an iris-basic board.
-// It finds the Iris Basic like the web app does (#search, #notify, @$info),
+// It finds the Iris Basic like the web app does (#search, #notify, @$name),
 // shows its state on its own four LEDs and sends commands from its buttons.
 // Button 1 turns all LEDs on or off. Button 2 lights one more LED each press.
 // The status LED (GPIO8) is on while a target is connected.
@@ -8,6 +8,7 @@
 #include <IOSignalConfig.h>
 #include <Bounce2.h>
 #include <string.h>
+#include <RemoconUi.h>
 // USB serial blocks when the cable is in but no monitor reads it.
 // Skip a log line when it does not fit, so buttons and commands stay responsive.
 void logLine(const char* a, const char* b) {
@@ -53,8 +54,7 @@ void pollNetwork() {
 
 const uint8_t DATA_PIN = 4, STATUS_LED = 8;
 const uint8_t BUTTON_PINS[] = {1, 2};
-const char* TARGET_NAME = "n=Iris Basic"; // A whole field of the target's info.
-const char* TARGET_NAME_OLD = "name=Iris Basic"; // Boards flashed before the short keys.
+const char* TARGET_NAME = "Iris Basic"; // The name part (before ':') of the target's $name.
 CRGB leds[4];
 Bounce2::Button buttons[2];
 char target[MAX_CID_LEN + 1] = ""; // CID of the Iris Basic, empty while searching.
@@ -83,14 +83,7 @@ void onReady() {
   io.subscribe("#notify");
   search();
 }
-// Tags arrive as <cid>@$info and <cid>@$state. Copies the <cid> part.
-// True when info "n=Iris Basic;t=..." has the whole field, not just a part of one.
-bool hasField(const char* info, const char* field) {
-  const size_t n = strlen(field);
-  for (const char* at = strstr(info, field); at; at = strstr(at + 1, field))
-    if ((at == info || at[-1] == ';') && (at[n] == ';' || at[n] == 0)) return true;
-  return false;
-}
+// Tags arrive as <cid>@$name and <cid>@$state. Copies the <cid> part.
 bool cidOf(const char* tag, const char* topic, char* cid) {
   const char* at = strstr(tag, topic);
   if (!at || strcmp(at, topic) != 0 || at == tag || at - tag > MAX_CID_LEN) return false;
@@ -102,13 +95,14 @@ void onMessage(char* tag, uint8_t type, uint8_t* payload, size_t size) {
   const char* text = (const char*)payload;
   char cid[MAX_CID_LEN + 1], sub[MAX_CID_LEN + 8];
   if (strcmp(tag, "#notify") == 0) {
-    // Ask every new device for its info until the target is found.
+    // Ask every new device for its name until the target is found.
     if (target[0] || !text[0] || text[0] == '#' || strlen(text) > MAX_CID_LEN) return;
-    snprintf(sub, sizeof(sub), "%s@$info", text);
+    snprintf(sub, sizeof(sub), "%s@$name", text);
     io.subscribe(sub);
-  } else if (cidOf(tag, "@$info", cid)) {
-    io.unsubscribe(tag); // The info is read once. Do not keep receiving it.
-    if (target[0] || !(hasField(text, TARGET_NAME) || hasField(text, TARGET_NAME_OLD))) return;
+  } else if (cidOf(tag, "@$name", cid)) {
+    io.unsubscribe(tag); // The name is read once. Do not keep receiving it.
+    // "Iris Basic" or "Iris Basic:<category>": the part before ':' must be the whole name.
+    if (target[0] || !remocon::nameIs(text, TARGET_NAME)) return;
     strcpy(target, cid);
     logLine("TARGET ", target);
     snprintf(sub, sizeof(sub), "%s@$state", target);

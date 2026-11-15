@@ -30,7 +30,8 @@ Bounce2::Button aBtn = Bounce2::Button();
 ArduinoLEDMatrix matrix;
 WiFiClient client;
 IOSignal io;
-const char *deviceInfo = "n=UnoR4-WiFi;g=HOME;t=light.1";
+const char *deviceName = "UnoR4-WiFi:HOME";  // $name "name:category" (device rules v2)
+const char *deviceUi = "t=light.1";      // $ui: the official type
 
 void publishState() { io.signal("@$state", digitalRead(LED_BUILTIN) ? "on=1" : "on=0"); }
 
@@ -105,7 +106,8 @@ void onReady()
   Serial.print("onReady cid: ");
   Serial.println( io.cid );
   io.subscribe("#search");
-  io.signal("@$info", deviceInfo);
+  io.signal("@$name", deviceName);
+  io.signal("@$ui", deviceUi);
   publishState();
   io.signal("#notify", io.cid);
   

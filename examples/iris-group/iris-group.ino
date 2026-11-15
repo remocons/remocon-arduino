@@ -8,14 +8,15 @@
 #include <IOSignalConfig.h>
 #include <Bounce2.h>
 #include <string.h>
+#include <RemoconUi.h>
 const char* WIFI_SSID = "WIFI_SSID";
 const char* WIFI_PASS = "WIFI_PASS";
 WiFiClient client;
 IOSignal io;
 // Wi-Fi, server and device key: set over USB on https://test.iosignal.net/wifi/, or the sketch values.
 IOSignalConfig config;
-// Group the web app shows (g= in the info): board settings 'group'. Empty: "iris G<group id>" from the DIP switches.
-IOSignalSetting group(config, "group", "Group (g=, empty: iris G<DIP>)", "");
+// The category the web app shows (after ':' in $name): board settings 'group'. Empty: "iris G<group id>" from the DIP switches.
+IOSignalSetting group(config, "group", "Category ($name, empty: iris G<DIP>)", "");
 void connectNetwork() {
   config.begin(Serial, "Iris Group", WIFI_SSID, WIFI_PASS);
   config.setServer("io.remocon.kr", 55488);
@@ -38,17 +39,22 @@ const uint8_t DIP_PINS[] = {21, 20, 10, 7, 6, 5};
 CRGB leds[4];
 Bounce2::Button buttons[2];
 uint8_t groupId = 0, deviceId = 0;
-char channel[16], stateTag[24], infoTag[24], groupInfo[96];
+char channel[16], stateTag[24], nameTag[24], uiTag[24], groupName[64];
 char states[9] = "00000000";
 // Buttons write the whole state, so wait for the stored value. A new group has none.
 bool stateKnown = false;
 unsigned long readyAt = 0;
+// The group's $name "Iris Lights <group id>:<category>". Every member sends the same $name and $ui (t=switch8.1).
 void makeInfo() {
-  char g[33];
-  if (group.value()[0]) snprintf(g, sizeof(g), "%s", group.value());
-  else snprintf(g, sizeof(g), "iris G%u", groupId);
-  for (char* c = g; *c; c++) if (*c == ';') *c = ' ';  // ';' separates info fields
-  snprintf(groupInfo, sizeof(groupInfo), "n=Iris Lights %u;g=%s;t=switch8.1", groupId, g);
+  char name[24], category[33];
+  snprintf(name, sizeof(name), "Iris Lights %u", groupId);
+  if (group.value()[0]) snprintf(category, sizeof(category), "%s", group.value());
+  else snprintf(category, sizeof(category), "iris G%u", groupId);
+  remocon::formatName(groupName, sizeof(groupName), name, category);
+}
+void sendInfo() {
+  io.signal(nameTag, groupName);
+  io.signal(uiTag, "t=switch8.1");
 }
 void applyState() {
   const bool on = states[deviceId] == '1';
@@ -71,7 +77,7 @@ void publishState() {
 void onReady() {
   readyAt = millis();
   io.subscribe(stateTag); io.subscribe("#search");
-  io.signal(infoTag, groupInfo);
+  sendInfo();
   io.signal("#notify", channel);
   // Do not overwrite the shared state on reconnect.
 }
@@ -98,10 +104,11 @@ void setup() {
   }
   snprintf(channel, sizeof(channel), "#Iris-g%u", groupId);
   snprintf(stateTag, sizeof(stateTag), "%s$state", channel);
-  snprintf(infoTag, sizeof(infoTag), "%s$info", channel);
+  snprintf(nameTag, sizeof(nameTag), "%s$name", channel);
+  snprintf(uiTag, sizeof(uiTag), "%s$ui", channel);
   makeInfo();
   group.maxLength(32);
-  group.onChange([](const char*) { makeInfo(); if (io.state == IO_READY) io.signal(infoTag, groupInfo); });
+  group.onChange([](const char*) { makeInfo(); if (io.state == IO_READY) sendInfo(); });
   for (uint8_t i = 0; i < 2; i++) {
     buttons[i].attach(BUTTON_PINS[i], INPUT_PULLUP);
     buttons[i].interval(10); buttons[i].setPressedState(LOW);

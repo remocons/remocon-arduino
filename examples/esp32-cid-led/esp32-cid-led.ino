@@ -10,6 +10,7 @@
 #include <IOSignal.h>
 #include <IOSignalConfig.h>
 #include <string.h>
+#include <RemoconUi.h>
 
 const char* WIFI_SSID = "WIFI_SSID";
 const char* WIFI_PASS = "WIFI_PASS";
@@ -20,14 +21,14 @@ const uint8_t LED_PIN = 4;
 WiFiClient client;
 IOSignal io;
 IOSignalConfig config;
-// Group the web app shows (g= in the info): board settings 'group'. A change is sent at once.
-IOSignalSetting group(config, "group", "Group (g=)", "HOME");
+// The category the web app shows (after ':' in $name): board settings 'group'. A change is sent at once.
+IOSignalSetting group(config, "group", "Category ($name)", "HOME");
 void sendInfo() {
-  char g[33], info[96];
-  snprintf(g, sizeof(g), "%s", group.value());
-  for (char* c = g; *c; c++) if (*c == ';') *c = ' ';  // ';' separates info fields
-  snprintf(info, sizeof(info), "n=ESP32-LED;g=%s;ui=on,off,toggle", g);
-  io.signal("@$info", info);
+  // $name "name:category" (the board setting group is the category), $ui the type or the buttons (device rules v2).
+  char name[64];
+  remocon::formatName(name, sizeof(name), "ESP32-LED", group.value());
+  io.signal("@$name", name);
+  io.signal("@$ui", "on,off,toggle");
 }
 bool ledOn = false;
 

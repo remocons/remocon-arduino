@@ -27,6 +27,7 @@
 #include <Bounce2.h>
 #include <U8g2lib.h>
 #include <Wire.h>
+#include <RemoconUi.h>
 
 // Buttons
 #define BTN_UP     16   // D0  SW1 *EXTERNAL HARDWARE PULLUP
@@ -51,14 +52,14 @@
 IOSignalConfig config;
 WiFiClient client;
 IOSignal io;
-// Group the web app shows (g= in the info): board settings 'group'. A change is sent at once.
-IOSignalSetting group(config, "group", "Group (g=)", "HOME");
+// The category the web app shows (after ':' in $name): board settings 'group'. A change is sent at once.
+IOSignalSetting group(config, "group", "Category ($name)", "HOME");
 void sendInfo() {
-  char g[33], info[96];
-  snprintf(g, sizeof(g), "%s", group.value());
-  for (char* c = g; *c; c++) if (*c == ';') *c = ' ';  // ';' separates info fields
-  snprintf(info, sizeof(info), "n=Remocon8266;g=%s;t=switch3.1", g);
-  io.signal("@$info", info);
+  // $name "name:category" (the board setting group is the category), $ui the type or the buttons (device rules v2).
+  char name[64];
+  remocon::formatName(name, sizeof(name), "Remocon8266", group.value());
+  io.signal("@$name", name);
+  io.signal("@$ui", "t=switch3.1");
 }
 
 
@@ -298,12 +299,22 @@ void onMessage( char *tag, uint8_t payloadType, uint8_t* payload, size_t payload
   }
       
   if( strcmp(tag, "@") == 0){
-    // s1=1 sets an output. Unknown commands still get a reply.
+    // s1=1 sets an output, all=1 / all=0 sets all three (device rules). Unknown commands still get a reply.
     const char *c = (const char *)payload;
     int i = c[0] == 's' ? c[1] - '1' : -1;
     if( i >= 0 && i < 3 && c[2] == '=' && (c[3] == '0' || c[3] == '1') && c[4] == 0 ){
       states[i] = c[3];
       stateChange(i);
+    }else if( strcmp(c, "all=1") == 0 || strcmp(c, "all=0") == 0 ){
+      // Every output, then one state: stateChange() of the last one publishes it.
+      for( int k = 0; k < 3; k++ ) states[k] = c[4];
+      for( int k = 0; k < 2; k++ ){
+        if( states[k] != last_states[k] ){
+          digitalWrite( pinMap[k] , (states[k] == '1') != activeLow[k] );
+          last_states[k] = states[k];
+        }
+      }
+      stateChange(2);
     }else{
       publishState();
     }

@@ -21,6 +21,7 @@
 #include <IOSignalConfig.h>
 #include <string.h>
 #include <Bounce2.h>
+#include <RemoconUi.h>
 #define BUTTON_PIN    14
 #define BUILTIN_LED   2
 
@@ -28,14 +29,14 @@ Bounce2::Button aBtn = Bounce2::Button();
 IOSignalConfig config;
 WiFiClient client;
 IOSignal io;
-// Group the web app shows (g= in the info): board settings 'group'. A change is sent at once.
-IOSignalSetting group(config, "group", "Group (g=)", "HOME");
+// The category the web app shows (after ':' in $name): board settings 'group'. A change is sent at once.
+IOSignalSetting group(config, "group", "Category ($name)", "HOME");
 void sendInfo() {
-  char g[33], info[96];
-  snprintf(g, sizeof(g), "%s", group.value());
-  for (char* c = g; *c; c++) if (*c == ';') *c = ' ';  // ';' separates info fields
-  snprintf(info, sizeof(info), "n=D1-mini;g=%s;t=light.1", g);
-  io.signal("@$info", info);
+  // $name "name:category" (the board setting group is the category), $ui the type or the buttons (device rules v2).
+  char name[64];
+  remocon::formatName(name, sizeof(name), "D1-mini", group.value());
+  io.signal("@$name", name);
+  io.signal("@$ui", "t=light.1");
 }
 
 
