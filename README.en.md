@@ -11,7 +11,7 @@ Communication uses the [IOSignal Arduino client](https://github.com/remocons/ios
 
 ## Versions
 
-From **9.0.0**, Remocon uses the same version number as the public [iosignal](https://github.com/remocons/iosignal) and [iosignal-arduino](https://github.com/remocons/iosignal-arduino) packages. Packages with the same number are meant to be used together. 9.14.0 requires IOSignal Arduino **9.14.0 or later**. See [Changes by version](#changes-by-version) below.
+From **9.0.0**, Remocon uses the same version number as the public [iosignal](https://github.com/remocons/iosignal) and [iosignal-arduino](https://github.com/remocons/iosignal-arduino) packages. Packages with the same number are meant to be used together. 9.14.1 requires IOSignal Arduino **9.14.0 or later**. See [Changes by version](#changes-by-version) below.
 
 ## Installation and getting started
 
@@ -101,6 +101,10 @@ Revoke and reissue any real authentication key that has already been published. 
 - **Large messages do not arrive:** Messages larger than the receive buffer (`setRxBuffer`) are not sent by a 9.0 server, or are skipped by the device. Increase the buffer if needed, keeping the board's memory in mind.
 
 ## Changes by version
+
+### 9.14.1
+
+- **`Remocon8266-4ch-control` reads the target relay's state again.** When its buttons moved to `RemoconButtons.h` after 9.13.0, the line that passed the received `$state` on was lost: the controller stayed at `relays=----`, `link=0`, and toggles from its buttons or card sent nothing. Reinstall boards that run this example.
 
 ### 9.14.0
 

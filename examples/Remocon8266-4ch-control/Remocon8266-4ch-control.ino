@@ -197,6 +197,7 @@ void onReady() {
 
 void onMessage(char* tag, uint8_t type, uint8_t* payload, size_t size) {
   if (strcmp(tag, "#search") == 0) { io.signal("#notify", io.cid); return; }
+  if (buttons.onMessage(tag, type, payload, size)) return;  // the target's state (changed() follows)
   if (type != IOSignal::TEXT || !payload || !size || !memchr(payload, 0, size)) return;
   const char* text = (const char*)payload;
 
