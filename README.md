@@ -11,7 +11,7 @@
 
 ## 버전
 
-**9.0.0**부터 Remocon은 공개 [iosignal](https://github.com/remocons/iosignal)·[iosignal-arduino](https://github.com/remocons/iosignal-arduino)와 같은 버전 번호를 씁니다. 같은 번호의 패키지는 함께 쓰도록 맞춘 조합입니다. 9.14.2는 IOSignal Arduino **9.14.0 이상**이 필요합니다. 버전별 변경은 아래 [버전별 변경 사항](#버전별-변경-사항)을 참고하세요.
+**9.0.0**부터 Remocon은 공개 [iosignal](https://github.com/remocons/iosignal)·[iosignal-arduino](https://github.com/remocons/iosignal-arduino)와 같은 버전 번호를 씁니다. 같은 번호의 패키지는 함께 쓰도록 맞춘 조합입니다. 9.14.3은 IOSignal Arduino **9.14.0 이상**이 필요합니다(보드 설정의 익명 접속은 9.14.1 이상). 버전별 변경은 아래 [버전별 변경 사항](#버전별-변경-사항)을 참고하세요.
 
 ## 설치 및 시작
 
@@ -104,7 +104,7 @@ Wi-Fi 비밀번호와 장치 인증키를 공개 저장소에 올리지 마세�
 
 ## 버전별 변경 사항
 
-### 다음 버전 (아직 릴리스 전)
+### 9.14.3
 
 - **보드 설정 `category`를 `name`으로 바꿔 장치 이름도 함께 정합니다.** 값은 `$name` 그대로 `이름:분류`입니다(예: `거실 조명:1층`). `:1층`처럼 이름을 비우면 스케치의 이름을 쓰고, `:`가 없으면 분류 없이 이름만 보냅니다. 비우면 스케치 기본값(예: `Iris Basic:HOME`)입니다. 보드 설정 화면에는 `Name & category (name:category)`로 나옵니다.
 - 예전 `category`에 저장한 값은 읽지 않습니다. 업데이트 뒤 필요하면 `name`을 다시 넣으세요.

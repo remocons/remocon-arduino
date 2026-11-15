@@ -11,7 +11,7 @@ Communication uses the [IOSignal Arduino client](https://github.com/remocons/ios
 
 ## Versions
 
-From **9.0.0**, Remocon uses the same version number as the public [iosignal](https://github.com/remocons/iosignal) and [iosignal-arduino](https://github.com/remocons/iosignal-arduino) packages. Packages with the same number are meant to be used together. 9.14.2 requires IOSignal Arduino **9.14.0 or later**. See [Changes by version](#changes-by-version) below.
+From **9.0.0**, Remocon uses the same version number as the public [iosignal](https://github.com/remocons/iosignal) and [iosignal-arduino](https://github.com/remocons/iosignal-arduino) packages. Packages with the same number are meant to be used together. 9.14.3 requires IOSignal Arduino **9.14.0 or later** (9.14.1 or later for anonymous login in the board settings). See [Changes by version](#changes-by-version) below.
 
 ## Installation and getting started
 
@@ -104,7 +104,7 @@ Revoke and reissue any real authentication key that has already been published. 
 
 ## Changes by version
 
-### Next version (not released yet)
+### 9.14.3
 
 - **The board setting `category` is now `name` and sets the device name too.** Its value is the `$name` itself, `name:category` (for example `Living Room Light:1F`). `:1F` keeps the sketch's name; without `:` there is no category. Empty uses the sketch default (for example `Iris Basic:HOME`). The board settings page shows it as `Name & category (name:category)`.
 - A value stored under `category` is not read; set `name` again after updating if needed.
