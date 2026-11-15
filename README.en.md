@@ -107,6 +107,7 @@ Revoke and reissue any real authentication key that has already been published. 
 - **The board setting `category` is now `name` and sets the device name too.** Its value is the `$name` itself, `name:category` (for example `Living Room Light:1F`). `:1F` keeps the sketch's name; without `:` there is no category. Empty uses the sketch default (for example `Iris Basic:HOME`). The board settings page shows it as `Name & category (name:category)`.
 - A value stored under `category` is not read; set `name` again after updating if needed.
 - New `remocon::formatNameSetting()` (`RemoconUi.h`) builds `$name` from the setting.
+- `wifi-simple`: board settings `out` (an LED or relay pin following s1), `out_high` and `button` (a pin that toggles s1) make it an ESP-01 relay or button board too; it now builds for the ESP-01.
 
 ### 9.14.2
 
