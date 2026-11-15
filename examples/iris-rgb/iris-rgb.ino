@@ -61,16 +61,16 @@ const uint8_t DIP_PINS[] = {21, 20, 10, 7, 6, 5};
 CRGB leds[4];
 Bounce2::Button groupButton, selfButton;
 uint8_t groupId = 0, deviceId = 0;
-// The app tab this board is listed under (after ':' in $name): board setting 'category'. Empty: "iris G<group id>" from the DIP switches.
-IOSignalSetting categorySetting(config, "category", "App tab (empty: iris G<DIP>)", "");
+// $name, the device name and its app tab ("name:category"): board setting 'name'. Empty: "iris<device id>:iris G<group id>"
+// from the DIP switches; an empty name part (":Kitchen") keeps the DIP name.
+IOSignalSetting nameSetting(config, "name", "Name & category (empty: from DIP)", "");
 // $name "iris<device id>:<category>" and $ui "t=iris.2" (device rules v2).
 char deviceName[64];
 void makeInfo() {
-  char name[12], category[33];
+  char name[12], category[16];
   snprintf(name, sizeof(name), "iris%u", deviceId);
-  if (categorySetting.value()[0]) snprintf(category, sizeof(category), "%s", categorySetting.value());
-  else snprintf(category, sizeof(category), "iris G%u", groupId);
-  remocon::formatName(deviceName, sizeof(deviceName), name, category);
+  snprintf(category, sizeof(category), "iris G%u", groupId);
+  remocon::formatNameSetting(deviceName, sizeof(deviceName), nameSetting.value(), name, category);
 }
 void sendInfo() {
   io.signal("@$name", deviceName);
@@ -190,8 +190,8 @@ void setup() {
   }
   snprintf(groupChannel, sizeof(groupChannel), "#iris-g%u", groupId);
   makeInfo();
-  categorySetting.maxLength(32);
-  categorySetting.onChange([](const char*) { makeInfo(); if (io.state == IO_READY) sendInfo(); });
+  nameSetting.maxLength(64);
+  nameSetting.onChange([](const char*) { makeInfo(); if (io.state == IO_READY) sendInfo(); });
   logLine("iris rgb start: ", deviceName);
   groupButton.attach(GROUP_BUTTON, INPUT_PULLUP); groupButton.interval(10); groupButton.setPressedState(LOW);
   selfButton.attach(SELF_BUTTON, INPUT_PULLUP); selfButton.interval(10); selfButton.setPressedState(LOW);

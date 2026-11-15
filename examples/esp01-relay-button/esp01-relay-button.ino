@@ -37,12 +37,13 @@
 IOSignalConfig config;
 WiFiClient client;
 IOSignal io;
-// The app tab this board is listed under (after ':' in $name): board setting 'category'. A change is sent at once.
-IOSignalSetting categorySetting(config, "category", "App tab (category)", "HOME");
+// $name, the device name and its app tab ("name:category"): board setting 'name'. Empty uses the sketch's
+// default; without ':' there is no category (미분류). A change is sent at once.
+IOSignalSetting nameSetting(config, "name", "Name & category (name:category)", "ESP01-Relay-Btn:HOME");
 void sendInfo() {
-  // $name "name:category" (the board setting 'category' is the category), $ui the type or the buttons (device rules v2).
+  // $name "name:category" (the board setting 'name'), $ui the type or the buttons (device rules v2).
   char name[64];
-  remocon::formatName(name, sizeof(name), "ESP01-Relay-Btn", categorySetting.value());
+  remocon::formatNameSetting(name, sizeof(name), nameSetting.value(), "ESP01-Relay-Btn");
   io.signal("@$name", name);
   io.signal("@$ui", "t=switch2.1");
 }
@@ -98,8 +99,8 @@ void setup() {
 
   // Wi-Fi, server and device key: stored over USB, or the sketch values. No serial yet.
   config.begin( "ESP01-Relay-Btn", WIFI_SSID, WIFI_PASS );
-  categorySetting.maxLength(32);
-  categorySetting.onChange([](const char*) { if (io.state == IO_READY) sendInfo(); });
+  nameSetting.maxLength(64);
+  nameSetting.onChange([](const char*) { if (io.state == IO_READY) sendInfo(); });
   config.setServer( "io.remocon.kr", 55488 );
 
   // You can't use Serial-tx and the LED together: serial only in setup mode.

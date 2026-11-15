@@ -7,7 +7,8 @@
 //          "t=iris.2;p=1;v=1;b=on,off" (t official type, p=1 screen on $panel, v=1 picture on $view, b buttons)
 //
 //   char name[64];
-//   remocon::formatName(name, sizeof(name), "Iris Basic", categorySetting.value());   // "Iris Basic:HOME"
+//   remocon::formatName(name, sizeof(name), "Iris Basic", "HOME");                 // "Iris Basic:HOME"
+//   remocon::formatNameSetting(name, sizeof(name), nameSetting.value(), "Iris Basic"); // the board setting "name"
 //   io.signal("@$name", name);
 //   io.signal("@$ui", "t=switch4.1");
 #ifndef RemoconUi_h
@@ -52,6 +53,24 @@ inline void formatName(char* out, size_t n, const char* name, const char* catego
   if (!category || !*category || used + 2 > n) return;
   out[used++] = ':';
   copyClean(out + used, n - used, category, ";");
+}
+
+// $name from a board setting that holds the device's "name" or "name:category" (the $name form itself).
+// Empty value: defaultName with defaultCategory. Empty name part (":Kitchen"): defaultName. No ':': no category,
+// so the apps show it under 미분류. Spaces around the name are dropped; the result is cleaned like formatName.
+inline void formatNameSetting(char* out, size_t n, const char* value, const char* defaultName,
+                              const char* defaultCategory = nullptr) {
+  if (!out || !n) return;
+  while (value && *value == ' ') value++;
+  if (!value || !*value) { formatName(out, n, defaultName, defaultCategory); return; }
+  const char* colon = strchr(value, ':');
+  size_t len = colon ? (size_t)(colon - value) : strlen(value);
+  while (len && value[len - 1] == ' ') len--;
+  char name[NAME_BYTES + 1];
+  if (len > NAME_BYTES) len = NAME_BYTES;
+  memcpy(name, value, len);
+  name[len] = 0;
+  formatName(out, n, len ? name : defaultName, colon ? colon + 1 : "");
 }
 
 // The name part of a $name (before the first ':') into out (size n).

@@ -21,12 +21,13 @@ const uint8_t LED_PIN = 4;
 WiFiClient client;
 IOSignal io;
 IOSignalConfig config;
-// The app tab this board is listed under (after ':' in $name): board setting 'category'. A change is sent at once.
-IOSignalSetting categorySetting(config, "category", "App tab (category)", "HOME");
+// $name, the device name and its app tab ("name:category"): board setting 'name'. Empty uses the sketch's
+// default; without ':' there is no category (미분류). A change is sent at once.
+IOSignalSetting nameSetting(config, "name", "Name & category (name:category)", "ESP32-LED:HOME");
 void sendInfo() {
-  // $name "name:category" (the board setting 'category' is the category), $ui the type or the buttons (device rules v2).
+  // $name "name:category" (the board setting 'name'), $ui the type or the buttons (device rules v2).
   char name[64];
-  remocon::formatName(name, sizeof(name), "ESP32-LED", categorySetting.value());
+  remocon::formatNameSetting(name, sizeof(name), nameSetting.value(), "ESP32-LED");
   io.signal("@$name", name);
   io.signal("@$ui", "on,off,toggle");
 }
@@ -63,8 +64,8 @@ void setup() {
   pinMode(LED_PIN, OUTPUT);
   digitalWrite(LED_PIN, LOW);
   config.begin(Serial, "ESP32-LED", WIFI_SSID, WIFI_PASS);
-  categorySetting.maxLength(32);
-  categorySetting.onChange([](const char*) { if (io.state == IO_READY) sendInfo(); });
+  nameSetting.maxLength(64);
+  nameSetting.onChange([](const char*) { if (io.state == IO_READY) sendInfo(); });
   config.setServer(IO_HOST, IO_PORT);
   config.printServer();
   io.setRxBuffer(256);

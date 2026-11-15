@@ -76,12 +76,13 @@ const char* devicePanel =
 WiFiClient client;
 IOSignal io;
 IOSignalConfig config;
-// The app tab this board is listed under (after ':' in $name): board setting 'category'. A change is sent at once.
-IOSignalSetting categorySetting(config, "category", "App tab (category)", "HOME");
+// $name, the device name and its app tab ("name:category"): board setting 'name'. Empty uses the sketch's
+// default; without ':' there is no category (미분류). A change is sent at once.
+IOSignalSetting nameSetting(config, "name", "Name & category (name:category)", "Relay Control:HOME");
 void sendInfo() {
-  // $name "name:category" (the board setting 'category' is the category), $ui the type or the buttons (device rules v2).
+  // $name "name:category" (the board setting 'name'), $ui the type or the buttons (device rules v2).
   char name[64];
-  remocon::formatName(name, sizeof(name), "Relay Control", categorySetting.value());
+  remocon::formatNameSetting(name, sizeof(name), nameSetting.value(), "Relay Control");
   io.signal("@$name", name);
   io.signal("@$ui", "p=1;b=r1,r2,r3,r4,all");
 }
@@ -223,8 +224,8 @@ void setup() {
 
   // Stored Wi-Fi (set over USB), or the sketch values when they are not the placeholders.
   config.begin(Serial, "Relay Control", WIFI_SSID, WIFI_PASS);
-  categorySetting.maxLength(32);
-  categorySetting.onChange([](const char*) { if (io.state == IO_READY) sendInfo(); });
+  nameSetting.maxLength(64);
+  nameSetting.onChange([](const char*) { if (io.state == IO_READY) sendInfo(); });
   config.setServer("io.remocon.kr", 55488);
 #ifdef SECRET_ID_KEY
   config.setKey(SECRET_ID_KEY);

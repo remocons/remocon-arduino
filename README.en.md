@@ -102,6 +102,12 @@ Revoke and reissue any real authentication key that has already been published. 
 
 ## Changes by version
 
+### Next version (not released yet)
+
+- **The board setting `category` is now `name` and sets the device name too.** Its value is the `$name` itself, `name:category` (for example `Living Room Light:1F`). `:1F` keeps the sketch's name; without `:` there is no category. Empty uses the sketch default (for example `Iris Basic:HOME`). The board settings page shows it as `Name & category (name:category)`.
+- A value stored under `category` is not read; set `name` again after updating if needed.
+- New `remocon::formatNameSetting()` (`RemoconUi.h`) builds `$name` from the setting.
+
 ### 9.14.2
 
 - **The board setting `group` is now `category`.** It is the app tab (remocon.kr and others) the device is listed under; the device sends `$name` as `name:category` (for example `Iris Basic:HOME`). It was renamed so it is not mistaken for a group channel; the board settings page shows it as `App tab (category)`.

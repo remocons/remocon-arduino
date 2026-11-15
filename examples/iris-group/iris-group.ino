@@ -15,8 +15,9 @@ WiFiClient client;
 IOSignal io;
 // Wi-Fi, server and device key: set over USB on https://test.iosignal.net/wifi/, or the sketch values.
 IOSignalConfig config;
-// The app tab this board is listed under (after ':' in $name): board setting 'category'. Empty: "iris G<group id>" from the DIP switches.
-IOSignalSetting categorySetting(config, "category", "App tab (empty: iris G<DIP>)", "");
+// $name, the device name and its app tab ("name:category"): board setting 'name'. Empty: "Iris Lights <group id>:iris G<group id>"
+// from the DIP switches; an empty name part (":Kitchen") keeps the DIP name.
+IOSignalSetting nameSetting(config, "name", "Name & category (empty: from DIP)", "");
 void connectNetwork() {
   config.begin(Serial, "Iris Group", WIFI_SSID, WIFI_PASS);
   config.setServer("io.remocon.kr", 55488);
@@ -46,11 +47,10 @@ bool stateKnown = false;
 unsigned long readyAt = 0;
 // The group's $name "Iris Lights <group id>:<category>". Every member sends the same $name and $ui (t=switch8.1).
 void makeInfo() {
-  char name[24], category[33];
+  char name[24], category[16];
   snprintf(name, sizeof(name), "Iris Lights %u", groupId);
-  if (categorySetting.value()[0]) snprintf(category, sizeof(category), "%s", categorySetting.value());
-  else snprintf(category, sizeof(category), "iris G%u", groupId);
-  remocon::formatName(groupName, sizeof(groupName), name, category);
+  snprintf(category, sizeof(category), "iris G%u", groupId);
+  remocon::formatNameSetting(groupName, sizeof(groupName), nameSetting.value(), name, category);
 }
 void sendInfo() {
   io.signal(nameTag, groupName);
@@ -107,8 +107,8 @@ void setup() {
   snprintf(nameTag, sizeof(nameTag), "%s$name", channel);
   snprintf(uiTag, sizeof(uiTag), "%s$ui", channel);
   makeInfo();
-  categorySetting.maxLength(32);
-  categorySetting.onChange([](const char*) { makeInfo(); if (io.state == IO_READY) sendInfo(); });
+  nameSetting.maxLength(64);
+  nameSetting.onChange([](const char*) { makeInfo(); if (io.state == IO_READY) sendInfo(); });
   for (uint8_t i = 0; i < 2; i++) {
     buttons[i].attach(BUTTON_PINS[i], INPUT_PULLUP);
     buttons[i].interval(10); buttons[i].setPressedState(LOW);

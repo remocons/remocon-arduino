@@ -5,7 +5,7 @@
  *    Relays 1-4 are on GPIO13, 12, 14 and 16. Commands: r1=1 ... r4=0, all=1, all=0.
  *    The names L (built-in LED, GPIO2) and A-D toggle an output; they are for IR
  *    routers that do not know the state.
- *    Its app tab (after ':' in $name) is the board setting "category" (HOME by default); Remocon8266-4ch-control can control this board.
+ *    Its $name is the board setting "name" ("Relay4CH:HOME" by default); Remocon8266-4ch-control can control this board.
  *
  *  Setup: connect a USB-TTL adapter to the programming port, hold IO0 to GND while
  *  resetting, upload, then release IO0 and reset. Set Wi-Fi over the same adapter on
@@ -41,12 +41,13 @@ const char* WIFI_PASS = SECRET_WIFI_PASS;
 WiFiClient client;
 IOSignalConfig config;
 IOSignal io;
-// The app tab this board is listed under (after ':' in $name): board setting 'category'. A change is sent at once.
-IOSignalSetting categorySetting(config, "category", "App tab (category)", "HOME");
+// $name, the device name and its app tab ("name:category"): board setting 'name'. Empty uses the sketch's
+// default; without ':' there is no category (미분류). A change is sent at once.
+IOSignalSetting nameSetting(config, "name", "Name & category (name:category)", "Relay4CH:HOME");
 void sendInfo() {
-  // $name "name:category" (the board setting 'category' is the category), $ui the type or the buttons (device rules v2).
+  // $name "name:category" (the board setting 'name'), $ui the type or the buttons (device rules v2).
   char name[64];
-  remocon::formatName(name, sizeof(name), "Relay4CH", categorySetting.value());
+  remocon::formatNameSetting(name, sizeof(name), nameSetting.value(), "Relay4CH");
   io.signal("@$name", name);
   io.signal("@$ui", "t=relay4.1");
 }
@@ -107,8 +108,8 @@ void setup() {
   Serial.println();
   // Wi-Fi, server and device key: set over USB, or the sketch values.
   config.begin( Serial, "Relay4CH", WIFI_SSID, WIFI_PASS );
-  categorySetting.maxLength(32);
-  categorySetting.onChange([](const char*) { if (io.state == IO_READY) sendInfo(); });
+  nameSetting.maxLength(64);
+  nameSetting.onChange([](const char*) { if (io.state == IO_READY) sendInfo(); });
 #ifdef SECRET_ID_KEY
   config.setKey( SECRET_ID_KEY ); // optional key (id.key) from _secrets.h; one set over USB wins
 #endif

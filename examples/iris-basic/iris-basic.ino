@@ -28,19 +28,20 @@ WiFiClient client;
 IOSignal io;
 // Wi-Fi, server and device key: set over USB on https://test.iosignal.net/wifi/, or the sketch values.
 IOSignalConfig config;
-// The app tab this board is listed under (after ':' in $name): board setting 'category'. A change is sent at once.
-IOSignalSetting categorySetting(config, "category", "App tab (category)", "HOME");
+// $name, the device name and its app tab ("name:category"): board setting 'name'. Empty uses the sketch's
+// default; without ':' there is no category (미분류). A change is sent at once.
+IOSignalSetting nameSetting(config, "name", "Name & category (name:category)", "Iris Basic:HOME");
 void sendInfo() {
-  // $name "name:category" (the board setting 'category' is the category), $ui the type or the buttons (device rules v2).
+  // $name "name:category" (the board setting 'name'), $ui the type or the buttons (device rules v2).
   char name[64];
-  remocon::formatName(name, sizeof(name), "Iris Basic", categorySetting.value());
+  remocon::formatNameSetting(name, sizeof(name), nameSetting.value(), "Iris Basic");
   io.signal("@$name", name);
   io.signal("@$ui", "t=switch4.1");
 }
 void connectNetwork() {
   config.begin(Serial, "Iris Basic", WIFI_SSID, WIFI_PASS);
-  categorySetting.maxLength(32);
-  categorySetting.onChange([](const char*) { if (io.state == IO_READY) sendInfo(); });
+  nameSetting.maxLength(64);
+  nameSetting.onChange([](const char*) { if (io.state == IO_READY) sendInfo(); });
   config.setServer("io.remocon.kr", 55488);
 #ifdef SECRET_ID_KEY
   config.setKey(SECRET_ID_KEY); // optional key (id.key) from _secrets.h; one set over USB wins
