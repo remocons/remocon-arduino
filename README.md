@@ -39,12 +39,14 @@ IOSignal Arduino 라이브러리 설치와 UNO Ethernet 실습은 [iosignal.net 
 | `iris-group` | iris (ESP32-C3) | DIP로 그룹·장치 번호를 설정하고 버튼·웹앱으로 WS2812 4개 제어 |
 | `iris-basic` | iris (ESP32-C3) | 내장 RGB LED 4개를 4구 스위치(`switch4.1`)로 켜고 끔, 버튼 2개 |
 | `iris-basic-control` | iris (ESP32-C3) | 다른 iris의 `iris-basic`을 찾아 제어하고 상태를 자기 LED에 표시 |
+| `iris-button-control` | iris (ESP32-C3) | 버튼 2개로 다른 장치를 제어(대상 CID·버튼 동작은 보드 설정), LED 4개에 대상의 채널 상태 |
 | `iris-rgb` | iris (ESP32-C3) | LED 4개의 색상·밝기 제어(`iris.2`), DIP로 번호·그룹 |
 | `esp8266_relay4ch` | ESP-12F 4채널 릴레이 보드 | 릴레이 4개(`relay4.1`), `all=1`/`all=0` |
 | `Remocon8266-4ch-control` | Remocon8266 전용 보드 | CID로 4채널 릴레이 보드를 제어, 버튼 4개·D6 전체 버튼·OLED 상태 |
+| `button-controller` | ESP8266 D1 mini, ESP32, ESP32-C3, ESP32-S3 + 버튼 2개 | 버튼 2개로 다른 장치(릴레이, 전등, 그룹 채널)를 제어. 대상 CID와 버튼 동작은 보드 설정 |
 | `esp32-cid-led` | ESP32 + GPIO 4 외부 LED | 장치 검색·CID 명령·실제 상태 발행, Remocon 또는 공개 통신 실습실 |
 | `esp32-group-led` | ESP32 1~2대 + GPIO 4 외부 LED | 그룹을 2구 스위치(`switch2.1`)로 공유, 보드별 출력 번호는 보드 설정 `index` |
-| `wifi-simple` | ESP8266, ESP32, ESP32-C3 | `#switch` 공유 스위치 그룹에 참여해 상태를 시리얼로 출력. `LED_PIN`을 켜면 `s1`로 LED 제어(active low, ESP32-C3 Super Mini는 GPIO 8) |
+| `wifi-simple` | ESP-01, ESP8266, ESP32, ESP32-C3 | `#switch` 공유 스위치 그룹에 참여해 상태를 시리얼로 출력. 보드 설정 `out`·`out_high`·`button`으로 `s1`을 따르는 LED·릴레이와 `s1` 토글 버튼 |
 | `esp8266-d1-mini` | ESP8266 D1 mini | 내장 LED와 GPIO 14(D5) 버튼 제어 |
 | `esp01-relay-button` | ESP8266 ESP-01 | 릴레이 GPIO 0, LED GPIO 1, 버튼 GPIO 2 |
 | `Remocon8266` | Remocon8266 전용 보드 | OLED·버튼·출력 제어, 폴더 내 회로도 참고 |
@@ -107,6 +109,7 @@ Wi-Fi 비밀번호와 장치 인증키를 공개 저장소에 올리지 마세�
 - **보드 설정 `category`를 `name`으로 바꿔 장치 이름도 함께 정합니다.** 값은 `$name` 그대로 `이름:분류`입니다(예: `거실 조명:1층`). `:1층`처럼 이름을 비우면 스케치의 이름을 쓰고, `:`가 없으면 분류 없이 이름만 보냅니다. 비우면 스케치 기본값(예: `Iris Basic:HOME`)입니다. 보드 설정 화면에는 `Name & category (name:category)`로 나옵니다.
 - 예전 `category`에 저장한 값은 읽지 않습니다. 업데이트 뒤 필요하면 `name`을 다시 넣으세요.
 - 새 함수 `remocon::formatNameSetting()`(`RemoconUi.h`)이 설정값으로 `$name`을 만듭니다.
+- **새 예제 `button-controller`, `iris-button-control`:** 버튼으로 다른 장치(4채널 릴레이, 전등, 그룹 채널)를 제어하는 범용 제어기입니다. 대상 CID와 버튼마다 할 일(b1, b2)을 보드 설정으로 정합니다. `button-controller`는 D1 mini·ESP32·ESP32-C3·ESP32-S3에 버튼 두 개, `iris-button-control`은 iris 보드이며 LED 4개에 대상의 채널 상태를 보여 줍니다.
 - `wifi-simple`: 보드 설정 `out`(s1을 따르는 LED·릴레이 핀), `out_high`, `button`(s1을 토글하는 버튼 핀)을 더해 ESP-01 릴레이·버튼 보드로도 씁니다. ESP-01 빌드를 추가했습니다.
 
 ### 9.14.2

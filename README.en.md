@@ -39,12 +39,14 @@ Installing the IOSignal Arduino library and the UNO Ethernet exercise are in the
 | `iris-group` | iris (ESP32-C3) | Set group and device numbers with DIP switches; control four WS2812 LEDs using buttons or the web app |
 | `iris-basic` | iris (ESP32-C3) | Turn the four built-in RGB LEDs on and off as a 4-way switch (`switch4.1`), two buttons |
 | `iris-basic-control` | iris (ESP32-C3) | Find another iris running `iris-basic`, control it and mirror its state on its own LEDs |
+| `iris-button-control` | iris (ESP32-C3) | Two buttons control another device (target CID and button actions are board settings); the four LEDs show the target's channels |
 | `iris-rgb` | iris (ESP32-C3) | Hue and brightness for four LEDs (`iris.2`), number and group from DIP switches |
 | `esp8266_relay4ch` | ESP-12F 4-channel relay board | Four relays (`relay4.1`), `all=1`/`all=0` |
 | `Remocon8266-4ch-control` | Remocon8266 board | Control a 4-channel relay board by CID: four buttons, a D6 all button, OLED state |
+| `button-controller` | ESP8266 D1 mini, ESP32, ESP32-C3, ESP32-S3 + two buttons | Two buttons control another device (relay board, light, group channel); target CID and button actions are board settings |
 | `esp32-cid-led` | ESP32 + external LED on GPIO 4 | Device discovery, CID commands, and actual state reporting with Remocon or the public workbench |
 | `esp32-group-led` | One or two ESP32 boards + external LED on GPIO 4 | Share a group as a 2-way switch (`switch2.1`); each board's output is the board setting `index` |
-| `wifi-simple` | ESP8266, ESP32, ESP32-C3 | Join the `#switch` shared-switch group and print its state to serial. Set `LED_PIN` to drive an LED with `s1` (active low; GPIO 8 on an ESP32-C3 Super Mini) |
+| `wifi-simple` | ESP-01, ESP8266, ESP32, ESP32-C3 | Joins the `#switch` shared switch group and prints its state. Board settings `out`, `out_high` and `button` add an LED or relay following `s1` and a button toggling `s1` |
 | `esp8266-d1-mini` | ESP8266 D1 mini | Built-in LED and GPIO 14 (D5) button control |
 | `esp01-relay-button` | ESP8266 ESP-01 | Relay on GPIO 0, LED on GPIO 1, button on GPIO 2 |
 | `Remocon8266` | Dedicated Remocon8266 board | OLED, button, and output control; see the schematic in the folder |
@@ -107,6 +109,7 @@ Revoke and reissue any real authentication key that has already been published. 
 - **The board setting `category` is now `name` and sets the device name too.** Its value is the `$name` itself, `name:category` (for example `Living Room Light:1F`). `:1F` keeps the sketch's name; without `:` there is no category. Empty uses the sketch default (for example `Iris Basic:HOME`). The board settings page shows it as `Name & category (name:category)`.
 - A value stored under `category` is not read; set `name` again after updating if needed.
 - New `remocon::formatNameSetting()` (`RemoconUi.h`) builds `$name` from the setting.
+- **New examples `button-controller` and `iris-button-control`:** general controllers whose buttons control another device (a 4-channel relay board, a light, a group channel). The target CID and what each button does (b1, b2) are board settings. `button-controller` runs on a D1 mini, ESP32, ESP32-C3 or ESP32-S3 with two buttons; `iris-button-control` runs on the iris board and shows the target's channels on its four LEDs.
 - `wifi-simple`: board settings `out` (an LED or relay pin following s1), `out_high` and `button` (a pin that toggles s1) make it an ESP-01 relay or button board too; it now builds for the ESP-01.
 
 ### 9.14.2
