@@ -11,7 +11,7 @@ Communication uses the [IOSignal Arduino client](https://github.com/remocons/ios
 
 ## Versions
 
-From **9.0.0**, Remocon uses the same version number as the public [iosignal](https://github.com/remocons/iosignal) and [iosignal-arduino](https://github.com/remocons/iosignal-arduino) packages. Packages with the same number are meant to be used together. 9.13.0 requires IOSignal Arduino **9.13.0 or later**. See [Changes by version](#changes-by-version) below.
+From **9.0.0**, Remocon uses the same version number as the public [iosignal](https://github.com/remocons/iosignal) and [iosignal-arduino](https://github.com/remocons/iosignal-arduino) packages. Packages with the same number are meant to be used together. 9.14.0 requires IOSignal Arduino **9.14.0 or later**. See [Changes by version](#changes-by-version) below.
 
 ## Installation and getting started
 
@@ -101,6 +101,14 @@ Revoke and reissue any real authentication key that has already been published. 
 - **Large messages do not arrive:** Messages larger than the receive buffer (`setRxBuffer`) are not sent by a 9.0 server, or are skipped by the device. Increase the buffer if needed, keeping the board's memory in mind.
 
 ## Changes by version
+
+### 9.14.0
+
+- **Requires IOSignal Arduino 9.14.0.** The dependency is now `IOSignal (>=9.14.0)`. 9.14.0 keeps its log texts in flash and saves RAM on the UNO (AVR): `uno-ethernet-ir` now has 822 bytes of RAM free instead of 394 and no longer stops during boot.
+- **Device rules v2: devices send `$name` and `$ui` instead of `$info`.** `$name` is `name:category` (for example `Iris Basic:HOME`; the part after the first `:` is the app's category tab, none means uncategorized). `$ui` is a button list (`on,off,toggle`) or an official type such as `t=switch4.1`. A device with a screen of its own sends `p=1;b=…`. remocon.kr, the Android app and IOSignal Desktop no longer read `$info`.
+- **New header `RemoconUi.h`:** `formatName()` builds `$name` (cleaning `:` and `;` out of the name) and `nameIs()` compares another device's `$name`. `RemoconBinding.h` and `RemoconButtons.h` for the button controllers are included too.
+- The board setting `group` keeps its name and is now the category in `$name`. Values already stored still apply.
+- `iris-basic-control` finds its target by the name in `$name` (`Iris Basic`).
 
 ### 9.13.0
 

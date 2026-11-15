@@ -11,7 +11,7 @@
 
 ## 버전
 
-**9.0.0**부터 Remocon은 공개 [iosignal](https://github.com/remocons/iosignal)·[iosignal-arduino](https://github.com/remocons/iosignal-arduino)와 같은 버전 번호를 씁니다. 같은 번호의 패키지는 함께 쓰도록 맞춘 조합입니다. 9.13.0은 IOSignal Arduino **9.13.0 이상**이 필요합니다. 버전별 변경은 아래 [버전별 변경 사항](#버전별-변경-사항)을 참고하세요.
+**9.0.0**부터 Remocon은 공개 [iosignal](https://github.com/remocons/iosignal)·[iosignal-arduino](https://github.com/remocons/iosignal-arduino)와 같은 버전 번호를 씁니다. 같은 번호의 패키지는 함께 쓰도록 맞춘 조합입니다. 9.14.0은 IOSignal Arduino **9.14.0 이상**이 필요합니다. 버전별 변경은 아래 [버전별 변경 사항](#버전별-변경-사항)을 참고하세요.
 
 ## 설치 및 시작
 
@@ -102,8 +102,9 @@ Wi-Fi 비밀번호와 장치 인증키를 공개 저장소에 올리지 마세�
 
 ## 버전별 변경 사항
 
-### 다음 버전 (아직 릴리스 전)
+### 9.14.0
 
+- **IOSignal Arduino 9.14.0이 필요합니다.** 의존성을 `IOSignal (>=9.14.0)`으로 올렸습니다. 9.14.0은 로그 문구를 플래시에 두어 UNO(AVR)의 RAM을 아낍니다. `uno-ethernet-ir`은 남는 RAM이 394바이트에서 822바이트로 늘어 부팅 중 멈추지 않습니다.
 - **장치 규칙 v2: `$info` 대신 `$name`과 `$ui`를 보냅니다.** `$name`은 `이름:분류`(예: `Iris Basic:HOME`, 첫 `:` 뒤가 앱의 분류 탭, 없으면 미분류), `$ui`는 버튼 목록(`on,off,toggle`) 또는 공식 타입 `t=switch4.1`입니다. 자체 화면을 보내는 장치는 `p=1;b=…`처럼 씁니다. remocon.kr, 안드로이드 앱, IOSignal Desktop은 `$info`를 더 읽지 않습니다.
 - **새 헤더 `RemoconUi.h`:** `formatName()`으로 `$name`을 만들고(이름 속 `:`·`;` 정리), `nameIs()`로 다른 장치의 `$name`을 비교합니다. 버튼 제어기용 `RemoconBinding.h`, `RemoconButtons.h`도 함께 들어 있습니다.
 - 보드 설정 `group`은 이름이 그대로이고, 이제 `$name`의 분류로 쓰입니다. 이미 저장된 값도 그대로 씁니다.
