@@ -15,8 +15,8 @@ WiFiClient client;
 IOSignal io;
 // Wi-Fi, server and device key: set over USB on https://test.iosignal.net/wifi/, or the sketch values.
 IOSignalConfig config;
-// The category the web app shows (after ':' in $name): board settings 'group'. Empty: "iris G<group id>" from the DIP switches.
-IOSignalSetting group(config, "group", "Category ($name, empty: iris G<DIP>)", "");
+// The app tab this board is listed under (after ':' in $name): board setting 'category'. Empty: "iris G<group id>" from the DIP switches.
+IOSignalSetting categorySetting(config, "category", "App tab (empty: iris G<DIP>)", "");
 void connectNetwork() {
   config.begin(Serial, "Iris Group", WIFI_SSID, WIFI_PASS);
   config.setServer("io.remocon.kr", 55488);
@@ -48,7 +48,7 @@ unsigned long readyAt = 0;
 void makeInfo() {
   char name[24], category[33];
   snprintf(name, sizeof(name), "Iris Lights %u", groupId);
-  if (group.value()[0]) snprintf(category, sizeof(category), "%s", group.value());
+  if (categorySetting.value()[0]) snprintf(category, sizeof(category), "%s", categorySetting.value());
   else snprintf(category, sizeof(category), "iris G%u", groupId);
   remocon::formatName(groupName, sizeof(groupName), name, category);
 }
@@ -107,8 +107,8 @@ void setup() {
   snprintf(nameTag, sizeof(nameTag), "%s$name", channel);
   snprintf(uiTag, sizeof(uiTag), "%s$ui", channel);
   makeInfo();
-  group.maxLength(32);
-  group.onChange([](const char*) { makeInfo(); if (io.state == IO_READY) sendInfo(); });
+  categorySetting.maxLength(32);
+  categorySetting.onChange([](const char*) { makeInfo(); if (io.state == IO_READY) sendInfo(); });
   for (uint8_t i = 0; i < 2; i++) {
     buttons[i].attach(BUTTON_PINS[i], INPUT_PULLUP);
     buttons[i].interval(10); buttons[i].setPressedState(LOW);

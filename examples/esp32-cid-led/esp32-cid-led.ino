@@ -21,12 +21,12 @@ const uint8_t LED_PIN = 4;
 WiFiClient client;
 IOSignal io;
 IOSignalConfig config;
-// The category the web app shows (after ':' in $name): board settings 'group'. A change is sent at once.
-IOSignalSetting group(config, "group", "Category ($name)", "HOME");
+// The app tab this board is listed under (after ':' in $name): board setting 'category'. A change is sent at once.
+IOSignalSetting categorySetting(config, "category", "App tab (category)", "HOME");
 void sendInfo() {
-  // $name "name:category" (the board setting group is the category), $ui the type or the buttons (device rules v2).
+  // $name "name:category" (the board setting 'category' is the category), $ui the type or the buttons (device rules v2).
   char name[64];
-  remocon::formatName(name, sizeof(name), "ESP32-LED", group.value());
+  remocon::formatName(name, sizeof(name), "ESP32-LED", categorySetting.value());
   io.signal("@$name", name);
   io.signal("@$ui", "on,off,toggle");
 }
@@ -63,8 +63,8 @@ void setup() {
   pinMode(LED_PIN, OUTPUT);
   digitalWrite(LED_PIN, LOW);
   config.begin(Serial, "ESP32-LED", WIFI_SSID, WIFI_PASS);
-  group.maxLength(32);
-  group.onChange([](const char*) { if (io.state == IO_READY) sendInfo(); });
+  categorySetting.maxLength(32);
+  categorySetting.onChange([](const char*) { if (io.state == IO_READY) sendInfo(); });
   config.setServer(IO_HOST, IO_PORT);
   config.printServer();
   io.setRxBuffer(256);

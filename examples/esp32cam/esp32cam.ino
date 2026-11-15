@@ -2,7 +2,7 @@
 // Pictures go as binary JPEG on <cid>@image (not kept by the server). With an E2E key they are encrypted
 // end to end (signal_e2e) and the card needs the same key; without one they are plain JPEG.
 // Board settings over USB on https://test.iosignal.net/wifi/: Wi-Fi, server, device key, and
-//   group (the category in $name), e2e_key (secret, never shown again), interval (ms between pictures).
+//   category (the app tab, after ':' in $name), e2e_key (secret, never shown again), interval (ms between pictures).
 // Commands on <cid>@: on, off, toggle, interval=<ms>. State: on=1;interval=1000
 #include "esp_camera.h"
 #include <IOSignal.h>
@@ -17,8 +17,8 @@ WiFiClient client;
 IOSignal io;
 IOSignalConfig config;
 
-// The category the web app shows (after ':' in $name): board settings 'group'. A change is sent at once.
-IOSignalSetting group(config, "group", "Category ($name)", "HOME");
+// The app tab this board is listed under (after ':' in $name): board setting 'category'. A change is sent at once.
+IOSignalSetting categorySetting(config, "category", "App tab (category)", "HOME");
 // Empty: plain JPEG. Set it on the board settings page and type the same key on the remocon.kr card.
 IOSignalSetting e2eKey(config, "e2e_key", "E2E key (empty: plain)", "", IOSignalSetting::TEXT, IOSignalSetting::SECRET);
 // Milliseconds between pictures. The app's interval command changes it too and the board keeps it.
@@ -29,9 +29,9 @@ bool cameraReady = false;
 unsigned long lastShot = 0;
 
 void sendInfo() {
-  // $name "name:category" (the board setting group is the category), $ui the type or the buttons (device rules v2).
+  // $name "name:category" (the board setting 'category' is the category), $ui the type or the buttons (device rules v2).
   char name[64];
-  remocon::formatName(name, sizeof(name), "ESP32-CAM", group.value());
+  remocon::formatName(name, sizeof(name), "ESP32-CAM", categorySetting.value());
   io.signal("@$name", name);
   io.signal("@$ui", "t=camera.1");
 }
@@ -128,8 +128,8 @@ void setup() {
   Serial.begin(115200);
   // Wi-Fi, server and device key: set over USB, or the sketch values.
   config.begin(Serial, "ESP32-CAM", WIFI_SSID, WIFI_PASS);
-  group.maxLength(32);
-  group.onChange([](const char*) { if (io.state == IO_READY) sendInfo(); });
+  categorySetting.maxLength(32);
+  categorySetting.onChange([](const char*) { if (io.state == IO_READY) sendInfo(); });
   e2eKey.maxLength(64);
   e2eKey.onChange([](const char*) {});  // read for each picture: no restart needed
   interval.range(100, 60000);

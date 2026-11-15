@@ -11,7 +11,7 @@ Communication uses the [IOSignal Arduino client](https://github.com/remocons/ios
 
 ## Versions
 
-From **9.0.0**, Remocon uses the same version number as the public [iosignal](https://github.com/remocons/iosignal) and [iosignal-arduino](https://github.com/remocons/iosignal-arduino) packages. Packages with the same number are meant to be used together. 9.14.1 requires IOSignal Arduino **9.14.0 or later**. See [Changes by version](#changes-by-version) below.
+From **9.0.0**, Remocon uses the same version number as the public [iosignal](https://github.com/remocons/iosignal) and [iosignal-arduino](https://github.com/remocons/iosignal-arduino) packages. Packages with the same number are meant to be used together. 9.14.2 requires IOSignal Arduino **9.14.0 or later**. See [Changes by version](#changes-by-version) below.
 
 ## Installation and getting started
 
@@ -101,6 +101,12 @@ Revoke and reissue any real authentication key that has already been published. 
 - **Large messages do not arrive:** Messages larger than the receive buffer (`setRxBuffer`) are not sent by a 9.0 server, or are skipped by the device. Increase the buffer if needed, keeping the board's memory in mind.
 
 ## Changes by version
+
+### 9.14.2
+
+- **The board setting `group` is now `category`.** It is the app tab (remocon.kr and others) the device is listed under; the device sends `$name` as `name:category` (for example `Iris Basic:HOME`). It was renamed so it is not mistaken for a group channel; the board settings page shows it as `App tab (category)`.
+- A value stored under `group` is not read. After the update the default applies (`HOME`; `iris G<group number>` for the iris group and RGB examples), so set `category` again on the [board settings page](https://test.iosignal.net/wifi/) if needed.
+- The board settings table on the [test.iosignal.net](https://test.iosignal.net/) example pages explains each setting in Korean: what it does, the default and what empty means.
 
 ### 9.14.1
 

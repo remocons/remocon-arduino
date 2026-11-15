@@ -11,7 +11,7 @@
 
 ## 버전
 
-**9.0.0**부터 Remocon은 공개 [iosignal](https://github.com/remocons/iosignal)·[iosignal-arduino](https://github.com/remocons/iosignal-arduino)와 같은 버전 번호를 씁니다. 같은 번호의 패키지는 함께 쓰도록 맞춘 조합입니다. 9.14.1은 IOSignal Arduino **9.14.0 이상**이 필요합니다. 버전별 변경은 아래 [버전별 변경 사항](#버전별-변경-사항)을 참고하세요.
+**9.0.0**부터 Remocon은 공개 [iosignal](https://github.com/remocons/iosignal)·[iosignal-arduino](https://github.com/remocons/iosignal-arduino)와 같은 버전 번호를 씁니다. 같은 번호의 패키지는 함께 쓰도록 맞춘 조합입니다. 9.14.2는 IOSignal Arduino **9.14.0 이상**이 필요합니다. 버전별 변경은 아래 [버전별 변경 사항](#버전별-변경-사항)을 참고하세요.
 
 ## 설치 및 시작
 
@@ -101,6 +101,12 @@ Wi-Fi 비밀번호와 장치 인증키를 공개 저장소에 올리지 마세�
 - **큰 메시지가 오지 않음:** 수신 버퍼(`setRxBuffer`)보다 큰 메시지는 서버가 보내지 않거나(9.0 서버), 장치가 건너뜁니다. 필요하면 버퍼 크기를 늘리세요. 보드 메모리를 고려해야 합니다.
 
 ## 버전별 변경 사항
+
+### 9.14.2
+
+- **보드 설정 `group`의 이름을 `category`로 바꿨습니다.** 이 값은 앱(remocon.kr 등)에서 장치가 나오는 탭 이름이고, 장치는 `$name`을 `이름:category`로 보냅니다(예: `Iris Basic:HOME`). 그룹 채널과 헷갈리지 않도록 이름을 바꿨고, 보드 설정 화면에는 `App tab (category)`로 나옵니다.
+- 예전 `group`에 저장한 값은 읽지 않습니다. 업데이트하면 기본값(`HOME`, iris 그룹·RGB는 `iris G<그룹 번호>`)으로 돌아가므로 필요하면 [보드 설정](https://test.iosignal.net/wifi/)에서 `category`를 다시 넣으세요.
+- [test.iosignal.net](https://test.iosignal.net/) 예제 페이지의 보드 설정 표에 항목마다 하는 일, 기본값, 비웠을 때의 동작을 한국어로 적었습니다.
 
 ### 9.14.1
 

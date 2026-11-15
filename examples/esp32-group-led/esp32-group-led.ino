@@ -28,12 +28,12 @@ const char* GROUP_STATE_TAG = GROUP_CHANNEL "$state";
 WiFiClient client;
 IOSignal io;
 IOSignalConfig config;
-// The category the web app shows (after ':' in $name): board settings 'group'. A change is sent at once.
-IOSignalSetting group(config, "group", "Category ($name)", "HOME");
+// The app tab this board is listed under (after ':' in $name): board setting 'category'. A change is sent at once.
+IOSignalSetting categorySetting(config, "category", "App tab (category)", "HOME");
 void sendInfo() {
   // Both members send the same $name and $ui; a group's $ui is the extended form (t=…), device rules v2.
   char name[64];
-  remocon::formatName(name, sizeof(name), "ESP32 LEDs", group.value());
+  remocon::formatName(name, sizeof(name), "ESP32 LEDs", categorySetting.value());
   io.signal(GROUP_NAME_TAG, name);
   io.signal(GROUP_UI_TAG, "t=switch2.1");
 }
@@ -76,8 +76,8 @@ void setup() {
   digitalWrite(LED_PIN, LOW);
   outputIndex.range(0, 1);
   config.begin(Serial, "ESP32 LEDs", WIFI_SSID, WIFI_PASS);
-  group.maxLength(32);
-  group.onChange([](const char*) { if (io.state == IO_READY) sendInfo(); });
+  categorySetting.maxLength(32);
+  categorySetting.onChange([](const char*) { if (io.state == IO_READY) sendInfo(); });
   config.setServer(IO_HOST, IO_PORT);
   config.printServer();
   useIndex(outputIndex.value());

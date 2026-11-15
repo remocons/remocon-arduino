@@ -38,12 +38,12 @@
 WiFiClient client;
 IOSignal io;
 IOSignalConfig config;
-// The category the web app shows (after ':' in $name): board settings 'group'. A change is sent at once.
-IOSignalSetting group(config, "group", "Category ($name)", "HOME");
+// The app tab this board is listed under (after ':' in $name): board setting 'category'. A change is sent at once.
+IOSignalSetting categorySetting(config, "category", "App tab (category)", "HOME");
 void sendInfo() {
-  // $name "name:category" (the board setting group is the category); a group's $ui is the extended form (t=…).
+  // $name "name:category" (the board setting 'category' is the category); a group's $ui is the extended form (t=…).
   char name[64];
-  remocon::formatName(name, sizeof(name), "공유 스위치", group.value());
+  remocon::formatName(name, sizeof(name), "공유 스위치", categorySetting.value());
   io.signal(SWITCH_CH "$name", name);
   io.signal(SWITCH_CH "$ui", "t=switch3.1");
 }
@@ -56,8 +56,8 @@ void setup() {
 #endif
   // Wi-Fi, server and device key: set over USB, or the sketch values.
   config.begin( Serial, "Wi-Fi Simple", WIFI_ID, WIFI_KEY );
-  group.maxLength(32);
-  group.onChange([](const char*) { if (io.state == IO_READY) sendInfo(); });
+  categorySetting.maxLength(32);
+  categorySetting.onChange([](const char*) { if (io.state == IO_READY) sendInfo(); });
   config.setServer( SERVER_URL, SERVER_PORT );
   config.printServer();
   io.setRxBuffer( 200 );

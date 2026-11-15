@@ -7,7 +7,7 @@
 //          "t=iris.2;p=1;v=1;b=on,off" (t official type, p=1 screen on $panel, v=1 picture on $view, b buttons)
 //
 //   char name[64];
-//   remocon::formatName(name, sizeof(name), "Iris Basic", group.value());   // "Iris Basic:HOME"
+//   remocon::formatName(name, sizeof(name), "Iris Basic", categorySetting.value());   // "Iris Basic:HOME"
 //   io.signal("@$name", name);
 //   io.signal("@$ui", "t=switch4.1");
 #ifndef RemoconUi_h
