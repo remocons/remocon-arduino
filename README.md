@@ -11,7 +11,7 @@
 
 ## 버전
 
-**9.0.0**부터 Remocon은 공개 [iosignal](https://github.com/remocons/iosignal)·[iosignal-arduino](https://github.com/remocons/iosignal-arduino)와 같은 버전 번호를 씁니다. 같은 번호의 패키지는 함께 쓰도록 맞춘 조합입니다. 9.14.3은 IOSignal Arduino **9.14.0 이상**이 필요합니다(보드 설정의 익명 접속은 9.14.1 이상). 버전별 변경은 아래 [버전별 변경 사항](#버전별-변경-사항)을 참고하세요.
+**9.0.0**부터 Remocon은 공개 [iosignal](https://github.com/remocons/iosignal)·[iosignal-arduino](https://github.com/remocons/iosignal-arduino)와 같은 버전 번호를 씁니다. 같은 번호의 패키지는 함께 쓰도록 맞춘 조합입니다. 9.14.4는 IOSignal Arduino **9.14.0 이상**이 필요합니다(보드 설정의 익명 접속은 9.14.1 이상). 버전별 변경은 아래 [버전별 변경 사항](#버전별-변경-사항)을 참고하세요.
 
 ## 설치 및 시작
 
@@ -104,7 +104,7 @@ Wi-Fi 비밀번호와 장치 인증키를 공개 저장소에 올리지 마세�
 
 ## 버전별 변경 사항
 
-### 다음 릴리스 (아직 배포 전)
+### 9.14.4
 
 - **예제 폴더 이름을 정리했습니다.** 동작은 그대로입니다. Arduino IDE의 예제 메뉴 이름도 함께 바뀝니다.
   - `Remocon8266-4ch-control` → `Remocon8266-button-controller` (릴레이가 아닌 장치도 제어합니다)

@@ -11,7 +11,7 @@ Communication uses the [IOSignal Arduino client](https://github.com/remocons/ios
 
 ## Versions
 
-From **9.0.0**, Remocon uses the same version number as the public [iosignal](https://github.com/remocons/iosignal) and [iosignal-arduino](https://github.com/remocons/iosignal-arduino) packages. Packages with the same number are meant to be used together. 9.14.3 requires IOSignal Arduino **9.14.0 or later** (9.14.1 or later for anonymous login in the board settings). See [Changes by version](#changes-by-version) below.
+From **9.0.0**, Remocon uses the same version number as the public [iosignal](https://github.com/remocons/iosignal) and [iosignal-arduino](https://github.com/remocons/iosignal-arduino) packages. Packages with the same number are meant to be used together. 9.14.4 requires IOSignal Arduino **9.14.0 or later** (9.14.1 or later for anonymous login in the board settings). See [Changes by version](#changes-by-version) below.
 
 ## Installation and getting started
 
@@ -104,7 +104,7 @@ Revoke and reissue any real authentication key that has already been published. 
 
 ## Changes by version
 
-### Next release (not released yet)
+### 9.14.4
 
 - **Example folders were renamed.** Behaviour is unchanged. The names in the Arduino IDE examples menu change with them.
   - `Remocon8266-4ch-control` → `Remocon8266-button-controller` (it also controls devices other than relays)
