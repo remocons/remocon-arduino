@@ -1,13 +1,13 @@
-# WiFi 공유 스위치
+# WiFi 공유 스위치 (가장 간단한 예제)
 
 #switch 그룹에 참여해 공유 상태를 시리얼로 출력합니다. 하드웨어 없이 통신만 확인하는 가장 간단한 예제이고, 보드 설정으로 출력 핀(LED·릴레이)과 버튼 핀을 정하면 s1을 따르는 릴레이나 s1을 토글하는 버튼 보드가 됩니다.
 
 ## 준비물
 
-- 보드: ESP8266 D1 mini
+- 보드: ESP-01 (ESP8266)
+- 보드: ESP8266 D1 mini (브라우저 설치는 ESP-01과 같은 ESP8266 펌웨어(1MB)를 씁니다)
 - 보드: ESP32 개발 보드
 - 보드: ESP32-C3 Super Mini
-- 보드: ESP-01 (ESP8266)
 - 네트워크: Wi-Fi 2.4GHz 공유기
 - 앱: https://remocon.kr 또는 IOSignal Desktop 장치 제어 화면
 
@@ -49,8 +49,8 @@
 ## 컴파일
 
 ```sh
+arduino-cli compile --fqbn esp8266:esp8266:generic examples/wifi-simple
 arduino-cli compile --fqbn esp8266:esp8266:d1_mini examples/wifi-simple
 arduino-cli compile --fqbn esp32:esp32:esp32 examples/wifi-simple
 arduino-cli compile --fqbn esp32:esp32:esp32c3 examples/wifi-simple
-arduino-cli compile --fqbn esp8266:esp8266:generic examples/wifi-simple
 ```

@@ -1,13 +1,13 @@
-# Remocon8266 4채널 릴레이 제어기
+# Remocon8266 버튼 제어기
 
-Remocon8266 보드가 4채널 릴레이 보드(esp8266_relay4ch)를 CID로 제어합니다. 기본 대상은 DEFAULT_TARGET(the-cid)이고, 웹앱 카드나 CLI에서 target=<cid>로, 또는 USB로 연결한 보드 설정 페이지에서 펌웨어 변경 없이 바꿀 수 있으며 target 설정으로 플래시에 저장됩니다. 버튼 4개로 릴레이 1~4를, D6 버튼으로 전체를 토글하고 OLED에 상태를 보여 줍니다.
+Remocon8266 보드의 버튼으로 다른 장치를 CID로 제어합니다. 기본 설정은 4채널 릴레이 보드(esp8266-relay4ch)용이고, 버튼마다 하는 일을 보드 설정(b1~b5)으로 바꾸면 스위치·전등·그룹도 제어합니다. 기본 대상은 DEFAULT_TARGET(the-cid)이고, 웹앱 카드나 CLI에서 target=<cid>로, 또는 USB로 연결한 보드 설정 페이지에서 펌웨어 변경 없이 바꿀 수 있으며 target 설정으로 플래시에 저장됩니다. 버튼 4개로 릴레이 1~4를, D6 버튼으로 전체를 토글하고 OLED에 상태를 보여 줍니다.
 
 ## 준비물
 
 - 보드: Remocon8266 보드 (D1 mini 기반)
 - 네트워크: Wi-Fi 2.4GHz 공유기
 - 앱: https://remocon.kr 장치 제어 화면에 Relay Control 카드가 나옵니다. 대상 CID 입력칸은 웹앱의 text 위젯이 필요하고, 없으면 r1~r4 버튼만 나옵니다
-- 연동: esp8266_relay4ch 보드: 제어 대상. 기본 CID는 스케치의 DEFAULT_TARGET(the-cid)이며, 장치 키로 고정된 릴레이 보드의 CID로 바꿉니다
+- 연동: esp8266-relay4ch 보드: 제어 대상. 기본 CID는 스케치의 DEFAULT_TARGET(the-cid)이며, 장치 키로 고정된 릴레이 보드의 CID로 바꿉니다
 
 ## 배선
 
@@ -23,7 +23,7 @@ Remocon8266 보드가 4채널 릴레이 보드(esp8266_relay4ch)를 CID로 제�
 ## 사용 순서
 
 1. 펌웨어를 올립니다. https://test.iosignal.net 의 이 예제 페이지에서 '이 보드에 설치'를 누르거나(데스크톱 Chrome·Edge), arduino-cli compile --upload -p <포트> --fqbn esp8266:esp8266:d1_mini 로 업로드합니다(Arduino IDE는 LOLIN(WEMOS) D1 R2 & mini).
-2. 릴레이 보드에 esp8266_relay4ch를 올리고 장치 키로 CID를 고정합니다.
+2. 릴레이 보드에 esp8266-relay4ch를 올리고 장치 키로 CID를 고정합니다.
 3. Wi-Fi는 설치 직후 이어지는 창이나 https://test.iosignal.net/wifi/ 에서 USB로 넣습니다. 보드가 저장하므로 다시 넣을 필요가 없습니다. 스케치 폴더의 _secrets.h(SECRET_WIFI_SSID, SECRET_WIFI_PASS)나 스케치의 WIFI_SSID에 실제 값을 쓰면 그 값이 부팅할 때마다 우선합니다. 제어기에 키를 쓰려면 릴레이와 다른 키로 SECRET_ID_KEY를 넣습니다.
 4. OLED에 Relay <대상 CID>와 상자 4개가 나오면 버튼을 눌러 봅니다. 맨 아래 줄은 이 제어기의 CID입니다.
 5. 버튼마다 하는 일은 보드 설정 b1~b5(SW1~SW4, D6 버튼)입니다. 비워 두면 릴레이 1~4 토글과 전체 토글입니다. 'r2=1'(릴레이 2 켜기), 'all=0'(모두 끄기), 'lamp1:toggle'(다른 장치), '#lab:s1'(그룹 채널)처럼 넣거나 remocon pub "<제어기 cid>@" "b5=all=0" 으로 바꿉니다.
@@ -59,5 +59,5 @@ Remocon8266 보드가 4채널 릴레이 보드(esp8266_relay4ch)를 CID로 제�
 ## 컴파일
 
 ```sh
-arduino-cli compile --fqbn esp8266:esp8266:d1_mini examples/Remocon8266-4ch-control
+arduino-cli compile --fqbn esp8266:esp8266:d1_mini examples/Remocon8266-button-controller
 ```

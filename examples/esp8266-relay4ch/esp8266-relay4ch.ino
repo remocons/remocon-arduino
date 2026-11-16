@@ -5,7 +5,7 @@
  *    Relays 1-4 are on GPIO13, 12, 14 and 16. Commands: r1=1 ... r4=0, all=1, all=0.
  *    The names L (built-in LED, GPIO2) and A-D toggle an output; they are for IR
  *    routers that do not know the state.
- *    Its $name is the board setting "name" ("Relay4CH:HOME" by default); Remocon8266-4ch-control can control this board.
+ *    Its $name is the board setting "name" ("Relay4CH:HOME" by default); Remocon8266-button-controller can control this board.
  *
  *  Setup: connect a USB-TTL adapter to the programming port, hold IO0 to GND while
  *  resetting, upload, then release IO0 and reset. Set Wi-Fi over the same adapter on

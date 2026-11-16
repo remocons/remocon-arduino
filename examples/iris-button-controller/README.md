@@ -44,5 +44,5 @@ iris 보드의 버튼 2개로 다른 장치(4채널 릴레이, 스위치, 전등
 ## 컴파일
 
 ```sh
-arduino-cli compile --fqbn esp32:esp32:esp32c3 examples/iris-button-control
+arduino-cli compile --fqbn esp32:esp32:esp32c3 examples/iris-button-controller
 ```

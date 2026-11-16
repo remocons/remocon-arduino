@@ -45,5 +45,5 @@ ESP8266 D1 mini의 내장 LED를 웹앱과 버튼으로 켜고 끕니다. 일반
 ## 컴파일
 
 ```sh
-arduino-cli compile --fqbn esp8266:esp8266:d1_mini examples/esp8266-d1-mini
+arduino-cli compile --fqbn esp8266:esp8266:d1_mini examples/d1-mini-led-button
 ```

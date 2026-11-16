@@ -38,16 +38,16 @@ Installing the IOSignal Arduino library and the UNO Ethernet exercise are in the
 | --- | --- | --- |
 | `iris-group` | iris (ESP32-C3) | Set group and device numbers with DIP switches; control four WS2812 LEDs using buttons or the web app |
 | `iris-basic` | iris (ESP32-C3) | Turn the four built-in RGB LEDs on and off as a 4-way switch (`switch4.1`), two buttons |
-| `iris-basic-control` | iris (ESP32-C3) | Find another iris running `iris-basic`, control it and mirror its state on its own LEDs |
-| `iris-button-control` | iris (ESP32-C3) | Two buttons control another device (target CID and button actions are board settings); the four LEDs show the target's channels |
+| `iris-basic-controller` | iris (ESP32-C3) | Find another iris running `iris-basic`, control it and mirror its state on its own LEDs |
+| `iris-button-controller` | iris (ESP32-C3) | Two buttons control another device (target CID and button actions are board settings); the four LEDs show the target's channels |
 | `iris-rgb` | iris (ESP32-C3) | Hue and brightness for four LEDs (`iris.2`), number and group from DIP switches |
-| `esp8266_relay4ch` | ESP-12F 4-channel relay board | Four relays (`relay4.1`), `all=1`/`all=0` |
-| `Remocon8266-4ch-control` | Remocon8266 board | Control a 4-channel relay board by CID: four buttons, a D6 all button, OLED state |
+| `esp8266-relay4ch` | ESP-12F 4-channel relay board | Four relays (`relay4.1`), `all=1`/`all=0` |
+| `Remocon8266-button-controller` | Remocon8266 board | Buttons control another device by CID (the defaults fit a 4-channel relay board): four buttons, a D6 button, OLED state; button actions are board settings |
 | `button-controller` | ESP8266 D1 mini, ESP32, ESP32-C3, ESP32-S3 + two buttons | Two buttons control another device (relay board, light, group channel); target CID and button actions are board settings |
 | `esp32-cid-led` | ESP32 + external LED on GPIO 4 | Device discovery, CID commands, and actual state reporting with Remocon or the public workbench |
 | `esp32-group-led` | One or two ESP32 boards + external LED on GPIO 4 | Share a group as a 2-way switch (`switch2.1`); each board's output is the board setting `index` |
 | `wifi-simple` | ESP-01, ESP8266, ESP32, ESP32-C3 | Joins the `#switch` shared switch group and prints its state. Board settings `out`, `out_high` and `button` add an LED or relay following `s1` and a button toggling `s1` |
-| `esp8266-d1-mini` | ESP8266 D1 mini | Built-in LED and GPIO 14 (D5) button control |
+| `d1-mini-led-button` | ESP8266 D1 mini | Built-in LED and GPIO 14 (D5) button control |
 | `esp01-relay-button` | ESP8266 ESP-01 | Relay on GPIO 0, LED on GPIO 1, button on GPIO 2 |
 | `Remocon8266` | Dedicated Remocon8266 board | OLED, button, and output control; see the schematic in the folder |
 | `uno-r4-wifi-heart` | Arduino UNO R4 WiFi | LED matrix heart, built-in LED, and D12 button |
@@ -103,6 +103,16 @@ Revoke and reissue any real authentication key that has already been published. 
 - **Large messages do not arrive:** Messages larger than the receive buffer (`setRxBuffer`) are not sent by a 9.0 server, or are skipped by the device. Increase the buffer if needed, keeping the board's memory in mind.
 
 ## Changes by version
+
+### Next release (not released yet)
+
+- **Example folders were renamed.** Behaviour is unchanged. The names in the Arduino IDE examples menu change with them.
+  - `Remocon8266-4ch-control` → `Remocon8266-button-controller` (it also controls devices other than relays)
+  - `iris-button-control` → `iris-button-controller`
+  - `iris-basic-control` → `iris-basic-controller`
+  - `esp8266_relay4ch` → `esp8266-relay4ch`
+  - `esp8266-d1-mini` → `d1-mini-led-button`
+- The notes for earlier versions below keep the names used at the time.
 
 ### 9.14.3
 

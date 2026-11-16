@@ -38,16 +38,16 @@ IOSignal Arduino 라이브러리 설치와 UNO Ethernet 실습은 [iosignal.net 
 | --- | --- | --- |
 | `iris-group` | iris (ESP32-C3) | DIP로 그룹·장치 번호를 설정하고 버튼·웹앱으로 WS2812 4개 제어 |
 | `iris-basic` | iris (ESP32-C3) | 내장 RGB LED 4개를 4구 스위치(`switch4.1`)로 켜고 끔, 버튼 2개 |
-| `iris-basic-control` | iris (ESP32-C3) | 다른 iris의 `iris-basic`을 찾아 제어하고 상태를 자기 LED에 표시 |
-| `iris-button-control` | iris (ESP32-C3) | 버튼 2개로 다른 장치를 제어(대상 CID·버튼 동작은 보드 설정), LED 4개에 대상의 채널 상태 |
+| `iris-basic-controller` | iris (ESP32-C3) | 다른 iris의 `iris-basic`을 찾아 제어하고 상태를 자기 LED에 표시 |
+| `iris-button-controller` | iris (ESP32-C3) | 버튼 2개로 다른 장치를 제어(대상 CID·버튼 동작은 보드 설정), LED 4개에 대상의 채널 상태 |
 | `iris-rgb` | iris (ESP32-C3) | LED 4개의 색상·밝기 제어(`iris.2`), DIP로 번호·그룹 |
-| `esp8266_relay4ch` | ESP-12F 4채널 릴레이 보드 | 릴레이 4개(`relay4.1`), `all=1`/`all=0` |
-| `Remocon8266-4ch-control` | Remocon8266 전용 보드 | CID로 4채널 릴레이 보드를 제어, 버튼 4개·D6 전체 버튼·OLED 상태 |
+| `esp8266-relay4ch` | ESP-12F 4채널 릴레이 보드 | 릴레이 4개(`relay4.1`), `all=1`/`all=0` |
+| `Remocon8266-button-controller` | Remocon8266 전용 보드 | 버튼으로 다른 장치를 CID로 제어(기본 설정은 4채널 릴레이 보드용). 버튼 4개·D6 버튼·OLED 상태, 버튼 동작은 보드 설정 |
 | `button-controller` | ESP8266 D1 mini, ESP32, ESP32-C3, ESP32-S3 + 버튼 2개 | 버튼 2개로 다른 장치(릴레이, 전등, 그룹 채널)를 제어. 대상 CID와 버튼 동작은 보드 설정 |
 | `esp32-cid-led` | ESP32 + GPIO 4 외부 LED | 장치 검색·CID 명령·실제 상태 발행, Remocon 또는 공개 통신 실습실 |
 | `esp32-group-led` | ESP32 1~2대 + GPIO 4 외부 LED | 그룹을 2구 스위치(`switch2.1`)로 공유, 보드별 출력 번호는 보드 설정 `index` |
 | `wifi-simple` | ESP-01, ESP8266, ESP32, ESP32-C3 | `#switch` 공유 스위치 그룹에 참여해 상태를 시리얼로 출력. 보드 설정 `out`·`out_high`·`button`으로 `s1`을 따르는 LED·릴레이와 `s1` 토글 버튼 |
-| `esp8266-d1-mini` | ESP8266 D1 mini | 내장 LED와 GPIO 14(D5) 버튼 제어 |
+| `d1-mini-led-button` | ESP8266 D1 mini | 내장 LED와 GPIO 14(D5) 버튼 제어 |
 | `esp01-relay-button` | ESP8266 ESP-01 | 릴레이 GPIO 0, LED GPIO 1, 버튼 GPIO 2 |
 | `Remocon8266` | Remocon8266 전용 보드 | OLED·버튼·출력 제어, 폴더 내 회로도 참고 |
 | `uno-r4-wifi-heart` | Arduino UNO R4 WiFi | LED 매트릭스 하트와 내장 LED, D12 버튼 |
@@ -103,6 +103,16 @@ Wi-Fi 비밀번호와 장치 인증키를 공개 저장소에 올리지 마세�
 - **큰 메시지가 오지 않음:** 수신 버퍼(`setRxBuffer`)보다 큰 메시지는 서버가 보내지 않거나(9.0 서버), 장치가 건너뜁니다. 필요하면 버퍼 크기를 늘리세요. 보드 메모리를 고려해야 합니다.
 
 ## 버전별 변경 사항
+
+### 다음 릴리스 (아직 배포 전)
+
+- **예제 폴더 이름을 정리했습니다.** 동작은 그대로입니다. Arduino IDE의 예제 메뉴 이름도 함께 바뀝니다.
+  - `Remocon8266-4ch-control` → `Remocon8266-button-controller` (릴레이가 아닌 장치도 제어합니다)
+  - `iris-button-control` → `iris-button-controller`
+  - `iris-basic-control` → `iris-basic-controller`
+  - `esp8266_relay4ch` → `esp8266-relay4ch`
+  - `esp8266-d1-mini` → `d1-mini-led-button`
+- 아래 이전 버전 설명의 예제 이름은 그때 이름 그대로입니다.
 
 ### 9.14.3
 

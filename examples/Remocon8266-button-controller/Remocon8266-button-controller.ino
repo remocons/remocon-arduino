@@ -1,7 +1,7 @@
 /*
  *  IOSignal Remocon example: Remocon8266 controller for a 4-channel relay board
  *
- *  Controls a board running esp8266_relay4ch by its CID (DEFAULT_TARGET, a fixed
+ *  Controls a board running esp8266-relay4ch by its CID (DEFAULT_TARGET, a fixed
  *  CID from that board's device key). The target can change without new firmware:
  *    - this board is a card in the web app, and its card sends "target=<cid>";
  *    - or from a CLI: remocon pub "<controller cid>@" "target=2001";

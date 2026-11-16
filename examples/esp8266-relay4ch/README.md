@@ -45,11 +45,11 @@ ESP-12F 릴레이 보드의 릴레이 4개를 relay4 타입으로 제어합니�
 ## 참고
 
 - 폴더의 ESP12F_Relay_X4.pdf가 보드 자료입니다.
-- SECRET_ID_KEY(id.key)를 정의하면 그 키로 인증해 CID가 고정됩니다. 제어기 예제 Remocon8266-4ch-control은 이 CID로 릴레이 보드를 찾습니다.
+- SECRET_ID_KEY(id.key)를 정의하면 그 키로 인증해 CID가 고정됩니다. 제어기 예제 Remocon8266-button-controller은 이 CID로 릴레이 보드를 찾습니다.
 - L, A, B, C, D 이름 명령은 상태를 모르는 IR 라우터를 위해 남겼습니다. 화면에는 나오지 않습니다. 내장 LED L은 상태에 넣지 않습니다.
 
 ## 컴파일
 
 ```sh
-arduino-cli compile --fqbn esp8266:esp8266:generic examples/esp8266_relay4ch
+arduino-cli compile --fqbn esp8266:esp8266:generic examples/esp8266-relay4ch
 ```
