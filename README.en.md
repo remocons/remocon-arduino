@@ -49,6 +49,7 @@ Installing the IOSignal Arduino library and the UNO Ethernet exercise are in the
 | `wifi-simple` | ESP-01, ESP8266, ESP32, ESP32-C3 | Joins the `#switch` shared switch group and prints its state. Board settings `out`, `out_high` and `button` add an LED or relay following `s1` and a button toggling `s1` |
 | `d1-mini-led-button` | ESP8266 D1 mini | Built-in LED and GPIO 14 (D5) button control |
 | `esp01-relay-button` | ESP8266 ESP-01 | Relay on GPIO 0, LED on GPIO 1, button on GPIO 2 |
+| `esp01-button-controller` | ESP8266 ESP-01 + a button | A button on GPIO 3 (RX) controls another device (target CID and button action are board settings); the built-in LED (GPIO 1) shows the target's state |
 | `Remocon8266` | Dedicated Remocon8266 board | OLED, button, and output control; see the schematic in the folder |
 | `uno-r4-wifi-heart` | Arduino UNO R4 WiFi | LED matrix heart, built-in LED, and D12 button |
 | `uno-ethernet-button` | UNO R3 + W5100 Ethernet shield | D2 button, D5 LED, D6 relay output |
@@ -103,6 +104,10 @@ Revoke and reissue any real authentication key that has already been published. 
 - **Large messages do not arrive:** Messages larger than the receive buffer (`setRxBuffer`) are not sent by a 9.0 server, or are skipped by the device. Increase the buffer if needed, keeping the board's memory in mind.
 
 ## Changes by version
+
+### Next release (not released yet)
+
+- **New example `esp01-button-controller`:** one button on the ESP-01's GPIO3 (RX) controls another device (a 4-channel relay board, an ESP-01 relay, an iris, a Remocon8266 board, a group channel), and the built-in LED (GPIO1) shows the target's state. The target CID and the button action (b1) are board settings. As RX and TX are the button and the LED, serial is on only in setup mode: when there is no Wi-Fi yet, or the button is held for the first 3 seconds after power on.
 
 ### 9.14.4
 

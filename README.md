@@ -49,6 +49,7 @@ IOSignal Arduino 라이브러리 설치와 UNO Ethernet 실습은 [iosignal.net 
 | `wifi-simple` | ESP-01, ESP8266, ESP32, ESP32-C3 | `#switch` 공유 스위치 그룹에 참여해 상태를 시리얼로 출력. 보드 설정 `out`·`out_high`·`button`으로 `s1`을 따르는 LED·릴레이와 `s1` 토글 버튼 |
 | `d1-mini-led-button` | ESP8266 D1 mini | 내장 LED와 GPIO 14(D5) 버튼 제어 |
 | `esp01-relay-button` | ESP8266 ESP-01 | 릴레이 GPIO 0, LED GPIO 1, 버튼 GPIO 2 |
+| `esp01-button-controller` | ESP8266 ESP-01 + 버튼 | GPIO 3(RX) 버튼으로 다른 장치를 제어(대상 CID·버튼 동작은 보드 설정), 내장 LED(GPIO 1)에 대상 상태 |
 | `Remocon8266` | Remocon8266 전용 보드 | OLED·버튼·출력 제어, 폴더 내 회로도 참고 |
 | `uno-r4-wifi-heart` | Arduino UNO R4 WiFi | LED 매트릭스 하트와 내장 LED, D12 버튼 |
 | `uno-ethernet-button` | UNO R3 + W5100 Ethernet 실드 | D2 버튼, D5 LED, D6 릴레이 출력 |
@@ -103,6 +104,10 @@ Wi-Fi 비밀번호와 장치 인증키를 공개 저장소에 올리지 마세�
 - **큰 메시지가 오지 않음:** 수신 버퍼(`setRxBuffer`)보다 큰 메시지는 서버가 보내지 않거나(9.0 서버), 장치가 건너뜁니다. 필요하면 버퍼 크기를 늘리세요. 보드 메모리를 고려해야 합니다.
 
 ## 버전별 변경 사항
+
+### 다음 릴리스 (아직 배포 전)
+
+- **새 예제 `esp01-button-controller`:** ESP-01의 GPIO3(RX) 버튼 하나로 다른 장치(4채널 릴레이, ESP-01 릴레이, iris, Remocon8266, 그룹 채널)를 제어하고, 내장 LED(GPIO1)로 대상의 상태를 보여 줍니다. 대상 CID와 버튼 동작(b1)은 보드 설정입니다. RX·TX를 버튼과 LED로 쓰므로, Wi-Fi가 없거나 켠 뒤 3초 안에 버튼을 누르고 있을 때만 시리얼이 켜지는 설정 모드로 시작합니다.
 
 ### 9.14.4
 
