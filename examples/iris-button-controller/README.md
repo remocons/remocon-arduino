@@ -7,7 +7,7 @@ iris 보드의 버튼 2개로 다른 장치(4채널 릴레이, 스위치, 전등
 - 보드: iris 보드 (ESP32-C3)
 - 네트워크: Wi-Fi 2.4GHz 공유기
 - 앱: https://remocon.kr (Iris Button Control 카드의 b1, b2), 대상 장치
-- 연동: undefined: undefined
+- 연동: esp8266-relay4ch
 
 ## 배선
 

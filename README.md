@@ -11,7 +11,7 @@
 
 ## 버전
 
-**9.0.0**부터 Remocon은 공개 [iosignal](https://github.com/remocons/iosignal)·[iosignal-arduino](https://github.com/remocons/iosignal-arduino)와 같은 버전 번호를 씁니다. 같은 번호의 패키지는 함께 쓰도록 맞춘 조합입니다. 9.14.4는 IOSignal Arduino **9.14.0 이상**이 필요합니다(보드 설정의 익명 접속은 9.14.1 이상). 버전별 변경은 아래 [버전별 변경 사항](#버전별-변경-사항)을 참고하세요.
+**9.0.0**부터 Remocon은 공개 [iosignal](https://github.com/remocons/iosignal)·[iosignal-arduino](https://github.com/remocons/iosignal-arduino)와 같은 버전 번호를 씁니다. 같은 번호의 패키지는 함께 쓰도록 맞춘 조합입니다. 9.14.5는 IOSignal Arduino **9.14.0 이상**이 필요합니다(보드 설정의 익명 접속은 9.14.1 이상). 버전별 변경은 아래 [버전별 변경 사항](#버전별-변경-사항)을 참고하세요.
 
 ## 설치 및 시작
 
@@ -105,9 +105,10 @@ Wi-Fi 비밀번호와 장치 인증키를 공개 저장소에 올리지 마세�
 
 ## 버전별 변경 사항
 
-### 다음 릴리스 (아직 배포 전)
+### 9.14.5
 
 - **새 예제 `esp01-button-controller`:** ESP-01의 GPIO3(RX) 버튼 하나로 다른 장치(4채널 릴레이, ESP-01 릴레이, iris, Remocon8266, 그룹 채널)를 제어하고, 내장 LED(GPIO1)로 대상의 상태를 보여 줍니다. 대상 CID와 버튼 동작(b1)은 보드 설정입니다. RX·TX를 버튼과 LED로 쓰므로, Wi-Fi가 없거나 켠 뒤 3초 안에 버튼을 누르고 있을 때만 시리얼이 켜지는 설정 모드로 시작합니다.
+- `button-controller`, `iris-button-controller` 예제 README의 연동 장치가 `undefined`로 보이던 것을 고쳤습니다(`esp8266-relay4ch`).
 
 ### 9.14.4
 

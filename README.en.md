@@ -11,7 +11,7 @@ Communication uses the [IOSignal Arduino client](https://github.com/remocons/ios
 
 ## Versions
 
-From **9.0.0**, Remocon uses the same version number as the public [iosignal](https://github.com/remocons/iosignal) and [iosignal-arduino](https://github.com/remocons/iosignal-arduino) packages. Packages with the same number are meant to be used together. 9.14.4 requires IOSignal Arduino **9.14.0 or later** (9.14.1 or later for anonymous login in the board settings). See [Changes by version](#changes-by-version) below.
+From **9.0.0**, Remocon uses the same version number as the public [iosignal](https://github.com/remocons/iosignal) and [iosignal-arduino](https://github.com/remocons/iosignal-arduino) packages. Packages with the same number are meant to be used together. 9.14.5 requires IOSignal Arduino **9.14.0 or later** (9.14.1 or later for anonymous login in the board settings). See [Changes by version](#changes-by-version) below.
 
 ## Installation and getting started
 
@@ -105,9 +105,10 @@ Revoke and reissue any real authentication key that has already been published. 
 
 ## Changes by version
 
-### Next release (not released yet)
+### 9.14.5
 
 - **New example `esp01-button-controller`:** one button on the ESP-01's GPIO3 (RX) controls another device (a 4-channel relay board, an ESP-01 relay, an iris, a Remocon8266 board, a group channel), and the built-in LED (GPIO1) shows the target's state. The target CID and the button action (b1) are board settings. As RX and TX are the button and the LED, serial is on only in setup mode: when there is no Wi-Fi yet, or the button is held for the first 3 seconds after power on.
+- The READMEs of `button-controller` and `iris-button-controller` showed their partner device as `undefined`; they now name `esp8266-relay4ch`.
 
 ### 9.14.4
 
