@@ -7,14 +7,17 @@
  *  GPIO1 is the TX pin, so this sketch normally does not use serial.
  *  GPIO0 and GPIO2 must be HIGH at boot; check the relay and button wiring.
  *
- *  Setup mode: when the board keeps no Wi-Fi yet, or the button is held during the first
- *  3 seconds after power on, serial is turned on instead of the LED until the next reset.
- *  Then set Wi-Fi over the USB-TTL adapter on https://test.iosignal.net/wifi/ (the board
- *  keeps it); the page can also set another IOSignal server and a device key.
+ *  Setup mode: when the board keeps no Wi-Fi yet, when the settings page talks to it over
+ *  RX (GPIO3, unused here), or when the button is held during the first 3 seconds after power on,
+ *  GPIO1 is TX instead of the LED until the next reset.
+ *  Set Wi-Fi over the USB-TTL adapter on https://arduino.remocon.kr/wifi/ (the board keeps it);
+ *  the page can also set another IOSignal server and a device key. A board that already keeps
+ *  Wi-Fi (from another sketch too) answers the page within a few seconds after Connect.
  *  Or write the Wi-Fi in WIFI_SSID and WIFI_PASS below. Then open https://remocon.kr.
  *
  *  [kr] ESP-01의 릴레이(GPIO0)와 LED(GPIO1)를 2구 스위치로 제어하고, GPIO2 버튼으로 릴레이를 토글합니다.
- *       Wi-Fi가 없거나 켠 뒤 3초 안에 버튼을 누르고 있으면 설정 모드(시리얼 켜짐, LED 꺼짐)로 시작합니다.
+ *       Wi-Fi가 없거나, 설정 페이지가 RX로 요청을 보내거나, 켠 뒤 3초 안에 버튼을 누르고 있으면
+ *       설정 모드(시리얼 켜짐, LED 꺼짐)가 됩니다.
  *
  *  Taeo Lee <sixgen@gmail.com>
  *  https://github.com/remocons/remocon-arduino
@@ -57,6 +60,27 @@ char last_states[] = "00";
 const bool activeLow[] = { true, true };
 uint8_t pinMap[] = { RELAY_PIN, LED_PIN };
 bool setupMode = false;  // serial on GPIO1/TX instead of the LED until the next reset
+
+void startSetupMode() {
+  setupMode = true;
+  pinMode( LED_PIN, SPECIAL );  // GPIO1 back to TX
+  config.attachSerial( Serial );
+  Serial.println();
+  Serial.println("ESP01 setup mode: set Wi-Fi on https://arduino.remocon.kr/wifi/");
+  config.printServer();
+}
+
+// In normal mode RX is still read: the settings page sends Improv packets ("IMPROV...") and asks
+// again every few seconds, so after the first header the board answers the next request.
+void watchSerial() {
+  static const char HEADER[] = "IMPROV";
+  static uint8_t matched = 0;
+  while ( !setupMode && Serial.available() ) {
+    char c = Serial.read();
+    matched = c == HEADER[matched] ? matched + 1 : ( c == HEADER[0] ? 1 : 0 );
+    if ( matched == 6 ) startSetupMode();
+  }
+}
 
 void publishState() {
   char text[23];
@@ -109,14 +133,11 @@ void setup() {
   for( unsigned long start = millis(); !setupMode && millis() - start < 3000; delay(10) ){
     if( digitalRead( BUTTON_PIN ) == LOW ) setupMode = true;
   }
+  Serial.begin(115200);  // RX is read in both modes; TX only in setup mode
   if( setupMode ){
-    Serial.begin(115200);
-    config.attachSerial( Serial );
-    Serial.println();
-    Serial.println("ESP01 setup mode: set Wi-Fi on https://test.iosignal.net/wifi/");
-    config.printServer();
+    startSetupMode();
   } else {
-    pinMode( LED_PIN , OUTPUT);
+    pinMode( LED_PIN , OUTPUT);   // GPIO1 leaves TX for the LED
     digitalWrite( LED_PIN, HIGH);  // active low
   }
 
@@ -129,6 +150,7 @@ void setup() {
 
 
 void loop() {
+    watchSerial(); // the settings page switches a running board to setup mode
     config.loop(); // USB setup requests (setup mode), Wi-Fi reconnect
     if ( config.connected() ) io.loop();   
     aBtn.update();
