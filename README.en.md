@@ -105,6 +105,11 @@ Revoke and reissue any real authentication key that has already been published. 
 
 ## Changes by version
 
+### 9.14.6
+
+- **`esp01-relay-button`: the settings page reaches a running board.** RX (GPIO3) is read in normal mode too; a request from the board settings page turns GPIO1 from the LED back into serial (TX) and the board stays in setup mode until the next reset. A board that already keeps Wi-Fi no longer needs the button held at power on.
+- No library code changes.
+
 ### 9.14.5
 
 - **New example `esp01-button-controller`:** one button on the ESP-01's GPIO3 (RX) controls another device (a 4-channel relay board, an ESP-01 relay, an iris, a Remocon8266 board, a group channel), and the built-in LED (GPIO1) shows the target's state. The target CID and the button action (b1) are board settings. As RX and TX are the button and the LED, serial is on only in setup mode: when there is no Wi-Fi yet, or the button is held for the first 3 seconds after power on.
