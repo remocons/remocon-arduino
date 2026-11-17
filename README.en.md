@@ -50,7 +50,9 @@ Installing the IOSignal Arduino library and the UNO Ethernet exercise are in the
 | `d1-mini-led-button` | ESP8266 D1 mini | Built-in LED and GPIO 14 (D5) button control |
 | `esp01-relay-button` | ESP8266 ESP-01 | Relay on GPIO 0, LED on GPIO 1, button on GPIO 2 |
 | `esp01-button-controller` | ESP8266 ESP-01 + a button | A button on GPIO 3 (RX) controls another device (target CID and button action are board settings); the built-in LED (GPIO 1) shows the target's state |
-| `Remocon8266` | Dedicated Remocon8266 board | OLED, button, and output control; see the schematic in the folder |
+| `Remocon8266-basic` | Dedicated Remocon8266 board | Three outputs (`switch3.1`) controlled from the web app, with the state and where the change came from on the OLED; see the schematic in the folder |
+| `Remocon8266-tv` | Dedicated Remocon8266 board + bayo.tv | Four buttons control a bayo.tv screen; play state, volume and title (the chapter title in a video with chapters) on the OLED |
+| `Remocon8266-scanner` | Dedicated Remocon8266 board | Finds the devices on the same router with `#search` and lists them on the OLED; pick one with the buttons to see its CID, name, type and state |
 | `uno-r4-wifi-heart` | Arduino UNO R4 WiFi | LED matrix heart, built-in LED, and D12 button |
 | `uno-ethernet-button` | UNO R3 + W5100 Ethernet shield | D2 button, D5 LED, D6 relay output |
 | `uno-ethernet-ir` | UNO R3 + W5100 Ethernet shield | D2 NEC infrared receiver, D5 and D6 outputs |
@@ -104,6 +106,15 @@ Revoke and reissue any real authentication key that has already been published. 
 - **Large messages do not arrive:** Messages larger than the receive buffer (`setRxBuffer`) are not sent by a 9.0 server, or are skipped by the device. Increase the buffer if needed, keeping the board's memory in mind.
 
 ## Changes by version
+
+### 9.14.7
+
+- **The `Remocon8266` example is split into three.** The old `Remocon8266` folder is gone.
+  - `Remocon8266-basic`: the web app (remocon.kr) controls three outputs (built-in LED, OUT1, OUT2) as a 3-way switch, and the OLED shows the state and where each change came from (the app, SW1-SW3). SW4 shows the CID, IP and server; text sent to `<cid>@msg` (Korean too) stays on the OLED for 6 seconds.
+  - `Remocon8266-tv`: four buttons control a bayo.tv screen by its CID (defaults `playToggle`, `left`, `down`, `right`), and the OLED shows the screen's play state, volume, mute, shuffle and title. In a video with chapters it shows the chapter playing, its title and number. The screen (`target`) and the button commands (`b1`-`b4`) are board settings; with no `target` the board finds the bayo.tv on the same router, and again after the screen reloads.
+  - `Remocon8266-scanner`: sends `#search` like the app, lists the devices on the same router (up to 16) on the OLED, and shows the CID, name, category, type and state of the one picked with the buttons.
+- Korean text uses U8g2's `u8g2_font_unifont_t_korean2` (the 2,350 KS X 1001 Hangul syllables, 16 px). Characters it does not have (emoji, decorative letters, rare syllables) are not drawn.
+- All three were checked on a Remocon8266 board. No library code changes.
 
 ### 9.14.6
 

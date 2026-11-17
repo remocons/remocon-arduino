@@ -50,7 +50,9 @@ IOSignal Arduino 라이브러리 설치와 UNO Ethernet 실습은 [iosignal.net 
 | `d1-mini-led-button` | ESP8266 D1 mini | 내장 LED와 GPIO 14(D5) 버튼 제어 |
 | `esp01-relay-button` | ESP8266 ESP-01 | 릴레이 GPIO 0, LED GPIO 1, 버튼 GPIO 2 |
 | `esp01-button-controller` | ESP8266 ESP-01 + 버튼 | GPIO 3(RX) 버튼으로 다른 장치를 제어(대상 CID·버튼 동작은 보드 설정), 내장 LED(GPIO 1)에 대상 상태 |
-| `Remocon8266` | Remocon8266 전용 보드 | OLED·버튼·출력 제어, 폴더 내 회로도 참고 |
+| `Remocon8266-basic` | Remocon8266 전용 보드 | 웹앱에서 출력 3개(`switch3.1`)를 제어하고 바뀐 상태와 출처를 OLED에 표시, 폴더 내 회로도 참고 |
+| `Remocon8266-tv` | Remocon8266 전용 보드 + bayo.tv | 버튼 4개로 bayo.tv 화면을 제어하고 재생 상태·음량·제목(챕터 영상은 챕터 제목)을 OLED에 표시 |
+| `Remocon8266-scanner` | Remocon8266 전용 보드 | `#search`로 같은 공유기의 장치를 찾아 OLED에 목록, 버튼으로 골라 CID·이름·타입·상태 보기 |
 | `uno-r4-wifi-heart` | Arduino UNO R4 WiFi | LED 매트릭스 하트와 내장 LED, D12 버튼 |
 | `uno-ethernet-button` | UNO R3 + W5100 Ethernet 실드 | D2 버튼, D5 LED, D6 릴레이 출력 |
 | `uno-ethernet-ir` | UNO R3 + W5100 Ethernet 실드 | D2 NEC 적외선 수신기, D5·D6 출력 |
@@ -104,6 +106,15 @@ Wi-Fi 비밀번호와 장치 인증키를 공개 저장소에 올리지 마세�
 - **큰 메시지가 오지 않음:** 수신 버퍼(`setRxBuffer`)보다 큰 메시지는 서버가 보내지 않거나(9.0 서버), 장치가 건너뜁니다. 필요하면 버퍼 크기를 늘리세요. 보드 메모리를 고려해야 합니다.
 
 ## 버전별 변경 사항
+
+### 9.14.7
+
+- **`Remocon8266` 예제를 세 개로 나눴습니다.** 기존 `Remocon8266` 폴더는 없어졌습니다.
+  - `Remocon8266-basic`: 웹앱(remocon.kr)에서 출력 3개(내장 LED, OUT1, OUT2)를 3구 스위치로 제어하고, 바뀐 상태와 출처(앱, SW1~SW3)를 OLED에 보여 줍니다. SW4는 CID·IP·서버, `<cid>@msg`의 글(한글 가능)은 OLED에 6초 동안 나옵니다.
+  - `Remocon8266-tv`: 버튼 4개로 bayo.tv 화면을 CID로 제어하고(기본 `playToggle`, `left`, `down`, `right`), 화면의 재생 상태·음량·음소거·셔플과 제목을 OLED에 보여 줍니다. 챕터가 있는 영상은 지금 챕터의 제목과 번호를 보여 줍니다. 대상 화면(`target`)과 버튼 명령(`b1`~`b4`)은 보드 설정이고, `target`이 비면 같은 공유기의 bayo.tv를 찾고 화면이 새로 고쳐지면 다시 찾습니다.
+  - `Remocon8266-scanner`: 앱처럼 `#search`를 보내 같은 공유기의 장치(최대 16대)를 OLED에 목록으로 보여 주고, 버튼으로 골라 CID·이름·분류·타입·상태를 봅니다.
+- 한글은 U8g2의 `u8g2_font_unifont_t_korean2`(KS X 1001 한글 2,350자, 16px)로 그립니다. 폰트에 없는 글자(이모지, 꾸밈 문자, 드문 음절)는 그리지 않습니다.
+- 세 예제 모두 Remocon8266 보드에서 확인했습니다. 라이브러리 코드는 바뀌지 않았습니다.
 
 ### 9.14.6
 
