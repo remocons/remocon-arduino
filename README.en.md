@@ -107,6 +107,11 @@ Revoke and reissue any real authentication key that has already been published. 
 
 ## Changes by version
 
+### 9.14.8
+
+- **`uno-ethernet-ir`: the remote's next and previous buttons move by chapter.** Buttons 0x06 and 0x07 send `right`/`left` on `#screen` instead of `next`/`prev`. bayo.tv moves to the next or previous chapter in a video with chapters, else (no chapters, or the last one) to the next or previous video. To always move whole videos, change them back to `next`/`prev` in the sketch.
+- No library code changes.
+
 ### 9.14.7
 
 - **The `Remocon8266` example is split into three.** The old `Remocon8266` folder is gone.

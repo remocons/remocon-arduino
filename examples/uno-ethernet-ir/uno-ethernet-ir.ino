@@ -9,7 +9,7 @@
     - iosignal server information is used without modification. If you use another server, change the server address and port number.
     - compile and upload to Arduino.
     - Access https://remocon.kr and https://bayo.tv with a modern web browser.
-    - control youtube player on bayo.tv
+    - control youtube player on bayo.tv (right / left move by chapter in a video with chapters)
     - It works with NEC compatible remotes, for other remotes you can modify the library and signal code.
 
   [kr] 리모컨 신호를 아두이노에서 감지하고 다른 장치에 신호를 전달하거나 웹앱의 신호를 아두이노가 수신하는 예제입니다. 
@@ -17,7 +17,7 @@
     - iosignal 서버 정보는 수정 없이 그대로 사용합니다. 다른 서버를 사용할 경우 서버 주소와 포트번호를 변경해줍니다.
     - 아두이노에 컴파일하고 업로딩합니다.
     - 모던 웹브라우저로  https://remocon.kr 와 https://bayo.tv 에 접속하세요.
-    - bayo.tv 의 동영상을 제어하세요!
+    - bayo.tv 의 동영상을 제어하세요! (챕터가 있는 영상은 right / left 로 챕터 이동)
     - NEC 호환 리모컨으로 작동되며, 다른 리모컨의 경우 라이브러리와 신호 코드를 수정하시면됩니다.
 
  *
@@ -122,12 +122,14 @@ void loop()
 
         switch (TinyIRReceiverData.Command)
         {
-        // Change to the code value of your NEC compatible remote
+        // Change to the code value of your NEC compatible remote.
+        // right / left: the next or previous chapter when the bayo.tv video has one, else the next or
+        // previous video (next / prev always move videos).
         case 0x06 :
-          io.signal("#screen", "next");
+          io.signal("#screen", "right");
           break;
         case 0x07 :
-          io.signal("#screen", "prev");
+          io.signal("#screen", "left");
           break;
         case 0x40 :
           io.signal("#screen", "up");
