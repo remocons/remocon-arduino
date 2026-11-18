@@ -169,7 +169,7 @@ Wi-Fi 비밀번호와 장치 인증키를 공개 저장소에 올리지 마세�
 ### 9.14.0
 
 - **IOSignal Arduino 9.14.0이 필요합니다.** 의존성을 `IOSignal (>=9.14.0)`으로 올렸습니다. 9.14.0은 로그 문구를 플래시에 두어 UNO(AVR)의 RAM을 아낍니다. `uno-ethernet-ir`은 남는 RAM이 394바이트에서 822바이트로 늘어 부팅 중 멈추지 않습니다.
-- **장치 규칙 v2: `$info` 대신 `$name`과 `$ui`를 보냅니다.** `$name`은 `이름:분류`(예: `Iris Basic:HOME`, 첫 `:` 뒤가 앱의 분류 탭, 없으면 미분류), `$ui`는 버튼 목록(`on,off,toggle`) 또는 공식 타입 `t=switch4.1`입니다. 자체 화면을 보내는 장치는 `p=1;b=…`처럼 씁니다. remocon.kr, 안드로이드 앱, IOSignal Desktop은 `$info`를 더 읽지 않습니다.
+- **장치 규칙 v2: 장치는 `$name`과 `$ui`로 자신을 알립니다.** `$name`은 `이름:분류`(예: `Iris Basic:HOME`, 첫 `:` 뒤가 앱의 분류 탭, 없으면 미분류), `$ui`는 버튼 목록(`on,off,toggle`) 또는 공식 타입 `t=switch4.1`입니다. 자체 화면을 보내는 장치는 `p=1;b=…`처럼 씁니다. 9.6.0~9.12.0 예제의 장치 정보 형식은 remocon.kr, 안드로이드 앱, IOSignal Desktop이 더 읽지 않으므로, 그 예제를 올린 보드는 다시 설치하세요.
 - **새 헤더 `RemoconUi.h`:** `formatName()`으로 `$name`을 만들고(이름 속 `:`·`;` 정리), `nameIs()`로 다른 장치의 `$name`을 비교합니다. 버튼 제어기용 `RemoconBinding.h`, `RemoconButtons.h`도 함께 들어 있습니다.
 - 보드 설정 `group`은 이름이 그대로이고, 이제 `$name`의 분류로 쓰입니다. 이미 저장된 값도 그대로 씁니다.
 - `iris-basic-control`: 대상을 `$name`의 이름(`Iris Basic`)으로 찾습니다.
@@ -187,9 +187,9 @@ Wi-Fi 비밀번호와 장치 인증키를 공개 저장소에 올리지 마세�
 ### 9.12.0
 
 - **버전 번호를 공개 iosignal 9.12.0과 맞췄습니다.** 의존성을 `IOSignal (>=9.12.0)`으로 올렸습니다.
-- 모든 예제의 `$info`가 짧은 키(`n=`, `g=`, `t=`)와 타입 이름 `<이름>.<major>`(`light.1`, `switch4.1` 등)를 씁니다. remocon.kr은 예전 형식도 계속 읽습니다.
-- `Remocon8266-4ch-control`: 카드 화면을 `$panel`로 보내고 `$info`에 `p=1`을 붙입니다. OLED 맨 아래 줄에 이 보드의 CID를 표시합니다. 기본 대상 `DEFAULT_TARGET`은 자리표시자 `the-cid`이니 릴레이 보드의 CID로 바꾸세요. 원격으로 지정해 플래시에 저장된 대상이 있으면 그 값을 먼저 씁니다.
-- `esp8266_relay4ch`: `$info` 분류를 `g=relays`로 바꿨습니다.
+- 타입 이름이 `<이름>.<major>`(`light.1`, `switch4.1` 등)로 바뀌었습니다. 장치 정보 형식은 9.14.0에서 지금 규칙(`$name`, `$ui`)으로 다시 바뀌었습니다.
+- `Remocon8266-4ch-control`: 카드 화면을 `$panel`로 보냅니다. OLED 맨 아래 줄에 이 보드의 CID를 표시합니다. 기본 대상 `DEFAULT_TARGET`은 자리표시자 `the-cid`이니 릴레이 보드의 CID로 바꾸세요. 원격으로 지정해 플래시에 저장된 대상이 있으면 그 값을 먼저 씁니다.
+- `esp8266_relay4ch`: 분류를 `relays`로 바꿨습니다.
 - `esp32c3/esp32c3-simple`을 `wifi-simple`에 합쳤습니다. `LED_PIN` 주석을 풀면 `s1` 값으로 LED를 켭니다.
 - 예제별 준비물, 배선, 순서와 브라우저 제어 화면은 [test.iosignal.net](https://test.iosignal.net/)에 있습니다.
 
@@ -197,8 +197,8 @@ Wi-Fi 비밀번호와 장치 인증키를 공개 저장소에 올리지 마세�
 
 - **버전 번호를 공개 iosignal 9.6.0과 맞췄습니다.** 의존성을 `IOSignal (>=9.6.0)`으로 올렸습니다. IOSignal Arduino 9.6.0에는 `unsubscribe()`와 전송 실패 시 재접속이 들어 있습니다.
 - 새 예제: `iris-basic`, `iris-basic-control`, `iris-rgb`, `esp8266_relay4ch`, `Remocon8266-4ch-control`.
-- `iris-group`, `uno-ethernet-button`, `uno-ethernet-ir`이 장치 검색·제어 규칙(`@$info`, `key=value` 상태, `#search`/`#notify`)을 따릅니다. `uno-ethernet-ir`의 리모컨 키 코드가 바뀌었습니다.
-- `Remocon8266`, `esp01-relay-button`, `esp8266-d1-mini`, `uno-r4-wifi-heart`, `esp32-cid-led`, `esp32-group-led`, `wifi-simple`, `esp32c3/esp32c3-simple`도 같은 규칙을 따르도록 바꿨습니다. 이전 방식(`$name`/`$ui`, `#scan/ch`, `#$switch`)은 더 쓰지 않습니다. 공유 스위치 채널은 `#switch`입니다. 이 8개는 컴파일과 규칙 검사만 했고 실제 보드에서는 확인하지 않았습니다.
+- `iris-group`, `uno-ethernet-button`, `uno-ethernet-ir`이 그때의 장치 검색·제어 규칙(`key=value` 상태, `#search`/`#notify`)을 따릅니다. `uno-ethernet-ir`의 리모컨 키 코드가 바뀌었습니다.
+- `Remocon8266`, `esp01-relay-button`, `esp8266-d1-mini`, `uno-r4-wifi-heart`, `esp32-cid-led`, `esp32-group-led`, `wifi-simple`, `esp32c3/esp32c3-simple`도 같은 규칙을 따르도록 바꿨습니다. `#scan/ch`, `#$switch`는 더 쓰지 않고, 공유 스위치 채널은 `#switch`입니다. 이 8개는 컴파일과 규칙 검사만 했고 실제 보드에서는 확인하지 않았습니다.
 - `esp32c3-button-led`와 `esp32s3-ws2812` 예제를 삭제했습니다.
 - 예제마다 `README.md`가 있습니다.
 

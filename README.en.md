@@ -169,7 +169,7 @@ Revoke and reissue any real authentication key that has already been published. 
 ### 9.14.0
 
 - **Requires IOSignal Arduino 9.14.0.** The dependency is now `IOSignal (>=9.14.0)`. 9.14.0 keeps its log texts in flash and saves RAM on the UNO (AVR): `uno-ethernet-ir` now has 822 bytes of RAM free instead of 394 and no longer stops during boot.
-- **Device rules v2: devices send `$name` and `$ui` instead of `$info`.** `$name` is `name:category` (for example `Iris Basic:HOME`; the part after the first `:` is the app's category tab, none means uncategorized). `$ui` is a button list (`on,off,toggle`) or an official type such as `t=switch4.1`. A device with a screen of its own sends `p=1;b=…`. remocon.kr, the Android app and IOSignal Desktop no longer read `$info`.
+- **Device rules v2: devices announce themselves with `$name` and `$ui`.** `$name` is `name:category` (for example `Iris Basic:HOME`; the part after the first `:` is the app's category tab, none means uncategorized). `$ui` is a button list (`on,off,toggle`) or an official type such as `t=switch4.1`. A device with a screen of its own sends `p=1;b=…`. remocon.kr, the Android app and IOSignal Desktop no longer read the device info format of the 9.6.0 to 9.12.0 examples, so reinstall boards running those examples.
 - **New header `RemoconUi.h`:** `formatName()` builds `$name` (cleaning `:` and `;` out of the name) and `nameIs()` compares another device's `$name`. `RemoconBinding.h` and `RemoconButtons.h` for the button controllers are included too.
 - The board setting `group` keeps its name and is now the category in `$name`. Values already stored still apply.
 - `iris-basic-control` finds its target by the name in `$name` (`Iris Basic`).
@@ -187,9 +187,9 @@ Revoke and reissue any real authentication key that has already been published. 
 ### 9.12.0
 
 - **The version number now matches the public iosignal 9.12.0 package.** The dependency is now `IOSignal (>=9.12.0)`.
-- Every example sends `$info` with the short keys (`n=`, `g=`, `t=`) and the type names `<name>.<major>` (`light.1`, `switch4.1` and so on). remocon.kr still reads the old form.
-- `Remocon8266-4ch-control`: the card screen is sent in `$panel`, with `p=1` in `$info`. The bottom OLED line shows this board's CID. The default target `DEFAULT_TARGET` is the placeholder `the-cid`; set it to your relay board's CID. A target set remotely and kept in flash is used first.
-- `esp8266_relay4ch`: the `$info` group is now `g=relays`.
+- Type names became `<name>.<major>` (`light.1`, `switch4.1` and so on). The device info format changed again in 9.14.0 to the current rules (`$name`, `$ui`).
+- `Remocon8266-4ch-control`: the card screen is sent in `$panel`. The bottom OLED line shows this board's CID. The default target `DEFAULT_TARGET` is the placeholder `the-cid`; set it to your relay board's CID. A target set remotely and kept in flash is used first.
+- `esp8266_relay4ch`: the category is now `relays`.
 - `esp32c3/esp32c3-simple` was merged into `wifi-simple`. Uncomment `LED_PIN` to drive an LED with `s1`.
 - Parts, wiring, steps and a browser control panel for each example are on [test.iosignal.net](https://test.iosignal.net/) (Korean).
 
@@ -197,8 +197,8 @@ Revoke and reissue any real authentication key that has already been published. 
 
 - **The version number now matches the public iosignal 9.6.0 package.** The dependency is now `IOSignal (>=9.6.0)`, which adds `unsubscribe()` and reconnects when a send does not go out.
 - New examples: `iris-basic`, `iris-basic-control`, `iris-rgb`, `esp8266_relay4ch`, `Remocon8266-4ch-control`.
-- `iris-group`, `uno-ethernet-button` and `uno-ethernet-ir` follow the device discovery and control rules (`@$info`, `key=value` state, `#search`/`#notify`). The remote key codes in `uno-ethernet-ir` changed.
-- `Remocon8266`, `esp01-relay-button`, `esp8266-d1-mini`, `uno-r4-wifi-heart`, `esp32-cid-led`, `esp32-group-led`, `wifi-simple` and `esp32c3/esp32c3-simple` now follow the same rules too. The old tags (`$name`/`$ui`, `#scan/ch`, `#$switch`) are no longer used; the shared-switch channel is `#switch`. These eight were compiled and checked against the rules, not tested on boards.
+- `iris-group`, `uno-ethernet-button` and `uno-ethernet-ir` follow the device discovery and control rules of that time (`key=value` state, `#search`/`#notify`). The remote key codes in `uno-ethernet-ir` changed.
+- `Remocon8266`, `esp01-relay-button`, `esp8266-d1-mini`, `uno-r4-wifi-heart`, `esp32-cid-led`, `esp32-group-led`, `wifi-simple` and `esp32c3/esp32c3-simple` now follow the same rules too. `#scan/ch` and `#$switch` are no longer used; the shared-switch channel is `#switch`. These eight were compiled and checked against the rules, not tested on boards.
 - The `esp32c3-button-led` and `esp32s3-ws2812` examples were removed.
 - Each example has a `README.md`.
 
