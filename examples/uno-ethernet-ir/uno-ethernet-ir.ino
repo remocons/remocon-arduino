@@ -66,38 +66,16 @@ void setup()
   io.begin(&client, "io.remocon.kr", 55488 );
   io.onReady(&onReady);
   io.onMessage(&onMessage);
-  // io.auth("ID_KEY"); // Optional: use your own device key.
-
-
+  // io.auth("ID_KEY"); // Optional: use your own device key ("id.key"). The sketch still fits an Uno with it.
 }
 
-void deviceOn()
+// LED and relay together, then the new state to the app. One function: an Uno with a device key
+// (io.auth) has almost no flash left.
+void setDevice(bool on)
 {
-  digitalWrite(5, HIGH);
-  digitalWrite(6, HIGH);
-  io.signal("@$state", "on=1");
-}
-
-void deviceOff()
-{
-  digitalWrite(5, LOW);
-  digitalWrite(6, LOW);
-  io.signal("@$state", "on=0");
-}
-
-void deviceToggle()
-{
-  int nextState = !digitalRead(5);
-  digitalWrite(5, nextState);
-  digitalWrite(6, nextState);
-  if (nextState)
-  {
-    io.signal("@$state", "on=1");
-  }
-  else
-  {
-    io.signal("@$state", "on=0");
-  }
+  digitalWrite(5, on);
+  digitalWrite(6, on);
+  publishState();
 }
 
 void loop()
@@ -120,35 +98,22 @@ void loop()
         Serial.print(F(" C="));
         Serial.println(TinyIRReceiverData.Command, HEX);
 
-        switch (TinyIRReceiverData.Command)
-        {
         // Change to the code value of your NEC compatible remote.
         // right / left: the next or previous chapter when the bayo.tv video has one, else the next or
         // previous video (next / prev always move videos).
-        case 0x06 :
-          io.signal("#screen", "right");
-          break;
-        case 0x07 :
-          io.signal("#screen", "left");
-          break;
-        case 0x40 :
-          io.signal("#screen", "up");
-          break;
-        case 0x41 :
-          io.signal("#screen", "down");
-          break;
-        case 0x44 :
-          deviceToggle(); 
-          break;
-        case 0x1E :
-          io.signal("cid1@", "toggle");
-          break;
-        case 0x1A :
-          io.signal("cid2@", "toggle");
-          break;
-        default:
-          io.signal("#screen", "playToggle");
+        const char *tag = "#screen";
+        const char *command = "playToggle";
+        switch (TinyIRReceiverData.Command)
+        {
+        case 0x06 : command = "right"; break;
+        case 0x07 : command = "left"; break;
+        case 0x40 : command = "up"; break;
+        case 0x41 : command = "down"; break;
+        case 0x1E : tag = "cid1@"; command = "toggle"; break;
+        case 0x1A : tag = "cid2@"; command = "toggle"; break;
+        case 0x44 : tag = NULL; setDevice(!digitalRead(5)); break; // this board's LED and relay
         }
+        if (tag) io.signal(tag, command);
       }
     }
 
@@ -167,20 +132,6 @@ void onReady()
 
 void onMessage(char *tag, uint8_t payloadType, uint8_t *payload, size_t payloadSize)
 {
-  // signal message info
-  Serial.print(F(">> signal tag: "));
-  Serial.print(tag);
-  Serial.print(F(" type: "));
-  Serial.print(payloadType);
-  Serial.print(F(" size: "));
-  Serial.println(payloadSize);
-
-  if (payloadType == IOSignal::PAYLOAD_TYPE::TEXT && payload && payloadSize && memchr(payload, 0, payloadSize))
-  {
-    Serial.print(F("string payload: "));
-    Serial.println((char *)payload);
-  }
-
   if (strcmp(tag, "#search") == 0)
   {
     io.signal("#notify", io.cid);
@@ -190,22 +141,15 @@ void onMessage(char *tag, uint8_t payloadType, uint8_t *payload, size_t payloadS
   if (payloadType != IOSignal::PAYLOAD_TYPE::TEXT || !payload ||
       !payloadSize || !memchr(payload, 0, payloadSize)) return;
 
+  Serial.print(tag);
+  Serial.print(' ');
+  Serial.println((char *)payload);
+
   if (strcmp(tag, "@") == 0)
   {
-    if (strcmp((char *)payload, "on") == 0)
-    {
-      deviceOn();
-    }
-    else if (strcmp((char *)payload, "off") == 0)
-    {
-      deviceOff();
-    }
-    else if (strcmp((char *)payload, "toggle") == 0)
-    {
-      deviceToggle();
-    } else {
-      publishState(); // Unknown commands still get a reply.
-    }
+    if (strcmp((char *)payload, "on") == 0) setDevice(true);
+    else if (strcmp((char *)payload, "off") == 0) setDevice(false);
+    else if (strcmp((char *)payload, "toggle") == 0) setDevice(!digitalRead(5));
+    else publishState(); // Unknown commands still get a reply.
   }
 }
-

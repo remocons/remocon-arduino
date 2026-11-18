@@ -11,7 +11,7 @@ Communication uses the [IOSignal Arduino client](https://github.com/remocons/ios
 
 ## Versions
 
-From **9.0.0**, Remocon uses the same version number as the public [iosignal](https://github.com/remocons/iosignal) and [iosignal-arduino](https://github.com/remocons/iosignal-arduino) packages. Packages with the same number are meant to be used together. 9.14.5 requires IOSignal Arduino **9.14.0 or later** (9.14.1 or later for anonymous login in the board settings). See [Changes by version](#changes-by-version) below.
+From **9.0.0**, Remocon uses the same version number as the public [iosignal](https://github.com/remocons/iosignal) and [iosignal-arduino](https://github.com/remocons/iosignal-arduino) packages. Packages with the same number are meant to be used together. 9.21.0 requires IOSignal Arduino **9.21.0 or later**. See [Changes by version](#changes-by-version) below.
 
 ## Installation and getting started
 
@@ -106,6 +106,13 @@ Revoke and reissue any real authentication key that has already been published. 
 - **Large messages do not arrive:** Messages larger than the receive buffer (`setRxBuffer`) are not sent by a 9.0 server, or are skipped by the device. Increase the buffer if needed, keeping the board's memory in mind.
 
 ## Changes by version
+
+### 9.21.0
+
+- **Requires IOSignal Arduino 9.21.0.** The dependency is now `IOSignal (>=9.21.0)`. 9.21.0 drops a connection the server stopped answering on and opens it again, keeps `loop()` running while it waits to reconnect, and uses Boho 1.1.0 with its new login nonce. See [IOSignal Arduino 9.21.0](https://github.com/remocons/iosignal-arduino/releases/tag/v9.21.0).
+- **`uno-ethernet-ir`: a device key now fits the UNO.** The sketch is smaller, so it still fits with `io.auth("id.key")` uncommented (31,996 bytes without a key, about 32,210 with one, of 32,256). Before, a key pushed it past the flash size. The remote codes, the signals they send and the `on`/`off`/`toggle` commands are the same; the serial output for a received signal is one line such as `@ toggle`.
+- Because `loop()` keeps running while reconnecting, the examples' buttons and board settings work while the connection is down.
+- The version number matches the public iosignal 9.21.0 package. There is no Remocon numbered 9.15 to 9.20.
 
 ### 9.14.8
 

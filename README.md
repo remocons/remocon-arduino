@@ -11,7 +11,7 @@
 
 ## 버전
 
-**9.0.0**부터 Remocon은 공개 [iosignal](https://github.com/remocons/iosignal)·[iosignal-arduino](https://github.com/remocons/iosignal-arduino)와 같은 버전 번호를 씁니다. 같은 번호의 패키지는 함께 쓰도록 맞춘 조합입니다. 9.14.5는 IOSignal Arduino **9.14.0 이상**이 필요합니다(보드 설정의 익명 접속은 9.14.1 이상). 버전별 변경은 아래 [버전별 변경 사항](#버전별-변경-사항)을 참고하세요.
+**9.0.0**부터 Remocon은 공개 [iosignal](https://github.com/remocons/iosignal)·[iosignal-arduino](https://github.com/remocons/iosignal-arduino)와 같은 버전 번호를 씁니다. 같은 번호의 패키지는 함께 쓰도록 맞춘 조합입니다. 9.21.0은 IOSignal Arduino **9.21.0 이상**이 필요합니다. 버전별 변경은 아래 [버전별 변경 사항](#버전별-변경-사항)을 참고하세요.
 
 ## 설치 및 시작
 
@@ -106,6 +106,13 @@ Wi-Fi 비밀번호와 장치 인증키를 공개 저장소에 올리지 마세�
 - **큰 메시지가 오지 않음:** 수신 버퍼(`setRxBuffer`)보다 큰 메시지는 서버가 보내지 않거나(9.0 서버), 장치가 건너뜁니다. 필요하면 버퍼 크기를 늘리세요. 보드 메모리를 고려해야 합니다.
 
 ## 버전별 변경 사항
+
+### 9.21.0
+
+- **IOSignal Arduino 9.21.0이 필요합니다.** 의존성을 `IOSignal (>=9.21.0)`으로 올렸습니다. 9.21.0은 응답 없는 연결을 스스로 끊고 다시 연결하고, 다시 연결을 기다리는 동안 `loop()`를 멈추지 않으며, 로그인 nonce를 바꾼 Boho 1.1.0을 씁니다. 자세한 내용은 [IOSignal Arduino 9.21.0](https://github.com/remocons/iosignal-arduino/releases/tag/v9.21.0)에 있습니다.
+- **`uno-ethernet-ir`: 장치 키를 넣어도 UNO에 들어갑니다.** 스케치를 줄여 `io.auth("id.key")`의 주석을 풀어도 플래시에 들어갑니다(키 없이 31,996바이트, 키 사용 약 32,210바이트, 최대 32,256). 전에는 키를 넣으면 플래시를 넘었습니다. 리모컨 코드와 보내는 신호, `on`/`off`/`toggle` 명령은 그대로이고, 받은 신호의 시리얼 출력은 `@ toggle`처럼 한 줄로 줄었습니다.
+- 재연결 중에 `loop()`가 멈추지 않으므로, 연결이 끊긴 동안에도 예제의 버튼과 보드 설정이 동작합니다.
+- 버전 번호를 공개 iosignal 9.21.0과 맞췄습니다. 9.15~9.20 번호의 Remocon은 없습니다.
 
 ### 9.14.8
 
