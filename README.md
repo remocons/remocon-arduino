@@ -11,7 +11,7 @@
 
 ## 버전
 
-**9.0.0**부터 Remocon은 공개 [iosignal](https://github.com/remocons/iosignal)·[iosignal-arduino](https://github.com/remocons/iosignal-arduino)와 같은 버전 번호를 씁니다. 같은 번호의 패키지는 함께 쓰도록 맞춘 조합입니다. 9.21.0은 IOSignal Arduino **9.21.0 이상**이 필요합니다. 버전별 변경은 아래 [버전별 변경 사항](#버전별-변경-사항)을 참고하세요.
+**9.0.0**부터 Remocon은 공개 [iosignal](https://github.com/remocons/iosignal)·[iosignal-arduino](https://github.com/remocons/iosignal-arduino)와 같은 버전 번호를 씁니다. 같은 번호의 패키지는 함께 쓰도록 맞춘 조합입니다. 9.22.0은 IOSignal Arduino **9.21.0 이상**이 필요합니다. 버전별 변경은 아래 [버전별 변경 사항](#버전별-변경-사항)을 참고하세요.
 
 ## 설치 및 시작
 
@@ -57,6 +57,7 @@ IOSignal Arduino 라이브러리 설치와 UNO Ethernet 실습은 [iosignal.net 
 | `uno-ethernet-button` | UNO R3 + W5100 Ethernet 실드 | D2 버튼, D5 LED, D6 릴레이 출력 |
 | `uno-ethernet-ir` | UNO R3 + W5100 Ethernet 실드 | D2 NEC 적외선 수신기, D5·D6 출력 |
 | `esp32cam` | ESP32-CAM (AI Thinker) | 사진을 remocon.kr 장치 카드로 보냄(`camera.1`), E2E 키로 암호화 가능 |
+| `esp32cam-session` | ESP32-CAM (AI Thinker) | 사진을 카드 하나만 열 수 있게 보냄(`camera-session.1`): E2E 키로 서로 확인하고 X25519로 세션 키를 새로 정함 |
 
 모든 예제가 모든 보드에서 컴파일되는 것은 아닙니다. ESP32-C3 제품별 LED 종류와 핀 번호도 다를 수 있으므로 실제 보드에 맞게 수정하세요.
 ESP-01은 부팅 시 GPIO 0·2 상태의 영향을 받으므로 버튼·릴레이 배선도 확인해야 합니다.
@@ -106,6 +107,12 @@ Wi-Fi 비밀번호와 장치 인증키를 공개 저장소에 올리지 마세�
 - **큰 메시지가 오지 않음:** 수신 버퍼(`setRxBuffer`)보다 큰 메시지는 서버가 보내지 않거나(9.0 서버), 장치가 건너뜁니다. 필요하면 버퍼 크기를 늘리세요. 보드 메모리를 고려해야 합니다.
 
 ## 버전별 변경 사항
+
+### 9.22.0
+
+- **새 예제 `esp32cam-session`:** ESP32-CAM 사진을 remocon.kr 카드 하나만 열 수 있게 보냅니다(공식 타입 `camera-session.1`). 보드 설정 `e2e_key`(필수)는 카드와 장치가 서로 확인하는 데만 쓰고, 사진은 X25519로 카드와 새로 정한 세션 키로 암호화합니다. 세션의 비밀값은 메모리에만 있어, 나중에 E2E 키가 새어도 녹화해 둔 지난 사진은 풀리지 않습니다. 세션은 재부팅, 다시 접속, 키 변경, 10분 경과로 끝나고 카드가 새로 맺습니다. 다른 브라우저는 '이 브라우저로 받기'로 세션을 가져올 수 있습니다. 키 교환은 예제 폴더의 `E2ESession.h`에 있습니다.
+- 라이브러리 소스(`src/`)와 기존 예제는 바뀌지 않았습니다. IOSignal Arduino는 9.21.0 그대로 씁니다.
+- 버전 번호를 공개 iosignal 9.22.0과 맞췄습니다.
 
 ### 9.21.0
 

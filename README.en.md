@@ -11,7 +11,7 @@ Communication uses the [IOSignal Arduino client](https://github.com/remocons/ios
 
 ## Versions
 
-From **9.0.0**, Remocon uses the same version number as the public [iosignal](https://github.com/remocons/iosignal) and [iosignal-arduino](https://github.com/remocons/iosignal-arduino) packages. Packages with the same number are meant to be used together. 9.21.0 requires IOSignal Arduino **9.21.0 or later**. See [Changes by version](#changes-by-version) below.
+From **9.0.0**, Remocon uses the same version number as the public [iosignal](https://github.com/remocons/iosignal) and [iosignal-arduino](https://github.com/remocons/iosignal-arduino) packages. Packages with the same number are meant to be used together. 9.22.0 requires IOSignal Arduino **9.21.0 or later**. See [Changes by version](#changes-by-version) below.
 
 ## Installation and getting started
 
@@ -57,6 +57,7 @@ Installing the IOSignal Arduino library and the UNO Ethernet exercise are in the
 | `uno-ethernet-button` | UNO R3 + W5100 Ethernet shield | D2 button, D5 LED, D6 relay output |
 | `uno-ethernet-ir` | UNO R3 + W5100 Ethernet shield | D2 NEC infrared receiver, D5 and D6 outputs |
 | `esp32cam` | ESP32-CAM (AI Thinker) | Sends pictures to the remocon.kr device card (`camera.1`), optionally encrypted with an E2E key |
+| `esp32cam-session` | ESP32-CAM (AI Thinker) | Sends pictures only one card can open (`camera-session.1`): both sides prove the E2E key and agree a new session key over X25519 |
 
 Not every example compiles for every board. LED types and pin assignments can also vary between ESP32-C3 products; adjust the sketch for your actual board.
 On ESP-01, GPIO 0 and GPIO 2 affect boot behavior, so check the button and relay wiring as well.
@@ -106,6 +107,12 @@ Revoke and reissue any real authentication key that has already been published. 
 - **Large messages do not arrive:** Messages larger than the receive buffer (`setRxBuffer`) are not sent by a 9.0 server, or are skipped by the device. Increase the buffer if needed, keeping the board's memory in mind.
 
 ## Changes by version
+
+### 9.22.0
+
+- **New example `esp32cam-session`:** an ESP32-CAM whose pictures only one remocon.kr card can open (official type `camera-session.1`). The board setting `e2e_key` (required) only lets the card and the board prove each other; pictures are encrypted with a session key they agree over X25519. The session's secrets stay in memory, so an E2E key leaked later does not open recorded pictures. A reboot, a new connection, a new key or 10 minutes end the session and the card makes a new one. Another browser can take the session with the card's '이 브라우저로 받기' (receive in this browser) button. The key exchange is in `E2ESession.h` in the example folder.
+- No changes in the library sources (`src/`) or the other examples. IOSignal Arduino stays at 9.21.0.
+- The version number matches the public iosignal 9.22.0 package.
 
 ### 9.21.0
 
