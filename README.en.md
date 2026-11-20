@@ -2,111 +2,19 @@
 
 [한국어](README.md) | **English**
 
-Arduino remote-control and messaging examples for the [remocon.kr](https://remocon.kr/) and [IOSignal Communication Workbench (test.iosignal.net)](https://test.iosignal.net/) web apps.
-Communication uses the [IOSignal Arduino client](https://github.com/remocons/iosignal-arduino).
+**The Remocon Arduino examples moved to [IOSignal Arduino](https://github.com/remocons/iosignal-arduino) 9.23.0.** The 22 examples and the helper headers (`IOSignalUi.h`, `IOSignalBinding.h`, `IOSignalButtons.h`, formerly `RemoconUi.h`, `RemoconBinding.h`, `RemoconButtons.h`) are under **File > Examples > IOSignal**; example guides, firmware install and board settings are on [arduino.iosignal.net](https://arduino.iosignal.net/) (Korean).
+
+This repository holds no examples now. It is kept for future Remocon-only features. The last version with the examples is [9.22.0](https://github.com/remocons/remocon-arduino/tree/v9.22.0).
 
 <p align="center">
   <img src="docs/assets/iosignal-ecosystem.png" alt="Server, CLI, Node.js, Arduino and remote web apps connected through IOSignal" width="720" />
 </p>
 
-## Versions
-
-From **9.0.0**, Remocon uses the same version number as the public [iosignal](https://github.com/remocons/iosignal) and [iosignal-arduino](https://github.com/remocons/iosignal-arduino) packages. Packages with the same number are meant to be used together. 9.22.0 requires IOSignal Arduino **9.21.0 or later**. See [Changes by version](#changes-by-version) below.
-
-## Installation and getting started
-
-1. Search for `Remocon` in the Arduino IDE Library Manager and install it with its dependencies.
-   To install from source, download a ZIP from the [public repository](https://github.com/remocons/remocon-arduino) and add it through **Sketch > Include Library > Add .ZIP Library**.
-2. Install the appropriate board package in Boards Manager, then select your board and port under **Tools > Board / Port**.
-3. Choose an example for your board under **File > Examples > Remocon**. Restart the IDE if the list has not updated.
-4. Replace `WIFI_SSID` and `WIFI_PASS` with your Wi-Fi credentials. Depending on the example, edit the `WIFI_ID` / `WIFI_KEY` macros or the strings passed to `WiFi.begin()` / `wifiMulti.addAP()`. The iris and relay examples use `_secrets.h` in the sketch folder when it exists.
-5. Connect any required LEDs, buttons, or relays, check the pin assignments, then compile and upload.
-6. Open the Serial Monitor at **115200 baud** to check the connection. The ESP-01 example uses the TX pin for an LED and does not provide serial output.
-
-Every example sets its receive buffer with `io.setRxBuffer()` before `io.begin()`. The size is sent to the server when connecting, so keep `setRxBuffer()` before `begin()` when you change an example. The server does not send the device messages larger than that.
-
-The default server for the public examples is `io.remocon.kr`, using TCP port `55488`.
-Ethernet examples use DHCP and require a wired connection to a router that supports DHCP. Assign a unique MAC address to each device when using multiple devices.
-
-## Arduino documentation
-
-Installing the IOSignal Arduino library and the UNO Ethernet exercise are in the [iosignal.net Arduino docs](https://iosignal.net/docs/arduino/). See the `README.md` in each example folder for wiring and steps. New sketches are included in the public repository; open them directly from the repository until they become available through Library Manager.
-
-## Examples by board
-
-| Example path (under `examples/`) | Target board | Behavior / hardware |
-| --- | --- | --- |
-| `iris-group` | iris (ESP32-C3) | Set group and device numbers with DIP switches; control four WS2812 LEDs using buttons or the web app |
-| `iris-basic` | iris (ESP32-C3) | Turn the four built-in RGB LEDs on and off as a 4-way switch (`switch4.1`), two buttons |
-| `iris-basic-controller` | iris (ESP32-C3) | Find another iris running `iris-basic`, control it and mirror its state on its own LEDs |
-| `iris-button-controller` | iris (ESP32-C3) | Two buttons control another device (target CID and button actions are board settings); the four LEDs show the target's channels |
-| `iris-rgb` | iris (ESP32-C3) | Hue and brightness for four LEDs (`iris.2`), number and group from DIP switches |
-| `esp8266-relay4ch` | ESP-12F 4-channel relay board | Four relays (`relay4.1`), `all=1`/`all=0` |
-| `Remocon8266-button-controller` | Remocon8266 board | Buttons control another device by CID (the defaults fit a 4-channel relay board): four buttons, a D6 button, OLED state; button actions are board settings |
-| `button-controller` | ESP8266 D1 mini, ESP32, ESP32-C3, ESP32-S3 + two buttons | Two buttons control another device (relay board, light, group channel); target CID and button actions are board settings |
-| `esp32-cid-led` | ESP32 + external LED on GPIO 4 | Device discovery, CID commands, and actual state reporting with Remocon or the public workbench |
-| `esp32-group-led` | One or two ESP32 boards + external LED on GPIO 4 | Share a group as a 2-way switch (`switch2.1`); each board's output is the board setting `index` |
-| `wifi-simple` | ESP-01, ESP8266, ESP32, ESP32-C3 | Joins the `#switch` shared switch group and prints its state. Board settings `out`, `out_high` and `button` add an LED or relay following `s1` and a button toggling `s1` |
-| `d1-mini-led-button` | ESP8266 D1 mini | Built-in LED and GPIO 14 (D5) button control |
-| `esp01-relay-button` | ESP8266 ESP-01 | Relay on GPIO 0, LED on GPIO 1, button on GPIO 2 |
-| `esp01-button-controller` | ESP8266 ESP-01 + a button | A button on GPIO 3 (RX) controls another device (target CID and button action are board settings); the built-in LED (GPIO 1) shows the target's state |
-| `Remocon8266-basic` | Dedicated Remocon8266 board | Three outputs (`switch3.1`) controlled from the web app, with the state and where the change came from on the OLED; see the schematic in the folder |
-| `Remocon8266-tv` | Dedicated Remocon8266 board + bayo.tv | Four buttons control a bayo.tv screen; play state, volume and title (the chapter title in a video with chapters) on the OLED |
-| `Remocon8266-scanner` | Dedicated Remocon8266 board | Finds the devices on the same router with `#search` and lists them on the OLED; pick one with the buttons to see its CID, name, type and state |
-| `uno-r4-wifi-heart` | Arduino UNO R4 WiFi | LED matrix heart, built-in LED, and D12 button |
-| `uno-ethernet-button` | UNO R3 + W5100 Ethernet shield | D2 button, D5 LED, D6 relay output |
-| `uno-ethernet-ir` | UNO R3 + W5100 Ethernet shield | D2 NEC infrared receiver, D5 and D6 outputs |
-| `esp32cam` | ESP32-CAM (AI Thinker) | Sends pictures to the remocon.kr device card (`camera.1`), optionally encrypted with an E2E key |
-| `esp32cam-session` | ESP32-CAM (AI Thinker) | Sends pictures only one card can open (`camera-session.1`): both sides prove the E2E key and agree a new session key over X25519 |
-
-Not every example compiles for every board. LED types and pin assignments can also vary between ESP32-C3 products; adjust the sketch for your actual board.
-On ESP-01, GPIO 0 and GPIO 2 affect boot behavior, so check the button and relay wiring as well.
-
-The common communication dependencies are `IOSignal` (9.13.0 or later), `Boho`, and `Crypto`. Individual examples also use `Bounce2`, `U8g2`, `IRremote`, `FastLED`, or `Ethernet`.
-Wi-Fi and UNO R4 LED matrix headers are provided by the relevant board package.
-Dependencies are declared in [library.properties](library.properties). The `architectures=*` declaration is package metadata and does not guarantee that every example supports every board.
-
-## Controlling devices from the web apps
-
-- [remocon.kr](https://remocon.kr/): Device discovery and control UI, with account-based management services.
-- [IOSignal Communication Workbench — test.iosignal.net](https://test.iosignal.net/): Send, receive, subscribe, and inspect logs using board presets or manual input. You can also download the [web app source](https://github.com/remocons/test_iosignal_net) and run it locally.
-
-In the workbench, select your board and connect to the same server as the example. For the default Remocon examples, set the web app server URL to `wss://io.remocon.kr/ws`.
-
-The workbench is available over both [HTTPS](https://test.iosignal.net/) and [HTTP](http://test.iosignal.net/). HTTPS + WSS is recommended for public servers. WS connections from an HTTPS page may be restricted by the browser and local network access permissions; switching to HTTP does not resolve every restriction. To use HTTP, enter `http://test.iosignal.net` directly in the browser address bar and open it anew.
-
-To use remocon.kr:
-
-1. Open [remocon.kr](https://remocon.kr) on a **phone or PC connected to the same router as the Arduino**.
-2. For examples that provide a device listing, select the device in the app after it connects, then control it.
-3. `wifi-simple` joins the `#switch` group and appears in the app as a **shared switch** card. Operate the switches on that card to test it.
-
-Use without an authentication key assumes that the devices are connected to the same router. To control your device from an external network, configure a device authentication key from your app account.
-Check the current web app guidance for account menus, authentication key quotas, and service availability.
-
-## Setting a device authentication key
-
-Sign in to the app and copy `ID_KEY` from the device information under Account.
-In the sketch's `setup()`, uncomment the following line and replace the placeholder with your own value. If the line is absent, add it after `io.begin()` and callback registration.
-
-```cpp
-io.auth("ID_KEY"); // Replace ID_KEY with the actual value issued by the app
-```
-
-Do not publish Wi-Fi passwords or device authentication keys in the public repository. Keep the `WIFI_SSID`, `WIFI_PASS`, and `ID_KEY` placeholders in distributed examples.
-Revoke and reissue any real authentication key that has already been published. Removing it from a file does not remove it from earlier Git history.
-
-## Troubleshooting
-
-- **Stuck waiting for Wi-Fi:** Check the SSID, password, Wi-Fi bands supported by the board, and router connectivity.
-- **Header file not found:** Check your board selection and installation of the dependencies listed above.
-- **Server connection fails:** Check internet connectivity, DNS, and whether communication on TCP port 55488 is allowed.
-- **Device does not appear in the app:** Check whether the example provides a device UI, whether you are on the same router, and whether a guest network or VPN is in use. When using authentication, also check the device key and app account.
-- **LED behavior is inverted:** Check active-low / active-high behavior and pin assignments.
-- **Device stops after authentication and does not reconnect:** When another device or program logs in with the same `ID_KEY`, the server closes the earlier connection and that device stops instead of reconnecting (IOSignal Arduino 7.0.0 and later). Use a separate key for each device.
-- **Large messages do not arrive:** Messages larger than the receive buffer (`setRxBuffer`) are not sent by a 9.0 server, or are skipped by the device. Increase the buffer if needed, keeping the board's memory in mind.
-
 ## Changes by version
+
+### Next version (unreleased)
+
+- **The examples and helper headers moved to IOSignal Arduino 9.23.0.** This library has no examples. An old sketch compiles with IOSignal alone after changing `#include <RemoconUi.h>` to `#include <IOSignalUi.h>` (the same for `RemoconBinding.h` and `RemoconButtons.h`, class `RemoconButtons` → `IOSignalButtons`).
 
 ### 9.22.0
 
@@ -227,12 +135,6 @@ Revoke and reissue any real authentication key that has already been published. 
 
 [MIT License](LICENSE)
 
-- [Remocon web app](https://remocon.kr)
-- [IOSignal Communication Workbench](https://test.iosignal.net/) · [Source repository](https://github.com/remocons/test_iosignal_net)
 - [IOSignal Arduino library](https://github.com/remocons/iosignal-arduino)
-- [Arduino library specification](https://docs.arduino.cc/arduino-cli/library-specification/)
-
-### Public board exercises
-
-- [iris group control](examples/iris-group): Four WS2812 LEDs, GROUP/SELF buttons, DIP switches for group and device numbers.
-
+- [IOSignal Arduino example site arduino.iosignal.net](https://arduino.iosignal.net/)
+- [Remocon web app](https://remocon.kr)
